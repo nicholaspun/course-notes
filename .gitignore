@@ -1,0 +1,7 @@
+**/*.yaml
+**/*.aux
+**/*.fls
+**/*.log
+**/*.out
+**/*.synctex.gz
+**/*.toc
