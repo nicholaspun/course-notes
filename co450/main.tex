@@ -1,0 +1,70 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{parskip}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\setcounter{section}{-1}
+
+\numberwithin{equation}{section}
+
+\begin{document}
+\begin{center}
+    \Large CO450 - Combinatorial Optimization (Fall 2019)
+\end{center}
+
+\tableofcontents
+
+\section{Introduction}
+\subsection{Overview of the Course}
+Combinatorial optimization leverages tools from: combinatorics, linear programming theory and algorithms to \textit{efficiently} solve optimization problems on discrete structures (e.g. graphs)
+
+The course will covering the following topics:
+\begin{itemize}
+    \item Spanning frees - \textit{Given connected, undirected graphs with edge costs, find the minimum spanning tree}
+    \item Max flow, Min cut
+    \item Matroids and matroid optimization
+    \item Matchings and related problems
+    \item Approximation algorithms
+\end{itemize}
+
+\subsection{Review of LP theory}
+A \underline{linear program} (LP) is an optimization problem of the form:
+\begin{equation}\label{eq:intro-review-lp}
+\begin{aligned}
+    \max \quad c^\intercal x & \\
+    \text{s.t.} \quad Ax &\leq b \\
+    x &\geq 0
+\end{aligned}
+\end{equation}
+where $x \in \R^n, \ A \in M_{m \times n}(\R) $, and the objective function and constraints are linear. We must also require that:
+\begin{itemize}
+    \item There are a finite number of variables and constraints
+    \item The inequalities are non-strict
+\end{itemize}
+
+Any LP has 3 possible outcomes:
+\begin{enumerate}
+    \item The LP is \underline{infeasible}
+    \item The LP is \underline{unbounded}, i.e. We can achieve feasible solutions of arbitrarily ``good" objective value. (For \eqref{eq:intro-review-lp}, this means that $\forall v \in \R$ there exists a feasible solution $x$ s.t $c^\intercal x > v$) 
+    \item The LP has an \underline{optimal solution}. (For \eqref{eq:intro-review-lp}, this means there is a feasible solution $x^*$ such that $c^\intercal x^* \geq c^\intercal x \ \forall \ \text{feasible solutions} \ x$)
+\end{enumerate}
+
+
+\end{document}
