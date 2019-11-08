@@ -1,0 +1,43 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+\section{Graph Theory Primer}
+Let $G = (V, E)$ be a graph, where $V$ is the vertex set and $E$ is the edge set.
+\begin{definition}
+   The \textbf{degree} of a vertex $v \in V$ (denoted $\deg(v)$) is the number of edges with one end in $v$. (i.e. The size of the set $\{ va \:\rvert\: a \in V, \ a \neq v \}$).
+
+   A \textbf{walk} is a sequence of vertices $v_1v_2\ldots v_k$ where $v_iv_{i+1}$ is an edge. A \textbf{path} is a walk where all vertices are distinct. A \textbf{cycle} is a walk where $v_1 = v_k$ and $v_1, \ldots v_{k-1}$ are distinct.
+
+   Finally, we say a graph is \textbf{connected} if there exists a path between any two vertices in $G$.
+\end{definition}
+
+\begin{definition}
+  For $S \subset V$, the \textbf{cut} induced by $S$ is the set of all edges with one end in $S$ and one end not in $S$, denoted $\delta(S) = \{uv \in E \:\rvert\: u \in S, \ v \not\in S \}$. Given two vertices $s, t \in V$ with $s \in S, t \not\in S$, we call $\delta(S)$ an \textbf{$s,t$-cut}
+
+  An \textbf{$s,t$-path} is a path with starting vertex $s$ and ends on $t$.
+\end{definition}
+
+\begin{theorem}
+  There exists an $s,t$-path if and only if every $s,t$-cut is nonempty
+\end{theorem}
+
+\begin{definition}
+  A \textbf{tree} is a connected graph with no cycles. A \textbf{spanning tree} is a subgraph that is a tree and has vertex set $V$
+\end{definition}
+Note the following:
+\begin{itemize}
+  \item A tree on $n$ vertices contains $n-1$ edges.
+  \item If $T$ is a tree, then adding an edge $uv \not\in T$ creates exactly one cycle $C$. Moreover, if $xy$ is an edge in $C$, then $T + uv - xy$
+\end{itemize}
+
+Let $D = (N, A)$ be a directed graph. $N$ is a set of nodes and $A$ is a set of ordered pairs of nodes (called arcs).
+
+\begin{definition}
+  For an arc $(u,v)$, we call $u$ the \textbf{tail} and $v$ the \textbf{head}
+\end{definition}
+
+\begin{definition}
+  The \textbf{out-degree} of node $u$ (denoted $d(u)$ or $d^{\text{out}}(u)$) is the number of arcs with tail $u$. The \textbf{in-degree} of node $u$ (denoted $d(\overline{u})$ or $d^{\text{in}}(u)$) is the number of arcs with head $u$.
+\end{definition}
+
+\end{document}
