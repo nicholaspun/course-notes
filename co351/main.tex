@@ -6,6 +6,9 @@
 \usepackage{fullpage}
 \usepackage{hyperref}
 \usepackage{parskip}
+\usepackage{mdframed}
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems}
 
 \usepackage{subfiles} % Best loaded last in the preamble
 
@@ -15,12 +18,13 @@
 \newcommand{\Z}{\mathbb{Z}}
 
 \theoremstyle{definition}
-\newtheorem{definition}{Definition}[section]
-\theoremstyle{remark}
-\newtheorem*{remark}{Remark}
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{corollary}{Corollary}[theorem]
-\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem*{note}{Note}
+
+\newtcbtheorem[number within=section]{definition}{Definition}{colback=black!5,colframe=lightgray!35!black,fonttitle=\bfseries}{defn}
+\newtcbtheorem[number within=section]{theorem}{Theorem}{colback=black!5,colframe=yellow!35!black,fonttitle=\bfseries}{th}
+\newtcbtheorem[number within=section]{proposition}{Proposition}{colback=black!5,colframe=yellow!50!black,fonttitle=\bfseries}{prop}
+\newtcbtheorem[number within=section]{lemma}{Lemma}{colback=black!5,colframe=yellow!50!black,fonttitle=\bfseries}{lem}
+\newtcbtheorem[number within=section]{corollary}{Corollary}{colback=black!5,colframe=yellow!35!black,fonttitle=\bfseries}{corol}
 \numberwithin{equation}{section}
 
 \begin{document}
