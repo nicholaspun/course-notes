@@ -4,15 +4,15 @@
 \section{Graph Theory Primer}
 Let $G = (V, E)$ be a graph, where $V$ is the vertex set and $E$ is the edge set.
 \begin{definition}{}{}
-   The \textbf{degree} of a vertex $v \in V$ (denoted $\deg(v)$) is the number of edges with one end in $v$. (i.e. The size of the set $\{ va \:\rvert\: a \in V, \ a \neq v \}$). \\
+   The \textbf{degree} of a vertex $v \in V$ (denoted $\deg(v)$) is the number of edges with one end in $v$. (i.e. The size of the set $\{ va \:\rvert\: a \in V, \ a \neq v \}$).
 
-   A \textbf{walk} is a sequence of vertices $v_1v_2\ldots v_k$ where $v_iv_{i+1}$ is an edge. A \textbf{path} is a walk where all vertices are distinct. A \textbf{cycle} is a walk where $v_1 = v_k$ and $v_1, \ldots v_{k-1}$ are distinct. \\
+   A \textbf{walk} is a sequence of vertices $v_1v_2\ldots v_k$ where $v_iv_{i+1}$ is an edge. A \textbf{path} is a walk where all vertices are distinct. A \textbf{cycle} is a walk where $v_1 = v_k$ and $v_1, \ldots v_{k-1}$ are distinct.
 
    Finally, we say a graph is \textbf{connected} if there exists a path between any two vertices in $G$.
 \end{definition}
 
 \begin{definition}{}{}
-  For $S \subset V$, the \textbf{cut} induced by $S$ is the set of all edges with one end in $S$ and one end not in $S$, denoted $\delta(S) = \{uv \in E \:\rvert\: u \in S, \ v \not\in S \}$. Given two vertices $s, t \in V$ with $s \in S, t \not\in S$, we call $\delta(S)$ an \textbf{$s,t$-cut} \\
+  For $S \subset V$, the \textbf{cut} induced by $S$ is the set of all edges with one end in $S$ and one end not in $S$, denoted $\delta(S) = \{uv \in E \:\rvert\: u \in S, \ v \not\in S \}$. Given two vertices $s, t \in V$ with $s \in S, t \not\in S$, we call $\delta(S)$ an \textbf{$s,t$-cut}
 
   An \textbf{$s,t$-path} is a path with starting vertex $s$ and ends on $t$.
 \end{definition}
@@ -33,11 +33,11 @@ Note the following:
 Let $D = (N, A)$ be a directed graph. $N$ is a set of nodes and $A$ is a set of ordered pairs of nodes (called arcs).
 
 \begin{definition}{}{}
-  For an arc $(u,v)$, we call $u$ the \textbf{tail} and $v$ the \textbf{head}. \\
+  For an arc $(u,v)$, we call $u$ the \textbf{tail} and $v$ the \textbf{head}.
 
-  The \textbf{out-degree} of node $u$ (denoted $d(u)$ or $d^{\text{out}}(u)$) is the number of arcs with tail $u$. The \textbf{in-degree} of node $u$ (denoted $d(\overline{u})$ or $d^{\text{in}}(u)$) is the number of arcs with head $u$. \\
+  The \textbf{out-degree} of node $u$ (denoted $d(u)$ or $d^{\text{out}}(u)$) is the number of arcs with tail $u$. The \textbf{in-degree} of node $u$ (denoted $d(\overline{u})$ or $d^{\text{in}}(u)$) is the number of arcs with head $u$.
 
-  A \textbf{diwalk} is a sequence of nodes $v_1v_2\ldots v_k$ where $(v_i, v_{i+1})$ is an arc. \textbf{Dipaths} and \textbf{Dicycle} are defined analgous to simple graphs but with arcs instead of edges. \\
+  A \textbf{diwalk} is a sequence of nodes $v_1v_2\ldots v_k$ where $(v_i, v_{i+1})$ is an arc. \textbf{Dipaths} and \textbf{Dicycle} are defined analgous to simple graphs but with arcs instead of edges.
 
   For $S \subset N$, the \textbf{cut} induced by $S$ is denoted $\delta(S) = \{ (u,v) \in A \:\rvert\: u \in S, v \not\in S \}$. (sometimes written as $\delta^{\text{out}}(S)$) This is the set of arcs with tail in $S$.
   We denote the complement of $S$ by $\overline{S}$, and define $\delta(\overline{S}) = \{ (u,v) \in A \:\rvert\: u \not\in S, v \in S \}$ (sometimes written as $\delta^{\text{in}}(S))$) to be the set of arcs with head in $S$. Finally, if $s \in S, t \not\in S$, then $\delta(S)$ is an $s,t$-cut.
@@ -70,7 +70,8 @@ Since $x \in S$, an $s,x$-dipath $P$ exists and since $y \not\in S$, there does 
     \]
   \end{itemize}
 \end{definition}
-\begin{example}
+
+\begin{example}{}{}
 An example of a digraph $D = (N, A)$ (on the left) and its corresponding node-arc incidence matrix on the right.
 
 \begin{minipage}[t]{\textwidth}

@@ -19,6 +19,7 @@
 \tikzset{edge/.style = {->, > = stealth, shorten > = 1pt, thick}}
 
 \usepackage{hyperref}
+\usepackage{cleveref}
 \usepackage{subfiles} % Best loaded last in the preamble
 
 \newcommand{\R}{\mathbb{R}}
@@ -26,23 +27,24 @@
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand{\Z}{\mathbb{Z}}
 
-\newtcbtheorem[number within=section]{definition}{Definition}{colback=black!5,colframe=lightgray!35!black,fonttitle=\bfseries}{defn}
-\newtcbtheorem[number within=section]{theorem}{Theorem}{colback=black!5,colframe=yellow!35!black,fonttitle=\bfseries}{th}
-\newtcbtheorem[number within=section]{proposition}{Proposition}{colback=black!5,colframe=yellow!50!black,fonttitle=\bfseries}{prop}
-\newtcbtheorem[number within=section]{lemma}{Lemma}{colback=black!5,colframe=yellow!50!black,fonttitle=\bfseries}{lem}
-\newtcbtheorem[number within=section]{corollary}{Corollary}{colback=black!5,colframe=yellow!35!black,fonttitle=\bfseries}{corol}
+\newtcbtheorem[number within=section]{definition}{Definition}{colback=black!5,colframe=lightgray!35!black,fonttitle=\bfseries,parbox=false}{defn}
+\newtcbtheorem[number within=section]{theorem}{Theorem}{colback=black!5,colframe=yellow!35!black,fonttitle=\bfseries,parbox=false}{th}
+\newtcbtheorem[number within=section]{proposition}{Proposition}{colback=black!5,colframe=yellow!50!black,fonttitle=\bfseries,parbox=false}{prop}
+\newtcbtheorem[number within=section]{lemma}{Lemma}{colback=black!5,colframe=yellow!50!black,fonttitle=\bfseries,parbox=false}{lem}
+\newtcbtheorem[number within=section]{corollary}{Corollary}{colback=black!5,colframe=yellow!35!black,fonttitle=\bfseries,parbox=false}{corol}
+\newtcbtheorem[number within=section]{example}{Example}{colback=white,colframe=blue!25!black!50,fonttitle=\bfseries, parbox=false}{exmp}
 
-\newtheoremstyle{break}% name
-  {}%         Space above, empty = `usual value'
-  {}%         Space below
-  {}%         Body font
-  {}%         Indent amount (empty = no indent, \parindent = para indent)
-  {\bfseries}% Thm head font
-  {}%         Punctuation after thm head
-  {\newline}% Space after thm head: \newline = linebreak
-  {}%         Thm head spec
-\theoremstyle{break}
-\newtheorem{example}{Example}[section]
+% \newtheoremstyle{break}% name
+%   {}%         Space above, empty = `usual value'
+%   {}%         Space below
+%   {}%         Body font
+%   {}%         Indent amount (empty = no indent, \parindent = para indent)
+%   {\bfseries}% Thm head font
+%   {}%         Punctuation after thm head
+%   {\newline}% Space after thm head: \newline = linebreak
+%   {}%         Thm head spec
+% \theoremstyle{break}
+% \newtheorem{example}{Example}[section]
 
 \numberwithin{equation}{section}
 
