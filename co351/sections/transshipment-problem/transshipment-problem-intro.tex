@@ -1,0 +1,155 @@
+\subsection{Introduction}
+Let $D = (N,A)$ be a digraph, $b \in \R^N$ \textit{node demands}, and $w \in \R^A$ \textit{arc costs}. We call $x \in \R^A$ a \textit{flow}, if it satisfies:
+\begin{equation*}
+  \sum_{uv \in A} x_{uv} - \sum_{vk \in A} x_{vk} = b_v \quad \forall v \in N
+\end{equation*}
+That is, for every node, we want the net flow through the node (the flow into the node minus the flow out of the node) to be equal to the demand of the node.
+Define $x(S) := \sum_{uv \in S} x_{uv}$. We will usually write the above constraint in the following form:
+\begin{equation*}
+ x(\delta(\overline{v})) - x(\delta(v)) = b_v \quad \forall v \in N
+\end{equation*}
+
+\begin{example}{}{}
+The left shows a digraph $D = (N,A)$, along with the node demands next to each node and the arcs costs on each arc. The right shows a feasible flow.
+
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \begin{tikzpicture}[node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$100$} (b);
+      \draw[edge] (a) to node {$30$} (c);
+      \draw[edge] (a) to node {$50$} (d);
+      \draw[edge] (c) to node {$80$} (b);
+      \draw[edge] (c) to node {$20$} (e);
+      \draw[edge] (d) to node {$30$} (c);
+      \draw[edge] (d) to node {$40$} (e);
+      \draw[edge] (e) to node {$40$} (b);
+    \end{scope}
+  \end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \begin{tikzpicture}[node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$5$} (b);
+      \draw[edge] (a) to node {$0$} (c);
+      \draw[edge] (a) to node {$0$} (d);
+      \draw[edge] (c) to node {$2$} (b);
+      \draw[edge] (c) to node {$0$} (e);
+      \draw[edge] (d) to node {$2$} (c);
+      \draw[edge] (d) to node {$3$} (e);
+      \draw[edge] (e) to node {$0$} (b);
+    \end{scope}
+  \end{tikzpicture}
+\end{minipage}
+\end{example}
+
+Given the inputs: $D = (N,A), b \in \R^N, w \in \R^A$, the \textbf{goal} in the transshipment problem (TP) is to find a flow of minimum cost, where the cost of a flow is defined as $w^\intercal x = \sum_{ij \in A} w_{ij}x_{ij}$.
+
+A common theme throughout this course will be to view our problems through the lens of linear programs (LP). Below is the LP formulation for the TP problem:
+\begin{equation}\label{eq:tp_lp-formulation}
+\begin{aligned}
+  \min \quad &w^\intercal x \\
+  \text{s.t} \quad &x(\delta(\overline{v})) - x(\delta(v)) = b_v \quad \forall v \in N \\
+  &x \geq 0
+\end{aligned}
+\end{equation}
+Alternatively, letting $M$ be the node-arc incidence matrix for our digraph, we can also rewrite the LP like so:
+\begin{align*}
+  \min \quad &w^\intercal x \\
+  \text{s.t} \quad &Mx = b \quad \forall v \in N \\
+  &x \geq 0
+\end{align*}
+We'll also find the dual formulation of this problem useful as well:
+\begin{equation}\label{eq:tp_dual-formulation}
+\begin{aligned}
+    \max \quad &b^\intercal y \\
+    \text{s.t} \quad &y_v - y_u \leq w_{uv} \quad \forall uv \in A \\
+    &y \text{ free}
+\end{aligned}
+\end{equation}
+We call the variables $y \in \R^N$ \textit{node potentials}.
+
+Recall from LP theory that two feasible solutions $x, y$ are optimal if and only if the complementary slackness (CS) conditions hold. What are the CS conditions for our primal-dual pair?
+\begin{equation}
+  x_{uv} = 0 \quad \text{OR} \quad y_v - y_v \leq w_{uv} \quad \forall uv \in A
+\end{equation}
+
+\begin{example}{Optimal flow}{cs-conditions}
+The left shows a digraph $D = (N,A)$, along with the node demands next to each node and the arcs costs on each arc. The right shows (what I claim to be) an optimal flow.
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \begin{tikzpicture}[node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$100$} (b);
+      \draw[edge] (a) to node {$30$} (c);
+      \draw[edge] (a) to node {$50$} (d);
+      \draw[edge] (c) to node {$80$} (b);
+      \draw[edge] (c) to node {$20$} (e);
+      \draw[edge] (d) to node {$30$} (c);
+      \draw[edge] (d) to node {$40$} (e);
+      \draw[edge] (e) to node {$40$} (b);
+    \end{scope}
+  \end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \begin{tikzpicture}[node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$0$} (b);
+      \draw[edge] (a) to node {$5$} (c);
+      \draw[edge] (a) to node {$0$} (d);
+      \draw[edge] (c) to node {$0$} (b);
+      \draw[edge] (c) to node {$5$} (e);
+      \draw[edge] (d) to node {$0$} (c);
+      \draw[edge] (d) to node {$5$} (e);
+      \draw[edge] (e) to node {$7$} (b);
+    \end{scope}
+  \end{tikzpicture}
+\end{minipage}
+
+Using the CS conditions, let's check that the flow is indeed optimal.
+
+First, check visually that $x$ is a feasible flow. Then, the CS conditions tell us that $x_{uv} = 0$ or $y_v - y_u = w_{uv}$. There are 4 arcs with non-zero flow, so the following 4 equations must hold:
+\begin{itemize}
+  \item $y_c - y_a = 30$
+  \item $y_e - y_c = 20$
+  \item $y_b - y_e = 40$
+  \item $y_e - y_d = 40$
+\end{itemize}
+We have $4$ equation, but $5$ unknowns. But, since $y$ is free, we can set $y_a = 0$. This will give us: $y_b = 90, y_c = 30, y_d = 10, y_e = 50$. And, it remains to check that $y$ with these values is feasible.
+\begin{itemize}
+  \item $y_b - y_a \leq 100 \longrightarrow 90 - 0 = 90 \leq 100$
+  \item $y_d - y_a \leq 50 \longrightarrow 10 - 0 = 10 \leq 50$
+  \item $y_d - y_c \leq 30 \longrightarrow 10 - 30 = -20 \leq 30$
+  \item $y_c - y_b \leq 80 \longrightarrow 30 - 90 = -60 \leq 80$
+\end{itemize}
+So, both $x, y$ are feasible, and the complementary slackeness conditions hold. As such, $x, y$ are both optimal solutions. The optimal value to this TP is: $730$.
+\end{example}
+\begin{note} Always make sure that both $x,y$ are feasible! \end{note}

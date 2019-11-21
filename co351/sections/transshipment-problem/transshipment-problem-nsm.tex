@@ -1,0 +1,285 @@
+\subsection{Network Simplex Method}
+We've described the basic foundations for the transshipment problem. Our goal now is to translate the simplex method into an algorithm for solving TPs.
+
+\begin{remark}
+We will assume $\sum_{v \in N} b_v = 0$ and that $D = (N,A)$ is connected.
+\end{remark}
+
+\subsubsection{Finding a basis}
+
+Let's take a look at the incidence matrix of the digraph from \Cref{exmp:cs-conditions}:
+\[
+  \begin{blockarray}{rrrrrrrrr}
+      & ab & ac & ad & cb & eb & dc & ce & de \\
+  \begin{block}{l[rrrrrrrr]}
+    a & -1 & -1 & -1 &  0 &  0 &  0 &  0 &  0 \\
+    b &  1 &  0 &  0 &  1 &  1 &  0 &  0 &  0 \\
+    c &  0 &  1 &  0 & -1 &  0 &  1 & -1 &  0 \\
+    d &  0 &  0 &  1 &  0 &  0 & -1 &  0 & -1 \\
+    e &  0 &  0 &  0 &  0 & -1 &  0 &  1 &  1 \\
+  \end{block}
+  \end{blockarray}
+\]
+Suppose we were to add up all the rows of this matrix. There is exactly one $-1$ and one $+1$ in each column (and the rest of the entries are $0$). As, such, the sum in each column is $0$, and so the sum of all the rows is the zero vector!
+
+In general, if we were to add up all $|N|$ rows of some incidence matrix, we will get the zero vector. So, the rows are linearly dependent, and the rank of our incidence matrix must be $< |N|$!
+This suggests that we can only choose at most $|N| - 1$ columns to form our basis, and in fact, we will prove that the rank is precisely $|N| - 1$.
+
+\begin{proposition}{}{tp_cycle-implies-ld}
+  The columns of the incidence matrix corresponding to a cycle are linearly dependent.
+\end{proposition}
+We'll use the following definition in our proof.
+\begin{definition}{Forward/Backward Arc}{}
+  For an (undirected) cycle $v_0v_1\ldots v_{k-1}v_0$ in a digraph $D = (N,A)$, an arc of the form $v_iv_{i+1}$ is \underline{forward} arc and an arc of the form $v_{i+1}v_i$ is a \underline{backward} arc.
+\end{definition}
+\begin{proof}
+Let $C$ be a cycle and $M_C$ be the submatrix formed by taking the columns corresponding to arcs of $C$ from the incidence matrix $M$.
+ Create a new matrix $M_C'$ by taking the columns of $M_C$ corresponding to backwards arcs and multiplying them by $-1$.
+ $M_C'$ is the incidence matrix of a cycle where every arc is a forward arc (and so a directed cycle).
+
+ For every node $v \in C$, $d(v) = d(\overline{v}) = 1$, so for every row representing $v$ in $M_C'$, there is exactly one entry with $1$ and one entry with $-1$.
+ The sum of the entries of each row in $M_C'$ will be $0$, and so the sum of the columns of $M_C'$ is $0$, hence the columns of $M_C$ are linearly dependent.
+\end{proof}
+
+In fact, the converse of this statement will also hold.
+\begin{proposition}{}{tp_ld-implies-cycle}
+  A set of linearly dependent columns of the incidence matrix must include a cycle.
+\end{proposition}
+\begin{proof}
+  Let $B$ be a set of linearly dependent columns in $M$.
+  There exists a nontrivial linear combination of these columns that equal $0$.
+  Let $B' = \{e_1, \ldots, e_k \}$ be the subset of columns in $B$ where $c_1M_{e_1} + \ldots + c_kM_{e_k} = 0, c_1, \ldots, c_k \in \R$ and all $c_i \neq 0$. (Here, $M_{e_k}$ denotes the column corresponding to the arc $e_k$)
+  For each node $v$, the sum of the entries of that row equals $0$, i.e. $c_1M_{v,e_1} + \ldots + c_kM_{v, e_k} = 0$. ($M_{v,e_i}$ represents the entry for node $v$ in column $e_i$).
+  Let $S$ be the subset of nodes where $M_{v,e_i} \neq 0$ for at least one $i$.
+  Since $M_{v, e_i} \neq 0$, then $c_iM_{v, e_i} \neq 0$, and so there must be another entry for node $v$ with $M_{v, e_j} \neq 0, j \neq i$.
+  Hence, for each node $v \in S$, there are at least 2 arcs in $B'$ whose columns in $M$ have non-zero entries for $v$, and each of these arcs are incident to $v$.
+  Therefore, the subgraph with $S$ as the nodes and $B'$ as the arcs have the property that every node has degree at least 2, and so must contain a cycle.
+\end{proof}
+
+\Cref{prop:tp_cycle-implies-ld,prop:tp_ld-implies-cycle} tells is that a basis in our algorithm will be a maximal set of arcs that do not contain a cycle. This is precisely a spanning tree! Let's summarize this in the following theorem:
+
+\begin{theorem}{}{}
+  Let $M$ be the incidence matrix of a connected digraph $D = (N, A)$. Then, a set of $|N|-1$ columns of $M$ is a basis if and only if these $|N|-1$ arcs corresponding to the columns form a spanning tree of $D$
+\end{theorem}
+
+\begin{example}{Finding a flow given a tree}{tp_find-tree-flow}
+The left shows a digraph $D = (N,A)$, along with the node demands next to each node and the arcs costs on each arc. The right shows a tree in $D$, can we find a flow based on it?
+
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \begin{tikzpicture}[node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$100$} (b);
+      \draw[edge] (a) to node {$30$} (c);
+      \draw[edge] (a) to node {$50$} (d);
+      \draw[edge] (c) to node {$80$} (b);
+      \draw[edge] (c) to node {$20$} (e);
+      \draw[edge] (d) to node {$30$} (c);
+      \draw[edge] (d) to node {$40$} (e);
+      \draw[edge] (e) to node {$40$} (b);
+    \end{scope}
+  \end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \begin{tikzpicture}[node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) edge (d);
+      \draw[edge] (c) edge (b);
+      \draw[edge] (d) edge (c);
+      \draw[edge] (d) edge (e);
+    \end{scope}
+  \end{tikzpicture}
+\end{minipage}
+
+First, note that we can solve for the reduced system $M_Tx = b_T$ ... but that's a lot of work. Instead, let's just look at the graph and do this in an iterative fashion:
+\begin{enumerate}[label=(\arabic*)]
+  \item Start with a leaf. For example, here we can pick node $a$. Its demand is $-5$, and the only arc it can send flow through is $ad$, so $ad$ must have a flow of $5$ units.
+  \item Now, $d$ must has $-5$ demand as well, so it must send a total of $10$ ($5$ from $a$ and $5$ by itself) to nodes $c$ and $e$. $e$ has a demand of $3$, so let's send $3$ flow through $de$ and the remaining flow ($7$) goes through $dc$.
+  \item Finally, $c$ has $0$ demand, but it just received $7$ flow from $d$, so it must send $7$ flow through $cb$ to $b$. Good thing $b$ has demand $7$!
+\end{enumerate}
+
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \begin{tikzpicture}[scale = 0.75, node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$5$} (d);
+      \draw[edge] (c) edge (b);
+      \draw[edge] (d) edge (c);
+      \draw[edge] (d) edge (e);
+    \end{scope}
+  \end{tikzpicture}
+  \captionof*{figure}{(1)}
+\end{minipage}
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \begin{tikzpicture}[scale = 0.75, node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$5$} (d);
+      \draw[edge] (c) edge (b);
+      \draw[edge] (d) to node {$7$} (c);
+      \draw[edge] (d) to node {$3$} (e);
+    \end{scope}
+  \end{tikzpicture}
+  \captionof*{figure}{(2)}
+\end{minipage}
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \begin{tikzpicture}[scale = 0.75, node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$5$} (d);
+      \draw[edge] (c) to node {$7$} (b);
+      \draw[edge] (d) to node {$7$} (c);
+      \draw[edge] (d) to node {$3$} (e);
+    \end{scope}
+  \end{tikzpicture}
+  \captionof*{figure}{(3)}
+\end{minipage}
+\end{example}
+
+In \Cref{exmp:tp_find-tree-flow}, we're given a spanning tree and can successfully find a corresponding tree flow. Can we do this for all spanning trees?
+
+\begin{example}{Finding another (?) flow given a tree}{tp_find-tree-flow-infeasible}
+The left shows a digraph $D = (N,A)$, along with the node demands next to each node and the arcs costs on each arc. The right shows a tree in $D$, can we find a flow based on it?
+
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \begin{tikzpicture}[node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$100$} (b);
+      \draw[edge] (a) to node {$30$} (c);
+      \draw[edge] (a) to node {$50$} (d);
+      \draw[edge] (c) to node {$80$} (b);
+      \draw[edge] (c) to node {$20$} (e);
+      \draw[edge] (d) to node {$30$} (c);
+      \draw[edge] (d) to node {$40$} (e);
+      \draw[edge] (e) to node {$40$} (b);
+    \end{scope}
+  \end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \begin{tikzpicture}[node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) edge (c);
+      \draw[edge] (a) edge (d);
+      \draw[edge] (c) edge (b);
+      \draw[edge] (d) edge (e);
+    \end{scope}
+  \end{tikzpicture}
+\end{minipage}
+
+Again, let's work through the tree, starting at the leaf $b$
+\begin{enumerate}[label=(\arabic*)]
+  \item $b$ has demand $7$, so it'll need $7$ flow from $c$
+  \item $c$ has demand $0$, so it'll need $7$ flow from $a$
+  \item $a$ has demand $-5$, but it's already pushed $7$ flow through $ac$. That means it must push $-2$ flow through $ad$ ... that doesn't seem right as flow is nonnegative!
+\end{enumerate}
+
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \begin{tikzpicture}[scale = 0.75, node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) edge (c);
+      \draw[edge] (a) edge (d);
+      \draw[edge] (c) to node {$7$} (b);
+      \draw[edge] (d) edge (e);
+    \end{scope}
+  \end{tikzpicture}
+  \captionof*{figure}{(1)}
+\end{minipage}
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \begin{tikzpicture}[scale = 0.75, node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$7$} (c);
+      \draw[edge] (a) edge (d);
+      \draw[edge] (c) to node {$7$} (b);
+      \draw[edge] (d) edge (e);
+    \end{scope}
+  \end{tikzpicture}
+  \captionof*{figure}{(2)}
+\end{minipage}
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \begin{tikzpicture}[scale = 0.75, node distance = 3cm]
+    \node[vertex][label={$-5$}] (a) at (0,4) {a};
+    \node[vertex][label={$7$}] (b) at (4,4) {b};
+    \node[vertex][label={$0$}] (c) at (2,2) {c};
+    \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+    \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$7$} (c);
+      \draw[edge] (a) to node {$-2$ ?} (d);
+      \draw[edge] (c) to node {$7$} (b);
+      \draw[edge] (d) edge (e);
+    \end{scope}
+  \end{tikzpicture}
+  \captionof*{figure}{(3)}
+\end{minipage}
+\end{example}
+
+Indeed, as one can see from \Cref{exmp:tp_find-tree-flow-infeasible}, we can't simply pick any spanning tree for our basis. This raises the following question.
+
+\textbf{Question: }How do we find an initial basic feasible solution?
+
+We will cover this in \Cref{sec:tp_feasiblity-characterization} (Hint: We want to construct an auxiliary TP and solve that problem)
+
+\subsubsection{Entering and Leaving variables}
