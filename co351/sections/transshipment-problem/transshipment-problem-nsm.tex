@@ -1,4 +1,4 @@
-\subsection{Network Simplex Method}
+\subsection{Network Simplex Method}\label{sec:tp_nsm}
 We've described the basic foundations for the transshipment problem. Our goal now is to translate the simplex method into an algorithm for solving TPs.
 
 \begin{remark}
@@ -552,7 +552,7 @@ We can't have negative flow, so out of all the backward arcs, we can only choose
 \subsubsection{The Algorithm}
 
 \IncMargin{1em}
-\begin{algorithm}[H]
+\begin{algorithm}[H]\label{alg:nsm}
   \SetKwInOut{Input}{Input}
 
   \Input{  
@@ -591,6 +591,6 @@ We can't have negative flow, so out of all the backward arcs, we can only choose
   
   \nl \Return{$T$ with max flow $x$}
   
-  \caption{Network Simplex Algorithm}\label{alg:nsm}
+  \caption{Network Simplex Algorithm}
 \end{algorithm}
 

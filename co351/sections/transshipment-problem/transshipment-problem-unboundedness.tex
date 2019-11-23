@@ -1,0 +1,75 @@
+\subsection{Unboundedness}
+The Network Simplex Algorithm (\Cref{alg:nsm}) we presented previously is not quite complete. 
+We have yet to characterize when a TP is unbounded or infeasible.
+In this section, we'll focus on characterizing unboundedness.
+
+Unboundedness occurs when no leaving arc can be found, so that you can push flow on the entering arc indefinitely. When does this happen? Say $uv$ is the entering arc and the cycle it creates is $T + uv = C = v_1v_2\ldots v_kv_1$:
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[scale = 0.75]
+      \node[vertex][label=below left:{$v_k = u$}] (vk) at (0,0) {};
+      \node[vertex][label=left:{$v_{k-1}$}] (vk-1) at (-1,3) {};
+      \node[vertex][label=above left:{$v_{k-2}$}] (vk-2) at (0,6) {};
+      \node[vertex][label=above right:{$v_3$}] (v3) at (6,6) {};
+      \node[vertex][label=right:{$v_2$}] (v2) at (7,3) {};
+      \node[vertex][label=below right:{$v = v_1$}] (v) at (6,0) {};
+
+      \draw[edge, dashed] (vk) to node[below] {$t$} (v);
+      \draw[edge] (v) to node[right] {$+t$} (v2);
+      \draw[edge] (v2) to node[right] {$+t$} (v3);
+      \draw[edge, dotted] (v3) to node[above] {} (vk-2);
+      \draw[edge] (vk-2) to node[left] {$+t$} (vk-1);
+      \draw[edge] (vk-1) to node[left] {$+t$} (vk);
+    \end{tikzpicture}
+\end{minipage}
+
+All arcs are forward arcs, and so we can increase the flow indefinitely.
+Let $y_{v_1}$ be the dual potential at $v_1$, then:
+\begin{align*}
+  y_{v_2} &= y_{v_1} + w_{v_1v_2} \\
+  y_{v_3} &= y_{v_2} + w_{v_2v_3} = y_{v_1} + w_{v_1v_2} + w_{v_2v_3} \\
+  &\vdots \\
+  y_{v_2} &= y_{v_{k-1}} + w_{v_{k-1}v_k} \\
+  &= y_{v_1} + w_{v_1v_2} + \ldots + w_{v_{k-1}v_k} \\
+\end{align*}
+The reduced cost of $uv$ is then:
+\begin{align*}
+  \bar{w}_{uv} &= y_{v_k} + w_{uv} - y_{v_1} \\
+  &=  (y_{v_1} + w_{v_1v_2} + \ldots + w_{v_{k-1}v_k}) w_{uv} - y_{v_1} \\
+  &= \sum_{e \in C} w_e < 0 \quad (\text{since } \bar{w}_{uv} < 0)
+\end{align*}
+
+\begin{definition}{Negative Dicycle}{}
+  A \underline{negative dicycle} is a directed cycle $C$, where the sum of the weights along the cycle is negative, i.e. $\sum_{e \in C} w_e < 0$
+\end{definition}
+
+And the presence of a negative dicycle is precisely the characterization of an unbounded TP, since we would be able to send flow through the cycle to reduce cost indefinitely!
+
+\begin{theorem}{}{}
+  A feasible TP is unbounded if and only if there exists a negative dicycle
+\end{theorem}
+\begin{proof}
+$(\Leftarrow)$ Let $C$ be a negative dicycle with $w(C) < 0$ and $x^*$ be a feasible flow.
+Define a flow $x^C$, where $x^C_e = \begin{cases} 
+t \quad \text{if } e \in C \\ 
+0 \quad \text{if } e \not\in C
+\end{cases}$.
+So, $x^C(\delta(\bar{v})) - x^C(\delta(v)) = 0$ for each $v \in N$ since $C$ is a dicycle.
+
+Then, $x^* + x^C$ is a feasible flow, since:
+\begin{align*}
+  &(x^* + x^C)(\delta(\bar{v})) - (x^* + x^C)(\delta(v)) \\ 
+  &=x*(\delta(\bar{v})) - x*(\delta(v)) + x^C(\delta(\bar{v})) - x^C(\delta(v)) \\ 
+  & = b_v + 0 = b_v
+\end{align*}
+And the objective value using $x^* + x^C$ is:
+\begin{align*}
+  w^\intercal(x^* + x^C) &= w^\intercal x^* + w^\intercal x^C \\
+  &= w^\intercal x^* + t \cdot w(C)
+\end{align*}
+While $w^\intercal x^*$ is fixed, we can make $t \cdot w(C)$ arbitarily large, and as $t \longrightarrow \infty$, $t \cdot w(C) \longrightarrow -\infty$ (since $w(C) < 0$), so the total objective value $w^\intercal(x^* + x^C) \longrightarrow \infty$
+
+$(\Rightarrow)$ TODO
+\end{proof}
+
