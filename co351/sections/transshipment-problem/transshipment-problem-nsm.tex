@@ -5,7 +5,7 @@ We've described the basic foundations for the transshipment problem. Our goal no
 We will assume $\sum_{v \in N} b_v = 0$ and that $D = (N,A)$ is connected.
 \end{remark}
 
-\subsubsection{Finding a basis}
+\subsubsection{Finding a Basis}
 
 Let's take a look at the incidence matrix of the digraph from \Cref{exmp:cs-conditions}:
 \[
@@ -280,6 +280,317 @@ Indeed, as one can see from \Cref{exmp:tp_find-tree-flow-infeasible}, we can't s
 
 \textbf{Question: }How do we find an initial basic feasible solution?
 
-We will cover this in \Cref{sec:tp_feasiblity-characterization} (Hint: We want to construct an auxiliary TP and solve that problem)
+We will cover this in \Cref{sec:tp_feasiblity-characterization} (Hint: We want to construct an auxiliary TP and solve that problem).
+For now, let's assume that we're given some initial spanning tree with a feasible flow.
 
 \subsubsection{Entering and Leaving variables}
+\textbf{Question: }How to do we choose an entering variable (arc)?
+
+Recall the CS conditions we found back in \Cref{eq:tp_cs-conditions}.
+Our flow is optimal if:
+\begin{equation*}
+  x_{uv} = 0 \quad \text{OR} \quad y_v - y_v \leq w_{uv} \quad \forall uv \in A
+\end{equation*}
+Our feasible flow will have $x_{uv} \geq 0$ for every arc $uv$ in the spanning tree. In that case, our CS conditions tell us that we want a corresponding $y$ such that
+\begin{equation*}
+  A^\intercal_B y = w_B
+\end{equation*}
+(where $B$ is the set of arcs in our spanning tree)
+
+Then, for the arcs with $0$ flow, we will have an optimal solution if:
+\begin{equation*}
+  w_N - A^\intercal_N y \geq 0
+\end{equation*}
+Further, if there is an arc $uv$ with $0$ flow, but $w_{uv} + y_u - y_v < 0$, then our solution is not optimal!
+
+So, to choose an entering arc, we will find an arc $uv \not\in B$ such that $w_{uv} + y_u - y_v < 0$, and add that into our basis. We'll give this value ($w_{uv} + y_u - y_v$) a name:
+\begin{definition}{Reduced Cost}{reduced-cost}
+  Recall that a vector $y \in \R^N$ is called a \underline{node potential}. Given a node potential $y$, the \underline{reduced cost} of an arc $uv$ is:
+  \begin{equation*}
+    \bar{w}_{uv} = w_{uv} + y_u - y_v
+  \end{equation*}
+\end{definition}
+\begin{note}
+  A node potential is feasible if $\bar{w}_{uv} \geq 0$ for all $uv \in A$
+\end{note}
+
+This leads us right to our next question:
+
+\textbf{Question: }How do we select a leaving variable (arc)?
+
+Adding an arc $uv$ into our spanning tree $T$ creates exactly one cycle, let's call this cycle $C$.
+To ensure that the leaving arc gives a spanning tree, the leaving arc needs to be from $C$. 
+
+Say we're given the following cycle, where $bc$ is the arc we've added to the spanning tree. To add $bc$ to the spanning tree, we push  $t$ units of flow through the arc, around the cycle:
+
+\begin{center}
+  \begin{tikzpicture}[scale = 0.75, node distance = 3cm]
+    \node[vertex] (a) at (0,0) {a};
+    \node[vertex] (b) at (0,4) {b};
+    \node[vertex] (c) at (4,4) {c};
+    \node[vertex] (d) at (4,0) {d};    
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$4$} (d);
+      \draw[edge] (b) to node {$t$} (c);
+      \draw[edge] (b) to node {$3$} (a);
+      \draw[edge] (c) to node {$2$} (d);
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+
+Now, any forward arcs (with respect to $bc$) will be given additional flow, and any backward arcs will have flow taken away:
+
+\begin{center}
+  \begin{tikzpicture}[scale = 0.75, node distance = 3cm]
+    \node[vertex] (a) at (0,0) {a};
+    \node[vertex] (b) at (0,4) {b};
+    \node[vertex] (c) at (4,4) {c};
+    \node[vertex] (d) at (4,0) {d};    
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$4 - t$} (d);
+      \draw[edge] (b) to node {$t$} (c);
+      \draw[edge] (b) to node {$3 - t$} (a);
+      \draw[edge] (c) to node {$2 + t$} (d);
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+
+We can't have negative flow, so out of all the backward arcs, we can only choose $t$ to be the minimium flow that is taken away. In this case, we have $t = \min\{4, 3\} = 3$, and the resulting flow looks like:
+
+\begin{center}
+  \begin{tikzpicture}[scale = 0.75, node distance = 3cm]
+    \node[vertex] (a) at (0,0) {a};
+    \node[vertex] (b) at (0,4) {b};
+    \node[vertex] (c) at (4,4) {c};
+    \node[vertex] (d) at (4,0) {d};    
+
+    \begin{scope}[every node/.style={fill=white,circle}]
+      \draw[edge] (a) to node {$1$} (d);
+      \draw[edge] (b) to node {$3$} (c);
+      \draw[edge] (b) to node {$0$} (a);
+      \draw[edge] (c) to node {$5$} (d);
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+
+\begin{example}{Improving a tree flow}{tp_improve-tree-flow}
+  On the left, we have the same digraph as with previous examples. On the right, we have a feasible (but not yet optimal!) tree flow.
+
+  \begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[node distance = 3cm]
+      \node[vertex][label={$-5$}] (a) at (0,4) {a};
+      \node[vertex][label={$7$}] (b) at (4,4) {b};
+      \node[vertex][label={$0$}] (c) at (2,2) {c};
+      \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+      \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+  
+      \begin{scope}[every node/.style={fill=white,circle}]
+        \draw[edge] (a) to node {$100$} (b);
+        \draw[edge] (a) to node {$30$} (c);
+        \draw[edge] (a) to node {$50$} (d);
+        \draw[edge] (c) to node {$80$} (b);
+        \draw[edge] (c) to node {$20$} (e);
+        \draw[edge] (d) to node {$30$} (c);
+        \draw[edge] (d) to node {$40$} (e);
+        \draw[edge] (e) to node {$40$} (b);
+      \end{scope}
+    \end{tikzpicture}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[node distance = 3cm]
+      \node[vertex][label={$-5$}] (a) at (0,4) {a};
+      \node[vertex][label={$7$}] (b) at (4,4) {b};
+      \node[vertex][label={$0$}] (c) at (2,2) {c};
+      \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+      \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+  
+      \begin{scope}[every node/.style={fill=white,circle}]
+        \draw[edge] (a) to node {$5$} (b);
+        \draw[edge] (c) to node {$2$} (b);
+        \draw[edge] (d) to node {$2$} (c);
+        \draw[edge] (d) to node {$3$} (e);
+      \end{scope}
+    \end{tikzpicture}
+  \end{minipage}
+
+  We want to improve this tree flow. First, let's find a feasible node potential $y$ on the nodes. Recall that we want to find $y$ so that $A^\intercal_B y = w_B$. So the following constraints must be tight:
+  \begin{itemize}
+    \item $y_b - y_a = w_{ab} = 100$
+    \item $y_b - y_c = w_{cb} = 80$
+    \item $y_d - y_c = w_{cd} = 30$
+    \item $y_e - y_d = w_{de} = 40$
+  \end{itemize}
+  We can always set $y_a = 0$ since $y$ is free, and so this will give us the following node potentials: 
+
+  \begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[node distance = 3cm]
+      \node[vertex][label={$0$}] (a) at (0,4) {a};
+      \node[vertex][label={$100$}] (b) at (4,4) {b};
+      \node[vertex][label={$20$}] (c) at (2,2) {c};
+      \node[vertex][label=below:{$-10$}] (d) at (0,0) {d};
+      \node[vertex][label=below:{$30$}] (e) at (4,0) {e};
+  
+      \begin{scope}[every node/.style={fill=white,circle}]
+        \draw[edge] (a) edge (b);
+        \draw[edge] (c) edge (b);
+        \draw[edge] (d) edge (c);
+        \draw[edge] (d) edge (e);
+      \end{scope}
+    \end{tikzpicture}
+  \end{minipage}
+
+  Now, to choose the entering arc, we want to calculate the \underline{reduced costs} for each arc and choose one with reduced cost $<0$. As an example, the reduced cost for arc $ac$ is $\bar{w}_{ac} = w_{ac} + y_a - y_c = 30 + 0 - 20 = 10$. Below is reduced costs for each arc, along with the node potentials.
+  
+  \begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[node distance = 3cm]
+      \node[vertex][label={$0$}] (a) at (0,4) {a};
+      \node[vertex][label={$100$}] (b) at (4,4) {b};
+      \node[vertex][label={$20$}] (c) at (2,2) {c};
+      \node[vertex][label=below:{$-10$}] (d) at (0,0) {d};
+      \node[vertex][label=below:{$30$}] (e) at (4,0) {e};
+  
+      \begin{scope}[every node/.style={fill=white,circle}]
+        \draw[edge] (a) to node {$0$} (b);
+        \draw[edge] (a) to node {$10$} (c);
+        \draw[edge] (a) to node {$60$} (d);
+        \draw[edge] (c) to node {$0$} (b);
+        \draw[edge] (c) to node {$10$} (e);
+        \draw[edge] (d) to node {$0$} (c);
+        \draw[edge] (d) to node {$0$} (e);
+        \draw[edge] (e) to node {$-30$} (b);
+      \end{scope}
+    \end{tikzpicture}
+  \end{minipage}
+
+  $\bar{w}_{eb} = -30 < 0$, so $eb$ will enter our basis and we push $t$ units of flow through it.
+
+  \begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[node distance = 3cm]
+      \node[vertex][label={$-5$}] (a) at (0,4) {a};
+      \node[vertex][label={$7$}] (b) at (4,4) {b};
+      \node[vertex][label={$0$}] (c) at (2,2) {c};
+      \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+      \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+  
+      \begin{scope}[every node/.style={fill=white,circle}]
+        \draw[edge] (a) to node {$5$} (b);
+        \draw[edge] (c) to node {$2 - t$} (b);
+        \draw[edge] (d) to node {$2 - t$} (c);
+        \draw[edge] (d) to node {$3 + t$} (e);
+        \draw[edge, dashed] (e) to node {$t$} (b);
+      \end{scope}
+    \end{tikzpicture}
+  \end{minipage}
+
+  $cb$ and $dc$ are our backward arcs, and each currently have a flow of 2, so we can at most push $t = 2$ units of flow through $eb$. As such, the flow on both $cb$ and $dc$ reach $0$, and either can leave the basis. The resulting flow looks like:
+
+  \begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[node distance = 3cm]
+      \node[vertex][label={$-5$}] (a) at (0,4) {a};
+      \node[vertex][label={$7$}] (b) at (4,4) {b};
+      \node[vertex][label={$0$}] (c) at (2,2) {c};
+      \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+      \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+  
+      \begin{scope}[every node/.style={fill=white,circle}]
+        \draw[edge] (a) to node {$5$} (b);
+        \draw[edge] (c) to node {$0$} (b);
+        \draw[edge] (d) to node {$0$} (c);
+        \draw[edge] (d) to node {$5$} (e);
+        \draw[edge] (e) to node {$2$} (b);
+      \end{scope}
+    \end{tikzpicture}
+  \end{minipage}
+
+  And we can continue the algorithm with either of the following spanning trees:
+
+  \begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[node distance = 3cm]
+      \node[vertex][label={$-5$}] (a) at (0,4) {a};
+      \node[vertex][label={$7$}] (b) at (4,4) {b};
+      \node[vertex][label={$0$}] (c) at (2,2) {c};
+      \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+      \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+  
+      \begin{scope}[every node/.style={fill=white,circle}]
+        \draw[edge] (a) to node {$5$} (b);
+        \draw[edge] (d) to node {$0$} (c);
+        \draw[edge] (d) to node {$5$} (e);
+        \draw[edge] (e) to node {$2$} (b);
+      \end{scope}
+    \end{tikzpicture}
+  \end{minipage}
+  \begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[node distance = 3cm]
+      \node[vertex][label={$-5$}] (a) at (0,4) {a};
+      \node[vertex][label={$7$}] (b) at (4,4) {b};
+      \node[vertex][label={$0$}] (c) at (2,2) {c};
+      \node[vertex][label=below:{$-5$}] (d) at (0,0) {d};
+      \node[vertex][label=below:{$3$}] (e) at (4,0) {e};
+  
+      \begin{scope}[every node/.style={fill=white,circle}]
+        \draw[edge] (a) to node {$5$} (b);
+        \draw[edge] (c) to node {$0$} (b);
+        \draw[edge] (d) to node {$5$} (e);
+        \draw[edge] (e) to node {$2$} (b);
+      \end{scope}
+    \end{tikzpicture}
+  \end{minipage}
+\end{example}
+
+\subsubsection{The Algorithm}
+
+\IncMargin{1em}
+\begin{algorithm}[H]
+  \SetKwInOut{Input}{Input}
+
+  \Input{  
+    \begin{itemize}
+      \item $D = (N,A)$ connected digraph
+      \item $w \in R^A$ arc costs
+      \item $b \in R^N$ node demands
+    \end{itemize}
+  }
+
+  \BlankLine
+  
+  \nl Start with a spanning tree $T$ that has a feasible tree flow $x$\;
+
+  \nl Calculate potentials $y$ such that $\bar{w}_{uv} = 0$ for all $uv \in T$\; \label{step:nsm-calc-potentials}
+  
+  \nl Calculate $\bar{w}_{uv}$ for any $uv \not\in T$\;
+
+  \While{there exists an arc $uv$ with $\bar{w}_{uv} < 0$}{
+    \nl $T + uv$ contains a cycle $C$. Consider the direction of $C$ such that $uv$ is a forward arc\;
+
+    \nl Pick $pq$ such that
+    \[
+      x_{pq} = \min\{ij \:\rvert\: ij \text{ is a backward arc of } C\}
+    \]
+    Let $t = x_{pq}$\;
+    
+    \nl For any forward arc in $C$, add a flow of $t$\;
+
+    \nl For any backward arc in $C$, subtract a flow of $t$\;
+    
+    \nl $T \leftarrow T + uv - pq$\;
+    
+    \nl Go back to step 2\;
+  }
+  
+  \nl \Return{$T$ with max flow $x$}
+  
+  \caption{Network Simplex Algorithm}\label{alg:nsm}
+\end{algorithm}
+

@@ -1,0 +1,32 @@
+\subsection{Economic Interpretation}
+In this section, we try to provide some intuition for the dual variables by giving an interpretation for node potentials in economic terms.
+
+Imagine transporting a set of commodities through our digraph, and the node potentials represents the prices of these commodities at the nodes.
+
+Say we have the following arc $uv$:
+
+\begin{minipage}{\textwidth}
+\centering
+\begin{tikzpicture}[scale = 0.75]
+    \node[vertex][label={$y_u = 80$}] (u) at (0,0) {u};
+    \node[vertex][label={$y_v = 120$}] (v) at (8,0) {v};
+
+    \draw[edge] (u) to node[below, inner sep = 4pt] {$w_{uv} = 70$} (v);
+\end{tikzpicture}
+\end{minipage}
+
+The reduced cost for this arc is: $\bar{w}_{uv} = 70 + 80 - 120 = 30 > 0$. We can interpret this as: ``Buying one unit of commodity at $u$ for $\$80$, transporting through $uv$ for $\$70$, and selling it at $v$ for $\$120$''. Then, it is clear that we are losing money by using arc $uv$, so we should never increase flow on arcs with positive reduced cost.
+
+Let's look at an example where $\bar{w}_{uv} < 0$
+
+\begin{minipage}{\textwidth}
+\centering
+\begin{tikzpicture}[scale = 0.75]
+    \node[vertex][label={$y_u = 30$}] (u) at (0,0) {u};
+    \node[vertex][label={$y_v = 80$}] (v) at (8,0) {v};
+
+    \draw[edge] (u) to node[below, inner sep = 4pt] {$w_{uv} = 40$} (v);
+\end{tikzpicture}
+\end{minipage}
+
+The reduced costs here is: $\bar{w}_{uv} = 40 + 30 - 80 = -10$. In this case, we buy one unit at $u$ for $\$30$, transport it for $\$40$, and sell it at $v$ for $\$80$. We make $\$10$ by using arc $uv$! So, when the reduced cost is $<0$, we increase flow on that arc.
