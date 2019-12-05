@@ -1,0 +1,218 @@
+\subsection{Infeasibility}\label{sec:tp_infeasbility-characterization}
+
+\textbf{Question: }How do we find an initial tree flow?
+
+As promised, we will discuss how to find an initial tree flow in this section. Turns out, this will help us find an infeasibility characterization.
+
+Recall that in the simplex method, we find our initial solution using an auxiliary problem. 
+We will create an auxiliary TP here.
+We know that every node with negative demands (the supply nodes) supply $b_v$ units of flow.
+Let's create a new node $z$ that accepts all the flow from the supply nodes.
+Now, since we assume $\sum b_v = 0$, $z$ has just enough excess flow to push towards the demand nodes.
+We demonstrate this below:
+
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale = 0.75]
+        \node[vertex][label=left:{$-5$}] (a) at (0,0) {a};
+        \node[vertex][label={$7$}] (b) at (4,2) {b};
+        \node[vertex][label=below:{$0$}] (c) at (4,-2) {c};
+        \node[vertex][label=right:{$-5$}] (d) at (8,0) {d};
+
+        \draw[edge] (a) to node {} (b);
+        \draw[edge] (a) to node {} (c);
+        \draw[edge] (b) to node {} (d);
+        \draw[edge] (c) to node {} (b);
+        \draw[edge] (c) to node {} (d);
+    \end{tikzpicture}
+    \captionof*{figure}{Original Digraph}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale = 0.75]
+        \node[vertex][label=left:{$-5$}] (a) at (0,0) {a};
+        \node[vertex][label={$7$}] (b) at (4,2) {b};
+        \node[vertex][label=below:{$0$}] (c) at (4,-2) {c};
+        \node[vertex][label=right:{$-5$}] (d) at (8,0) {d};
+        \node[vertex][label=above:{$3$}] (z) at (8,4) {z};
+
+        \draw[edge] (a) to node {} (b);
+        \draw[edge] (a) to node {} (c);
+        \draw[edge] (b) to node {} (d);
+        \draw[edge] (c) to node {} (b);
+        \draw[edge] (c) to node {} (d);
+        \draw[edge, bend left] (a) to node {} (z);
+        \draw[edge] (b) to node {} (z);
+        \draw[edge] (z) to node {} (d);
+        \draw[edge, out = 0, in = 0, looseness = 2] (z) to node {} (c);
+    \end{tikzpicture}
+    \captionof*{figure}{Digraph with our new node}
+\end{minipage}
+
+We want any solution to this modified digraph \underline{not} use any of the new arcs, so let's set the cost of the original arcs to be $0$ and the new arcs to be $1$
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[scale = 0.75]
+        \node[vertex][label=left:{$-5$}] (a) at (0,0) {a};
+        \node[vertex][label={$7$}] (b) at (4,2) {b};
+        \node[vertex][label=below:{$0$}] (c) at (4,-2) {c};
+        \node[vertex][label=right:{$-5$}] (d) at (8,0) {d};
+        \node[vertex][label=above:{$3$}] (z) at (8,4) {z};
+
+        \begin{scope}[every node/.style={fill = white, circle}]
+            \draw[edge] (a) to node {$0$} (b);
+            \draw[edge] (a) to node {$0$} (c);
+            \draw[edge] (b) to node {$0$} (d);
+            \draw[edge] (c) to node {$0$} (b);
+            \draw[edge] (c) to node {$0$} (d);
+            \draw[edge, bend left] (a) to node {$1$} (z);
+            \draw[edge] (b) to node {$1$} (z);
+            \draw[edge] (z) to node {$1$} (d);
+            \draw[edge, out = 0, in = 0, looseness = 2] (z) to node {$1$} (c);
+        \end{scope}
+    \end{tikzpicture}
+    \captionof*{figure}{Auxiliary TP}
+\end{minipage}
+
+\begin{definition}{Auxiliary TP}{}
+    Given a digraph $D = (N,A)$ and node demands $b \in R^M$, the \underline{auxiliary TP} $D' = (N', A')$ with node demands $b' \in R^{N'}$ and arc costs $w' \in R^{A'}$ is:
+    \begin{itemize}
+        \item $N' = N \cup \{z\}$, where $z$ is a new node
+        \item $A' = A \cup \{ uz \:\rvert\: u \in N, b(u) < 0\} \cup \{zu \:\rvert\: u \in N, b(u) > 0\}$
+        \item $b'(z) = 0, \: b'(v) = b(v) \quad \forall v \in N$
+        \item $w'(e) = \begin{cases}
+            0 \quad \text{if }e\in A \\
+            1 \quad \text{if }e\in A' \setminus A
+        \end{cases}$
+    \end{itemize}
+\end{definition}
+
+\begin{remark}
+    ~
+    \begin{itemize}
+        \item The auxiliary TP has a natural feasible solution (send all flow through $z$, as described above)
+        \item The lower bound is $0$ (Every new arc receives $0$ flow).
+        \item Combining these 2 observations $\Rightarrow$ An optimal solution exists, and if the optimal solution is $0$, then that means we are sending $0$ flow through the new arcs. So, any flow must be going through the original arcs. This is an initial solution!
+    \end{itemize}
+\end{remark}
+
+\begin{theorem}{}{}
+    A TP is feasible if and only if its auxiliary TP has optimal value $0$
+\end{theorem}
+And, this behaviour matches that of an auxiliary problem for the two-phase simplex method!
+
+This is great, but still requires us to solve the auxiliary TP in order to determine feasibility of the original. 
+Instead, we aim for a characterization that can determine feasibility using only the original TP.
+To get there, let's assume that our TP is not feasible, and bootstrap off of what we can determine about our instance through the auxiliary TP.
+
+Assuming the TP is not feasible, the auxiliary TP has an optimal solution with strictly positive optimal value. Let $x^*$ be such a solution that is a also a tree. Let's look at the dual potentials for this solution, setting $y_z = 0$
+
+For any node with an incoming arc $uz$ with non-zero flow in $x^*$, we get that $\bar{w}_{uz} = w_{uz} + y_u - y_z = 0 \Rightarrow 1 + y_u - 0 = 0 \Rightarrow y_u = - 1$.
+
+And, for any node with an outgoing arc $zv$ with non-zero flow in $x^*$, we get that $\bar{w}_{zv} = w_{zv} + y_z - y_v = 0 \Rightarrow 1 + 0 - y_v = 0 \Rightarrow y_v = 1$.
+
+It is easy to check that every other node will have dual potential equal to its parent.
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[scale = 0.75]
+        \node[vertex][label = {$0$}] (z) at (0,0) {z};
+        \node[vertex][label = right:{$1$}] (11) at (-3,-3) {};
+        \node[vertex][label = right:{$-1$}] (12) at (0,-3) {};
+        \node[vertex][label = right:{$1$}] (13) at (3,-3) {};
+
+        \node[vertex][label = left:{$1$}] (111) at (-4,-6) {};
+        \node[vertex][] (112) at (-3,-6) {};
+        \node[vertex][label = right:{$1$}] (113) at (-2,-6) {};
+
+        \node[vertex][label = right:{$-1$}] (121) at (0,-6) {};
+
+        \node[vertex][label = right:{$1$}] (131) at (2,-6) {};
+        \node[vertex][label = right:{$1$}] (132) at (4,-6) {};
+
+        \draw[densely dotted, thick, shorten < = 3pt] (111) edge (-4,-7); 
+        \draw[densely dotted, thick, shorten < = 3pt] (112) edge (-3,-7); 
+        \draw[densely dotted, thick, shorten < = 3pt] (113) edge (-2,-7); 
+        \draw[densely dotted, thick, shorten < = 3pt] (121) edge (0,-7); 
+        \draw[densely dotted, thick, shorten < = 3pt] (131) edge (2,-7); 
+        \draw[densely dotted, thick, shorten < = 3pt] (132) edge (4,-7); 
+
+        \draw[edge] (z) edge (11);
+        \draw[edge] (12) edge (z);
+        \draw[edge] (z) edge (13);
+
+        \draw[edge] (11) edge (111);
+        \draw[edge] (11) edge (112);
+        \draw[edge] (113) edge (11);
+        
+        \draw[edge] (12) edge (121);
+
+        \draw[edge] (13) edge (131);
+        \draw[edge] (13) edge (132);
+    \end{tikzpicture}
+\end{minipage}
+
+This labelling partitions the nodes in $N$ into two sets according to their dual potentials.
+Let's give these two sets a name: let $S_+$ be the nodes with potential $+1$ and $S_-$ be the nodes with potentials $-1$.
+We can reduce our focus to these two sets and $z$, along with the possible arcs that could appear between each entity.
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex][label = {$0$}] (z) at (0,0) {z};
+        \node[vertex, minimum size = 2cm][label = above left:{\large $S_-$}] (S-) at (-2,-2) {};
+        \node[vertex, minimum size = 2cm][label = above right:{\large $S_+$}] (S+) at (2,-2) {};
+
+        \draw[edge] (z) edge (S+);
+        \draw[edge] (S-) edge (z);
+        \draw[edge, bend left] (S-) edge (S+);
+        \draw[edge, bend left] (S+) edge (S-);
+    \end{tikzpicture}
+\end{minipage}
+
+In fact, doing a bit more analysis, we find that no arcs go from $S_-$ to $S_+$. Why?
+Suppose there is such an arc $e$, then $\overline{w}_e \geq 0$, since otherwise, we would have added such an arc to our tree flow. 
+However, doing a bit of calculation, $\overline{w}_e = 0 + (-1) - 1 = -2 < 0$. So, there are no arcs from $S_-$ to $S_+$!
+
+Performing the same analysis on arcs from $S_+$ to $S_-$, we find that the reduced cost:  $\overline{w}_e = 0 + 1 - (-1) = 2 > 0$, and so the flow through this arc must be $0$.
+Phew, this is good, since these arcs weren't considered in our tree flow.
+So, in fact, our diagram should have one less type of arc.
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex][label = {$0$}] (z) at (0,0) {z};
+        \node[vertex, minimum size = 2cm][label = above left:{\large $S_-$}] (S-) at (-2,-2) {};
+        \node[vertex, minimum size = 2cm][label = above right:{\large $S_+$}] (S+) at (2,-2) {};
+
+        \draw[edge] (z) edge (S+);
+        \draw[edge] (S-) edge (z);
+        \draw[edge] (S+) edge (S-);
+    \end{tikzpicture}
+\end{minipage}
+
+Good, we've done a lot of work now, what can we conclude about the original TP from this?
+First, the set $S_-$ pushes a non-zero amount of flow through $z$ towards $S_+$, but receives no flow from $S_+$ (Since all such arcs have $0$-flow). That must mean that $\sum_{v \in S_-} b_v < 0$. 
+But, remember that $z$ is a node we added for the auxiliary TP---it doesn't exist in the original TP.
+That is, if we remove $z$, then $S_-$ is a set with no outgoing arcs.
+
+In summary, $S_-$ has negative demand, but no outgoing arcs! So, there's nowhere to push the excess flow out from $S_-$. This will be our infeasbility characterization.
+
+\begin{theorem}{}{tp-infeasbility-characterization}
+    A TP with digraph $D = (N,A)$ and node demands $b \in \R^N$ is infeasible if and only if there exists $S \subseteq N$ such that $b(S) < 0$ and $\delta(S) = \emptyset$
+\end{theorem}
+\begin{proof}
+    $(\Rightarrow)$ Formalize what we've done above.
+
+    $(\Leftarrow)$ Suppose there exist $S \subseteq N$ with $b(S) < 0$ and $\delta(S) = \emptyset$. We want to show that the TP is infeasible.
+
+    Suppose for a contradiction that there exists a feasible flow $x$. Then
+    \begin{align*}
+        0 > b(S) &= \sum_{v \in S} b_v \\
+        &= \sum_{v \in S} (x(\delta(\overline{v})) - x(\delta(v))) \\
+        &= x(\delta(\overline{S})) - x(\delta(S)) \\
+        &= x(\delta(\overline{S})) \quad (x(\delta(S)) = 0,\:\text{since}\:\delta(S) = \emptyset) \\
+    \end{align*}
+    This gives us that $x(\delta(\overline{S})) < 0$, but $x \geq 0$, so $x(\delta(\overline{S})) \geq 0$, giving us our contradiction.
+\end{proof}
