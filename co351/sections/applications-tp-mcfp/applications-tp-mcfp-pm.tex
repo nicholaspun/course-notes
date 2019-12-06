@@ -1,0 +1,127 @@
+\subsection{Minimum Bipartite Perfect Matching (MBPM)}
+
+\underline{\textbf{Goal:}} Given a bipartite graph $G = (V = A \cup B, E)$, with $|A| = |B|$, and edge costs $w \in \R^E$, find a perfect matching in $G$ of minimum total cost.
+
+\begin{example}{Perfect Matchings}{applications-tp-mcfp_pm}
+    Below is a complete bipartite graph $G$ with bipartiion $\{1,2,3\}$ and $\{a,b,c\}$ and 2 perfect matchings of $G$
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \node[vertex] (2) at (0,0) {2};
+            \node[vertex] (3) at (4,0) {3};
+            \node[vertex] (1) at (-4, 0) {1};
+
+            \node[vertex] (b) at (0,-4) {b};
+            \node[vertex] (c) at (4,-4) {c};
+            \node[vertex] (a) at (-4,-4) {a};
+            
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw (1) to node {\small $5$} (a);
+                \draw (1) to node[pos = 0.8] {\small $10$} (b);
+                \draw (1) to node[pos = 0.2] {\small $4$} (c);
+
+                \draw (2) to node[pos = 0.8] {\small $3$} (a);
+                \draw (2) to node[pos = 0.2] {\small $14$} (b);
+                \draw (2) to node[pos = 0.8] {\small $15$} (c);
+
+                \draw (3) to node[pos = 0.2] {\small $9$} (a);
+                \draw (3) to node[pos = 0.8] {\small $2$} (b);
+                \draw (3) to node {\small $6$} (c);
+            \end{scope}
+        \end{tikzpicture}
+        \captionof*{figure}{Complete Bipartite Graph $G$}
+    \end{minipage}
+
+    \begin{minipage}{\textwidth}
+        \begin{minipage}{0.5\textwidth}            
+            \centering
+            \begin{tikzpicture}[scale = 0.5]
+                \node[vertex] (2) at (0,0) {2};
+                \node[vertex] (3) at (4,0) {3};
+                \node[vertex] (1) at (-4, 0) {1};
+
+                \node[vertex] (b) at (0,-4) {b};
+                \node[vertex] (c) at (4,-4) {c};
+                \node[vertex] (a) at (-4,-4) {a};
+                
+                \begin{scope}[every node/.style={fill = white, ellipse}]
+                    \draw (1) to node {\small $5$} (a);    
+                    \draw (2) to node {\small $14$} (b);
+                    \draw (3) to node {\small $6$} (c);
+                \end{scope}
+            \end{tikzpicture}
+            \captionof*{figure}{Perfect matching with cost $25$}
+        \end{minipage}
+        \begin{minipage}{0.5\textwidth}            
+            \centering
+            \begin{tikzpicture}[scale = 0.5]
+                \node[vertex] (2) at (0,0) {2};
+                \node[vertex] (3) at (4,0) {3};
+                \node[vertex] (1) at (-4, 0) {1};
+    
+                \node[vertex] (b) at (0,-4) {b};
+                \node[vertex] (c) at (4,-4) {c};
+                \node[vertex] (a) at (-4,-4) {a};
+                
+                \begin{scope}[every node/.style={fill = white, ellipse}]
+                    \draw (1) to node {\small $4$} (c);
+                    \draw (2) to node[pos = 0.75] {\small $3$} (a);
+                    \draw (3) to node[pos = 0.25] {\small $2$} (b);
+                \end{scope}
+            \end{tikzpicture}
+            \captionof*{figure}{Perfect matching with cost $9$}
+        \end{minipage}
+    \end{minipage}
+\end{example}
+
+We will formulate this as an MCFP.
+
+Direct each edge from $A$ to $B$. 
+For each arc, set the capacity to be $1$ And, for each node, set $b_v = \begin{cases} -1 \: \text{if }v \in A \\ 1 \: \text{if } v \in B \end{cases} $. 
+The arc costs stay the same.
+For example, using the graph from \Cref{exmp:applications-tp-mcfp_pm}, our resulting digraph for the MCFP instance becomes:
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex] (2) at (0,0) {2};
+        \node[vertex] (3) at (4,0) {3};
+        \node[vertex] (1) at (-4, 0) {1};
+
+        \node[vertex] (b) at (0,-4) {b};
+        \node[vertex] (c) at (4,-4) {c};
+        \node[vertex] (a) at (-4,-4) {a};
+        
+        \begin{scope}[every node/.style={fill = white, ellipse}]
+            \draw[edge] (1) to node {\footnotesize $(5,1)$} (a);
+            \draw[edge] (1) to node[pos = 0.8] {\footnotesize $(10,1)$} (b);
+            \draw[edge] (1) to node[pos = 0.2] {\footnotesize $(4,1)$} (c);
+
+            \draw[edge] (2) to node[pos = 0.8] {\footnotesize $(3,1)$} (a);
+            \draw[edge] (2) to node[pos = 0.2] {\footnotesize $(14,1)$} (b);
+            \draw[edge] (2) to node[pos = 0.8] {\footnotesize $(15,1)$} (c);
+
+            \draw[edge] (3) to node[pos = 0.2] {\footnotesize $(9,1)$} (a);
+            \draw[edge] (3) to node[pos = 0.8] {\footnotesize $(2,1)$} (b);
+            \draw[edge] (3) to node {\footnotesize $(6,1)$} (c);
+        \end{scope}
+    \end{tikzpicture}
+    \captionof*{figure}{MCFP Formulation for \Cref{exmp:applications-tp-mcfp_pm} \\
+    The arcs are labelled $(x_e, c_e)$}
+\end{minipage}
+
+We want to show a correspondence between optimal solutions to this MCFP and MBPM. 
+\begin{theorem}{Integrality Condition}{}
+    If an MCFP has an optimal solution, and all capacities and node demands are integers, then there exists an integral optimal solution
+\end{theorem}
+\begin{proof}
+    The proof is based on the NSM algorithm. 
+    Since node demands are integral, we can always start off with an integral basic feasible solution.
+    Then, in every iteration, we modify our feasible solution by pushing/removing flow until an arc reaches capacity or $0$ flow.
+    But capacities are also integral, so in each iteration where we modify the feasible solution, we remain integral.
+\end{proof}
+By this theorem, we can say that for our MCFP formulation, there exists an integer-valued optimal solution $x$.
+So, $x_e = 0$ or $x_e = 1$ for each arc $e$ and $M = \{e\:|\:x_e = 1\}$ is exactly a perfect matching because each node in $A$ can push out at most $1$ unit of flow, and so is incident with exactly one edge in $M$.
+
+In the reverse direction, we also note that any PM corresponds to an integral flow. So, our MCFP formulation solves the MBPM problem.
