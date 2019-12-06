@@ -1,0 +1,98 @@
+\subsection{Infeasibility}
+To solve the feasibility problem, we use the same auxiliary digraph as before. 
+The capacities on the original arcs remain the same, and the capacities on the new arcs can be $\infty$ or some large number (e.g. Sum of all demands)
+
+\begin{example}{Auxiliary Digraph for MCFP}{}
+    The first digraph is the MCFP labelled with arc capacities, and the second digraph is the auxiliary digraph for this instance.
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.75]
+            \node[vertex] (a) at (0,0) {a};
+            \node[vertex] (b) at (4,2) {b};
+            \node[vertex] (c) at (4,-2) {c};
+            \node[vertex] (d) at (8,0) {d};
+    
+            \begin{scope}[every node/.style={fill = white, circle}]
+                \draw[edge] (a) to node {$7$} (b);
+                \draw[edge] (a) to node {$5$} (c);
+                \draw[edge] (b) to node {$2$} (d);
+                \draw[edge] (c) to node {$12$} (b);
+                \draw[edge] (c) to node {$8$} (d);
+            \end{scope}
+        \end{tikzpicture}
+        \captionof*{figure}{Original Digraph}
+    \end{minipage}
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.75]
+            \node[vertex] (a) at (0,0) {a};
+            \node[vertex] (b) at (4,2) {b};
+            \node[vertex] (c) at (4,-2) {c};
+            \node[vertex] (d) at (8,0) {d};
+            \node[vertex] (z) at (8,4) {z};
+    
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (a) to node {$(0,7)$} (b);
+                \draw[edge] (a) to node {$(0,5)$} (c);
+                \draw[edge] (b) to node {$(0,2)$} (d);
+                \draw[edge] (c) to node {$(0,12)$} (b);
+                \draw[edge] (c) to node {$(0,8)$} (d);
+                \draw[edge, bend left] (a) to node {$(1, \infty)$} (z);
+                \draw[edge] (b) to node {$(1, \infty)$} (z);
+                \draw[edge] (z) to node {$(1, \infty)$} (d);
+                \draw[edge, out = 0, in = 0, looseness = 2] (z) to node {$(1, \infty)$} (c);
+            \end{scope}
+        \end{tikzpicture}
+        \captionof*{figure}{Auxiliary Digraph}
+    \end{minipage}
+\end{example}
+
+\begin{theorem}{}{}
+    A MCFP is feasible if and only if its corresponding auxiliary MCFP has optimal value $0$.
+\end{theorem}
+
+We will construct a infeasbility characterization similar to the one we have for TPs.
+
+Suppose our MCFP is infeasbible, then the auxiliary MCFP has optimal value greater than $0$.
+Take $x$ to be a tree flow.
+Just like we did back in \Cref{sec:tp_infeasbility-characterization}, set the potentials $y$ so that $y_z = 0$. We'll find that we can, yet again, partition the nodes into the sets $S_+$ and $S_-$. 
+
+The reduced cost on $e$ is $\overline{w}_e = -2 < 0$, so $x_e = c_e$, and the reduced cost on $f$ is $\overline{w}_f = 2 > 0$, so $x_f = 0$
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex][label = {$0$}] (z) at (0,0) {z};
+        \node[vertex, minimum size = 2cm][label = above left:{\large $S_-$}] (S-) at (-2,-2) {};
+        \node[vertex, minimum size = 2cm][label = above right:{\large $S_+$}] (S+) at (2,-2) {};
+
+        \draw[edge] (z) edge (S+);
+        \draw[edge] (S-) edge (z);
+        \draw[edge, bend left, below] (S-) to node {$x_e = c_e$} (S+);
+        \draw[edge, bend left, above] (S+) to node {$x_f = 0$} (S-);
+    \end{tikzpicture}
+\end{minipage}
+
+Now, consider $S_+$.
+The net flow on $S_+$ is just the flow coming in, since all outgoing arcs have $0$ flow.
+All flow coming in from $S_-$ are at capacity \textit{and} there is some (strictly positive) incoming flow from $z$.
+However, $z$ is an extra node we added for the auxiliary digraph, so when we remove it, that must mean that $S_+$ requires more flow than $S_-$ can give. 
+So, $b(S_+) > c(\delta(\overline{S}_+)$.
+
+\begin{theorem}{}{}
+    An MCFP is infeasible if and only if there exists $S \subseteq N$ such that $b(S) > c(\delta(\overline{S}))$
+\end{theorem}
+\begin{proof}
+    $(\Rightarrow)$ Formalize what we have above!
+
+    $(\Leftarrow)$ Suppose there exists $S \subseteq N$ with $b(S) > c(\delta(\overline{S}))$ and a feasible flow $x$. Then:
+    \begin{align*}
+        b(S) = \sum_{v \in S} b_v &= \sum_{v \in S} x(\delta(\overline{v})) - x(\delta(v)) \\
+        &= x(\delta(\overline{S})) - x(\delta(S)) \\ 
+        &\leq c(\delta(\overline{S})) - 0 = c(\delta(\overline{S}))
+    \end{align*}
+    But that's a contradiction.
+\end{proof}
+
+

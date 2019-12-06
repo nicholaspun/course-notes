@@ -1,0 +1,311 @@
+\subsection{Network Simplex Method for MCFP}
+Much like with the transshipment problem, we'll develop a similar Network Simplex Method for MCFP.
+
+\subsubsection{Finding a Basis}
+Again, we start by asking the question: \textit{What does a basis look like for MCFP?}
+
+Let's put our constraints from our LP in \Cref{eq:mcfp_lp-formulation} into matrix form. 
+We'll introduce $|A|$ slack variables $s_e$ to get rid of the inequality in the 2nd constraint ($x_e \leq c_e$)
+\[
+    \renewcommand{\arraystretch}{2}
+    \begin{blockarray}{ccccc}
+        & x_e & s_e & &\\
+    \begin{block}{c[c|c]c[c]}
+        V & M_{|V| \times |A|} & 0_{|V| \times |A|} & \multirow{2}{*}{=} & b_v\\
+        \cline{2-3}
+        A & I_{|A| \times |A|} & I_{|A| \times |A|} & & c_e \\
+    \end{block}
+    \end{blockarray}
+\]
+($M$ is the node-arc incidence matrix, $I$ is the identity matrix, and $0$ is the matrix of all zeroes)
+
+We know that $M$ has a rank of $|N| - 1$. 
+We'll extend this by putting all of the other constraints into our basis.
+There are $|A|$ remaining constraints, so the total rank of our matrix is $|N| - 1 + |A|$.
+That means that a basis for the MCFP will have $|N| - 1 + |A|$ variables, and all non-basic variables will be set to $0$.
+
+Observe that for each arc $e \in A$, at least one of $x_e$ or $s_e$ is in the basis. Why?
+If both $x_e = s_e = 0$, then $x_e + s_e = 0 < c_e$, since we assume that $c_e$ are all positive.
+So, this violates feasibility.
+
+Therefore, for each arc $e \in A$, we have the following $3$ possibilities:
+\begin{enumerate}
+    \item Only $x_e$ is in the basis (and $s_e$ is not)
+    \item Only $s_e$ is in the basis
+    \item Both $x_e$ and $s_e$ are in the basis.
+\end{enumerate}
+
+How many arcs can there be in case $3$?
+Let's try to count them; denote the number of arcs in case $3$ with $k$.
+Then, there are $|A| - k$ arcs in case $1$ or $2$.
+This gives a total of $2k + |A| - k = k + |A|$ variables.
+Our basis has size $|N| + |A| - 1$, so $k = |N| - 1$.
+\begin{remark}
+    These $|N| - 1$ arcs don't contain a cycle.
+\end{remark}
+\begin{proof}
+Exercise! (This number should seem awfully similar to something we've shown before)
+\end{proof}
+So, these $|N| - 1$ arcs from case $3$ must represent a spanning tree!
+
+\underline{\textbf{In Summary:}}
+
+A basic feasible solution in MCFP consists of a spanning tree $T$  and a feasible flow where all arcs not in $T$ satisfies $x_e \in \{0, c_e\}$. (Since if the arc falls under case $1$, then only $x_e$ is in basis and so $s_e = 0 \Rightarrow x_e = c_e$, and similarly for arcs under case $2$)
+
+\begin{example}{}{}
+Below is a feasible flow (labelled with $x_e \leq c_e$). The dashed lines are in the spanning tree. So, the variables in the basis are: $x_{ab}, x_{bd}, x_{ac}, s_{ac}, x_{bc}, s_{bc}, x_{cd}, s_{cd}$.
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[scale = 0.75]
+        \node[vertex][label=left:{$-10$}] (a) at (0,0) {a};
+        \node[vertex][label={$-5$}] (b) at (4.5,3) {b};
+        \node[vertex][label=below:{$12$}] (c) at (4.5,-3) {c};
+        \node[vertex][label=right:{$3$}] (d) at (9,0) {d};
+        
+        \begin{scope}[every node/.style={fill = white, ellipse}]
+            \draw[edge] (a) to node {$7 \leq 7$} (b);
+            \draw[edge, dashed] (a) to node {$3 \leq 5$} (c);
+            \draw[edge] (b) to node {$2 \leq 2$} (d);
+            \draw[edge, dashed] (b) to node {$10 \leq 12$} (c);
+            \draw[edge, dashed] (c) to node {$1 \leq 8$} (d);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+\end{example}
+
+\subsubsection{Optimality Conditions}
+Good, now we know what a basic feasible solution looks like for MCFP, we want to be able to improve it until it's optimal.
+Again, we'll use the CS conditions to derive optimal conditions.
+
+Using \Cref{eq:mcfp_lp-formulation,eq:mcfp_dual-formulation}, we obtain the following 2 CS conditions:
+\begin{enumerate}
+    \item $z_{uv} > 0 \Rightarrow x_{uv} = c_{uv}$
+    \item $-y_u + y_v - z_{uv} < w_{uv} \Rightarrow x_{uv} = 0$
+\end{enumerate}
+
+There's a lot of variables here!
+Let's try to rewrite these conditions in terms reduced costs. (Recall that the reduced cost for an arc $uv$ is $\overline{w}_{uv} = y_u + w_{uv} - y_v$)
+
+Then, the dual constraint: $-y_u + y_v - z_{uv} \leq w_{uv}$ can be rewritten as $z_{uv} \geq -\overline{w}_{uv}$, and we'll keep the second constraint: $z_{uv} \geq 0$ as is.
+Note that in the dual LP, our objective function maximizes $b^\intercal y - c^\intercal z$.
+In particular, we want to minimize $c^\intercal z$.
+So, $z_{uv} = \max\{0, -\overline{w}_{uv}\}$
+
+Using this, we can rewrite our two CS conditions:
+\begin{enumerate}
+    \item We had $z_{uv} > 0 \Rightarrow x_{uv} = c_{uv}$, but $z_{uv} > 0$ if and only if $\overline{w}_{uv} < 0$. So, this is equivalent to saying:
+    \begin{equation*}
+        \overline{w}_{uv} < 0 \Rightarrow x_{uv} = c_{uv}
+    \end{equation*}
+
+    \item We had $-y_u + y_v - z_{uv} < w_{uv} \Rightarrow x_{uv} = 0$. But, we can rewrite the premise as $z_{uv} > -\overline{w}_{uv}$ and this is true if and only if $\overline{w}_{uv} > 0$. So, this condition is equivalent to:
+    \begin{equation*}
+        \overline{w}_{uv} > 0 \Rightarrow x_{uv} = 0
+    \end{equation*} 
+\end{enumerate}
+
+\underline{\textbf{In Summary:}}
+\begin{enumerate}
+    \item $\overline{w}_{uv} < 0 \Rightarrow x_{uv} = c_{uv}$
+    \item $\overline{w}_{uv} > 0 \Rightarrow x_{uv} = 0$
+\end{enumerate}
+And, if $0 < x_{uv} \leq c_{uv}$, then $\overline{w}_uv = 0$.
+
+To gain some intuition for the optimality conditions, recall that we introduced an economic interpretation for NSM for TPs in \Cref{sec:tp_econ-interp}. 
+We can extend the interpretation by capping the amount we can transport through an arc $uv$ by $c_{uv}$.
+Then, using the same interpretation of the reduced cost, when $\overline{w}_{uv} < 0$, we can make profit by using arc $uv$, so we should send as much as possible through $uv$.
+The maximum we can send is $c_{uv}$, so set $x_{uv} = c_{uv}$.
+
+And, if $\overline{w}_{uv} > 0$, we lose money through $uv$, so we don't send anything through this arc, i.e. $x_{uv} = 0$
+
+\begin{example}{Checking for optimality}{}
+    On the left is a digraph with arc labelled by $(x_e, c_e)$ and on the right is a feasible flow along with feasible node potentials. The dashed lines are in the spanning tree.
+
+    We can check that $\overline{w}_{bc} = w_{bc} + y_b - y_c = -110 < 0$, but $x_{bc} = 10 \neq 12$, so this flow is not optimal
+
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.6]
+            \node[vertex][label=left:{$-10$}] (a) at (0,0) {a};
+            \node[vertex][label={$-5$}] (b) at (4.5,3) {b};
+            \node[vertex][label=below:{$12$}] (c) at (4.5,-3) {c};
+            \node[vertex][label=right:{$3$}] (d) at (9,0) {d};
+            
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (a) to node {$(50,7)$} (b);
+                \draw[edge] (a) to node {$(70,5)$} (c);
+                \draw[edge] (b) to node {$(20,2)$} (d);
+                \draw[edge] (b) to node {$(30,12)$} (c);
+                \draw[edge] (c) to node {$(100,8)$} (d);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.6]
+            \node[vertex][label=left:{$0$}] (a) at (0,0) {a};
+            \node[vertex][label={$50$}] (b) at (4.5,3) {b};
+            \node[vertex][label=below:{$80$}] (c) at (4.5,-3) {c};
+            \node[vertex][label=right:{$180$}] (d) at (9,0) {d};
+            
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge, dashed] (a) to node {$5$} (b);
+                \draw[edge] (a) to node {$5$} (c);
+                \draw[edge] (b) to node {$10$} (d);
+                \draw[edge, dashed] (b) to node {$10$} (c);
+                \draw[edge, dashed] (c) to node {$3$} (d);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+\end{example}
+
+\subsubsection{Entering and Leaving Arcs}
+Now, for the final step in creating NSM for MCFP.
+
+For entering arcs, we should choose arcs that violate either optimality condition (which we'll quickly recall):
+\begin{enumerate}
+    \item $\overline{w}_{uv} < 0 \Rightarrow x_{uv} = c_{uv}$
+    \item $\overline{w}_{uv} > 0 \Rightarrow x_{uv} = 0$
+\end{enumerate}
+
+If the reduced cost $\overline{w}_{uv} < 0$, but $x_{uv} < c_{uv}$, then there's nothing to modify here.
+We proceed as we did with NSM for TP: Create a cycle using the arc $uv$, and push as much flow through $uv$ as we can. 
+The arc that leaves the basis is the one that reaches capacity or is reduced to $0$ flow.
+
+However, if the reduced cost $\overline{w}_{uv} > 0$, we want to make $x_{uv} = 0$.
+In this case, we want to \textit{decrease} flow through $uv$.
+So, instead of orienting the cycle in the direction of $uv$, let's orient the cycle in the reverse direction of $uv$. The leaving arc is, again, the arc that reaches capacity or is reduced to $0$ flow.
+
+\begin{example}{Removing flow from the entering arc}{}
+    On the left is a digraph with arc labelled by $(x_e, c_e)$ and on the right is a feasible flow along with feasible node potentials. The dashed lines are in the spanning tree.
+
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.6]
+            \node[vertex][label=left:{$-10$}] (a) at (0,0) {a};
+            \node[vertex][label={$-5$}] (b) at (4.5,3) {b};
+            \node[vertex][label=below:{$12$}] (c) at (4.5,-3) {c};
+            \node[vertex][label=right:{$3$}] (d) at (9,0) {d};
+            
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (a) to node {$(50,7)$} (b);
+                \draw[edge] (a) to node {$(70,5)$} (c);
+                \draw[edge] (b) to node {$(20,2)$} (d);
+                \draw[edge] (b) to node {$(30,12)$} (c);
+                \draw[edge] (c) to node {$(100,8)$} (d);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.6]
+            \node[vertex][label=left:{$0$}] (a) at (0,0) {a};
+            \node[vertex][label={$40$}] (b) at (4.5,3) {b};
+            \node[vertex][label=below:{$70$}] (c) at (4.5,-3) {c};
+            \node[vertex][label=right:{$170$}] (d) at (9,0) {d};
+            
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (a) to node {$7$} (b);
+                \draw[edge, dashed] (a) to node {$3$} (c);
+                \draw[edge] (b) to node {$2$} (d);
+                \draw[edge, dashed] (b) to node {$10$} (c);
+                \draw[edge, dashed] (c) to node {$1$} (d);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+
+    We want to calculate the reduced costs on $bd$ and $ab$.
+    \begin{itemize}
+        \item $\overline{w}_{bd} =  20 -170 + 40 = -110 < 0$ and $x_{bd} = c_{bd}$, so this arc is fine.
+        \item $\overline{w}_{ab} =  50 - 40 = 10 > 0$, but $x_{ab} \neq 0$, so this arc violates the optimality conditions.
+    \end{itemize}
+
+    So, $ab$ is our entering arc, and we want to \textit{decrease} the flow through this arc. Orient $ab$ as a reverse arc in the cycle $acb$, and let $t$ be the flow we push through the cycle
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.6]
+            \node[vertex][label=left:{$0$}] (a) at (0,0) {a};
+            \node[vertex][label={$40$}] (b) at (4.5,3) {b};
+            \node[vertex][label=below:{$70$}] (c) at (4.5,-3) {c};
+            \node[vertex][label=right:{$170$}] (d) at (9,0) {d};
+            
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge, red] (a) to node {$7 - t$} (b);
+                \draw[edge, dashed, red] (a) to node {$3 + t$} (c);
+                \draw[edge] (b) to node {$2$} (d);
+                \draw[edge, dashed, red] (b) to node {$10 - t$} (c);
+                \draw[edge, dashed] (c) to node {$1$} (d);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+
+    We can take away at most $7$ and $10$ flow from $ab$ and $bc$ respectively. We can add at most $2$ flow to $ac$, since its capacity is $5$. So, $t = \min\{7, 10, 2\} = 2$. $ac$ reaches capacity so it leaves the basis and $ab$ enters.
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.6]
+            \node[vertex][label=left:{$0$}] (a) at (0,0) {a};
+            \node[vertex][label={$40$}] (b) at (4.5,3) {b};
+            \node[vertex][label=below:{$70$}] (c) at (4.5,-3) {c};
+            \node[vertex][label=right:{$170$}] (d) at (9,0) {d};
+            
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge, dashed, red] (a) to node {$5$} (b);
+                \draw[edge, red] (a) to node {$5$} (c);
+                \draw[edge] (b) to node {$2$} (d);
+                \draw[edge, dashed, red] (b) to node {$8$} (c);
+                \draw[edge, dashed] (c) to node {$1$} (d);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+
+    And, one can check that this flow is optimal!
+\end{example}
+
+\subsubsection{The Algorithm}
+
+\IncMargin{1em}
+\begin{algorithm}[H]\label{alg:nsm-mcfp}
+  \SetKwInOut{Input}{Input}
+
+  \Input{  
+    \begin{itemize}
+      \item $D = (N,A)$ connected digraph
+      \item $w \in R^A$ arc costs
+      \item $b \in R^N$ node demands
+      \item $c \in R^A$ arc capacities
+    \end{itemize}
+  }
+
+  \BlankLine
+  
+  \nl Look for an arc such that
+  \begin{enumerate}
+      \item $\overline{w}_{e} < 0$ and $x_e = 0$, or 
+      \item $\overline{w}_{e} > 0$ and $x_e = c_e$
+  \end{enumerate}
+
+  \nl $T + e$ has a cycle $C$. Depending on which case $e$ falls under:
+  \begin{enumerate}
+      \item Orient $C$ such that $e$ is a forward arc
+      \item Orient $C$ such that $e$ is a backward arc
+  \end{enumerate}
+
+  \nl Find $t$ that is the minimum of: $\{c_f - x_f\::\:f\:\text{is a forward arc}\}$ and $\{x_f\::\:f\:\text{is a backward arc}\}$
+
+  \nl Pick $f$ to be an arc in $C$ that is used to pick $t$
+
+  \nl Update the flow:
+  \begin{itemize}
+      \item Add $t$ to forward arcs in the cycle,
+      \item Subtract $t$ from backward arcs
+  \end{itemize}
+
+  \nl Replace $T$ with $T + e - f$
+
+  \nl Repeat until optimal
+
+  \caption{Network Simplex Algorithm For MCFP}
+\end{algorithm}

@@ -1,0 +1,76 @@
+
+\subsection{Introduction}
+The \textit{Minimum Cost Flow Problem} (MCFP) is quite similar to the transhippment problem. 
+We are given:
+\begin{itemize}
+    \item A digraph $D = (N,A)$,
+    \item Node demands $b \in \R^N$, 
+    \item Arc costs $w \in R^A$, and
+    \item (the new addition) Arc capacities $c \in R^A$, representing the maximum amount of flow that can be pushed through an arc. (We'll assume that $c_e > 0$, since otherwise, we can just remove the arc)
+\end{itemize}
+
+Our \underline{goal} is for this problem is to find a feasible flow (if it exists) satisfying the node demands \textit{and arc capacities}, while minimizing total cost.
+
+\begin{example}{}{}
+    Below is an example of an MCFP. Arcs are labelled with a pair $(w_e, c_e)$---the first value is the arc cost, and the second is the arc capacity.
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.75]
+            \node[vertex][label=left:{$-10$}] (a) at (0,0) {a};
+            \node[vertex][label={$-5$}] (b) at (4.5,3) {b};
+            \node[vertex][label=below:{$12$}] (c) at (4.5,-3) {c};
+            \node[vertex][label=right:{$3$}] (d) at (9,0) {d};
+            
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (a) to node {$(50,7)$} (b);
+                \draw[edge] (a) to node {$(70,5)$} (c);
+                \draw[edge] (b) to node {$(20,2)$} (d);
+                \draw[edge] (b) to node {$(30,12)$} (c);
+                \draw[edge] (c) to node {$(100,8)$} (d);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+    And, this example has a feasible solution:
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.75]
+            \node[vertex][label=left:{$-10$}] (a) at (0,0) {a};
+            \node[vertex][label={$-5$}] (b) at (4.5,3) {b};
+            \node[vertex][label=below:{$12$}] (c) at (4.5,-3) {c};
+            \node[vertex][label=right:{$3$}] (d) at (9,0) {d};
+            
+            \begin{scope}[every node/.style={fill = white, circle}]
+                \draw[edge] (a) to node {$7$} (b);
+                \draw[edge] (a) to node {$3$} (c);
+                \draw[edge] (b) to node {$2$} (d);
+                \draw[edge] (b) to node {$10$} (c);
+                \draw[edge] (c) to node {$1$} (d);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+\end{example}
+
+We can extend our LP formulation from TP for MCFP by including the arc capacity constraints:
+\begin{equation}\label{eq:mcfp_lp-formulation}
+\begin{aligned}
+      \min \quad &w^\intercal x \\
+      \text{s.t} \quad &x(\delta(\overline{v})) - x(\delta(v)) = b_v \quad \forall v \in N \\
+      &x_e \leq c_e \quad \forall e \in A \\
+      &x \geq 0
+\end{aligned}
+\end{equation}
+
+The dual of this LP is:
+\begin{equation}\label{eq:mcfp_dual-formulation}
+\begin{aligned}
+    \max \quad &b^\intercal y - c^\intercal z \\
+    \text{s.t} \quad &-y_u + y_v - z_{uv} \leq w_{uv} \quad \forall uv \in A \\
+    &z_{uv} \geq 0 \quad \forall uv \in A \\
+    &y\:\text{free}
+\end{aligned}
+\end{equation}
+
+In this section, we'll tweak the NSM algorithm to solve MCFP instances and find an infeasibility characterization for the problem.
+Note that this problem cannot be unbounded since $x_e \leq c_e$ places an upper bound on the maximum flow we can push.
