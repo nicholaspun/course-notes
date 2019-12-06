@@ -1,0 +1,49 @@
+\subsection{Dijkstra's Algorithm}
+Dijkstra's algorithm can only be used on the special case where there are no negative costs in our digraph. It is more efficient than Bellman-Ford.
+
+Recall that in the analysis of Bellman-Ford, we showed that once $y_v = d_v$ for some node $v$, then $y_v$ will never change.
+Dijkstra's algorithm takes advantage of this by keeping track of such nodes and wasting computations.
+
+Let's formalize this.
+
+Dijkstra's algorithm keeps a set $T$ of nodes on which the spanning tree is built.
+In each iteration of the algorithm, we raise the dual potentials of only the non-tree nodes by $t$.
+Now, what happens to the reduced costs after raising these potentials?
+\begin{enumerate}
+    \item If $u,v \not\in N(T)$, then both $y_u, y_v$ increase by $t$, so $\overline{w}_{uv}$ does not change.
+    \item If $u,v \in N(T)$, then both $y_u, y_v$ stay the same, so $\overline{w}_{uv}$ does not change.
+    \item If $u \not\in N(T), v \in N(T)$, then $y_u$ increases, while $y_v$ stays the same, so overall $\overline{w}_{uv}$ increases. This is fine.
+    \item If $u \in N(T), v \not\in N(T)$, then $y_u$ stays the same, while $y_v$ increases by $t$, so overall $ \overline{w}_{uv}$ decreases. In this case, to keep feasibility, we want to choose $t$ by picking the smallest $\overline{w}_{uv}$ amongst $\delta(N(T))$. Such an arc becomes an equality arc and is added to $T$.
+\end{enumerate}
+
+\subsubsection{The Algorithm}
+
+\IncMargin{1em}
+\begin{algorithm}[H]\label{alg:ford}  
+  \nl \textbf{Initialization:}
+  \begin{itemize}
+      \item Set $y_v = 0$ for all $v \in N$ 
+      \item Set $T = \{s\}$
+  \end{itemize}
+
+  \nl \While{$T$ is not a spanning tree}{
+    \begin{enumerate}[label=(\alph*)]
+        \item Pick $uv \in \delta(N(T))$ such that: $\overline{w}_{uv} = \min\{\overline{w}_e\::\:e \in \delta(N(T)) \}$
+
+        \item Set $y_z \leftarrow y_z + \overline{w}_{uv}$ for all $z \in N\setminus N(T)$
+        \item Add $uv$ and $u$ to $T$
+    \end{enumerate}
+  }
+
+  \caption{Dijkstra's Algorithm}
+\end{algorithm}
+
+\subsubsection{Correctness}
+We'll briefly justify this algorithm. Most of the ideas are the same as the analysis on Bellman-Ford. 
+\begin{itemize}
+    \item $y$ is always feasible ($y$ is feasible at initialization, since we don't have negative costs, and stays feasible in each iteration)
+    \item All arcs in $T$ are equality arcs
+    \item The algorithm produces a spanning tree rooted at $s$
+\end{itemize}
+So, the same LP argument gives that the resulting spanning tree must be a tree of shortest $s,v$-dipaths for all $v \in N$.
+

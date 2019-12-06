@@ -1,0 +1,47 @@
+\subsection{Applications}
+\subsubsection{Network Reliability}
+\underline{Problem:} Given a network $D = (N,A)$, each arc $e$ is assigned an associated reliability $r_e$, where $0 < r_e \leq 1$, representing the probability that $e$ is operational.
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex] (s) at (0,0) {$s$};
+        \node[vertex] (1) at (3,1) {};
+        \node[vertex] (2) at (4,-1) {};
+        \node[vertex] (3) at (1,-3) {};
+        \node[vertex] (4) at (6,1) {};
+        \node[vertex] (5) at (4,-3) {};
+        \node[vertex] (t) at (8,0) {$t$};
+
+        \begin{scope}[every node/.style={fill = white, ellipse}]
+            \draw[edge] (s) to node {$0.99$} (1);
+            \draw[edge] (s) to node {$0.98$} (2);
+            \draw[edge] (s) to node {$0.7$} (3);
+            \draw[edge] (1) to node {$0.82$} (4);
+            \draw[edge] (4) to node {$0.7$} (t);
+            \draw[edge] (5) to node {$0.91$} (3);
+            \draw[edge] (2) to node {$0.96$} (5);
+            \draw[edge] (2) to node {$0.81$} (t);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+
+For a given dipath $P$, the \underline{reliability} of $P$ is $\prod_{e \in P} r_e$, denoted $r(P)$.
+
+\underline{Goal:} Maximize the reliability amongst all $s,t$-dipaths
+
+We can apply Dijkstra's algorithm on this problem. Note that $\log(r(P)) = \sum_{e \in P} log(r_e)$. And, we can turn this maximization problem into a minimization problem by multiplying $-1$ on each arc.
+
+So, for each arc $ij$, the cost is $-\log(r_{ij})$. Since $0 < r_{ij} \leq 1,\:-\log(r_{ij}) > 0$, so Dijkstra's algorithm applies!
+ 
+\subsubsection{Currency Exchange}
+\underline{Problem:} We have a set of currencies and exchange rates $r_{uv}$ between two currencies $u$ and $v$, representing how much one unit of currency $u$ converts into currency $v$.
+
+\underline{Goal:} Exchange a series of currencies back to the original one so that we make a profit. That is, we want a dicycle $v_1v_2\ldots v_kv_1$ so that $r_{v_1v_2}r_{v_2v_3}\ldots r_{v_kv_1} > 1$
+
+\underline{Setup:} We use the same trick as with the Network Reliability example:
+\begin{align*}
+    \prod_{e \in C}r_e > 1 &\Leftrightarrow \log \prod_{e \in C} r_e > 1 \\ 
+    &\Leftrightarrow \sum_{e \in C} -(\log r_e) < 1
+\end{align*}
+So, we'll label each arc with cost $-\log r_e$, and since we're interested in finding a negative dicycle, we can just run Bellman-Ford.

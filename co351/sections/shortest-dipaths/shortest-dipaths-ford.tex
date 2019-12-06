@@ -1,0 +1,385 @@
+\subsection{Ford's Algorithm}
+In this section, we will create an algorithm that will find all shortest $s,v$-dipaths (provided there are no negative dicycles).
+Note that it will not be able to detect negative dicycles.
+Although this may not be ideal, we will find that this algorithm serves as a good starting point for the discussion of the algorithms that come after.
+
+\underline{Some motivation for the algorithm:}
+
+Consider the following path:
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex] (s) at (0,0) {$s$};
+        \node[vertex] (v1) at (2,0) {$v_1$};
+        \node[vertex] (v2) at (4,0) {$v_2$};
+        \node[vertex] (v3) at (6,0) {$v_3$};
+        \node[vertex] (t) at (8,0) {$t$};
+
+        \begin{scope}[every node/.style={fill = white, ellipse}]
+            \draw[edge] (s) edge (v1);
+            \draw[edge] (v1) edge (v2);
+            \draw[edge] (v2) edge (v3);
+            \draw[edge] (v3) edge (t);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+
+If there are no negative dicycles, then this shortest $s,t$-dipath also contains the shortest $s,v_3$-dipath, $s,v_2$-dipath, and $s,v_1$-dipath.
+
+It is worth seeing an example where there are negative dicycles:
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex] (s) at (0,0) {$s$};
+        \node[vertex] (v1) at (3,0) {$v_1$};
+        \node[vertex] (v2) at (6,0) {$v_2$};
+        \node[vertex] (t) at (9,0) {$t$};
+
+        \begin{scope}[every node/.style={fill = white, ellipse}]
+            \draw[edge] (s) to node {$1$} (v1);
+            \draw[edge, bend left] (s) to node {$4$} (t);
+            \draw[edge] (v1) to node {$1$} (v2);
+            \draw[edge] (v2) to node {$1$} (t);
+            \draw[edge, bend left] (t) to node {$-4$} (v1);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+
+Here, rather than taking the arc $su$ for a cost of $1$, the cheaper path is $stu$ for a cost of $0$.
+
+So, in the absence of negative dicycles, let's prove our motivating idea:
+\begin{theorem}{}{}
+    Let $D = (N, A)$ be a digraph with arc costs $w \in \R^A$ with no negative dicycles. 
+    If $v_1v_2\ldots v_k$ is the shortest $v_1,v_k$-dipath, then $v_1\ldots v_i$ is the shortest $v_1,v_i$-dipath.
+\end{theorem}
+\begin{proof}
+    Since there are no negative dicycles, our LP has an optimal solution which is the characteristic vector of an $v_1,v_k$-dipath $P$.
+    Then, there is a corresponding optimal dual solution $y$ where all arcs of $P$ are equality arcs (due to CS conditions).
+    Let $P': v_1\ldots v_i$ for some $i<k$.
+    $y$ is still feasible for the dual LP of the shortest $v_1,v_i$-dipath problem and any arc in $P'$ is in $P$, so all arcs of $P'$ are equality arcs.
+    So, the CS conditions are satisfied for the $v_1,v_i$-dipath problem
+\end{proof}
+\begin{definition}{Rooted Tree (at $s$)}{}
+    A tree $T$ is \underline{rooted} at $s$ if for all $t \in N(T)$, the unique $s,t$-path in $T$ is an $s,t$-dipath
+\end{definition}
+We can build a rooted tree at $s$ representing the shortest $s,v$-dipaths for all $v \in N\setminus\{s\}$ by solving the single $s,v$-dipath problem multiple times.
+However, we can, in fact, do much better than this, and we'll show that we can find them all at once.
+
+First, we'll need two results on rooted trees:
+\begin{proposition}{}{}
+    There is an $s,t$-dipath in $D$ for all $t \in N$ if and only if there exists a spanning tree in $D$ rooted at $s$
+\end{proposition}
+\begin{proposition}{}{}
+    Let $T$ be a spanning tree in $D$. Then, $T$ is rooted at $s$ if and only if the in-degree of $s$ is $0$, and the in-degree of all other nodes is $1$ in $T$
+\end{proposition}
+\begin{proof}
+    TODO!
+\end{proof}
+
+\begin{definition}{Predecessor}{}
+    In a spanning tree $T$, rooted at $s$, for each node $v \in N\setminus\{s\}$, its \underline{predecessor} is the unique node $u$ so that $uv$ is an arc in $T$. We write this as $p_v = u$
+\end{definition}
+
+\subsubsection{The Algorithm}
+At each step of the algorithm, we maintain a potential and the predecessor of each node.
+
+\IncMargin{1em}
+\begin{algorithm}[H]\label{alg:ford}  
+  \nl \textbf{Initialization:}
+  \begin{itemize}
+      \item Set $y_s = 0$ and $y_v = \infty\:\forall v \in N\setminus\{s\}$ 
+      \item Set $p_v =$ undefined $\forall v \in N$
+  \end{itemize}
+
+  \nl \While{$y$ is \underline{not} feasible}{
+    \begin{enumerate}[label=(\alph*)]
+        \item Find an arc $uv \in A$ where $\overline{w}_{uv} < 0$ (So $y_u + w_{uv} < y_v$)
+        \item Set $y_v = y_u + w_{uv}$ (i.e. Make it an equality arc)
+        \item Set $p_v = u$
+    \end{enumerate}
+  }
+
+  \caption{Ford's Algorithm}
+\end{algorithm}
+
+\begin{example}{Ford's Algorithm}{}
+    We'll run Ford's algorithm to find the spanning tree rooted at $s$ in the digraph below. 
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.75]
+            \node[vertex] (s) at (0,0) {$s$};
+            \node[vertex] (a) at (4,2) {$a$};
+            \node[vertex] (b) at (4,-2) {$b$};
+            \node[vertex] (c) at (8,0) {$c$};
+    
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (s) to node {$-1$} (a);
+                \draw[edge] (s) to node {$2$} (b);
+                \draw[edge] (a) to node {$5$} (c);
+                \draw[edge] (b) to node {$-4$} (a);
+                \draw[edge] (b) to node {$2$} (c);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+
+    \underline{Initialization:} We've labelled the nodes with their dual potentials. (Note: UD stands for undefined)
+    
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{minipage}{0.6\textwidth}
+            \centering
+            \begin{tikzpicture}[scale = 0.6]
+                \node[vertex][label = left:{$0$}] (s) at (0,0) {$s$};
+                \node[vertex][label = above:{$\infty$}] (a) at (4,2) {$a$};
+                \node[vertex][label = below:{$\infty$}] (b) at (4,-2) {$b$};
+                \node[vertex][label = right:{$\infty$}] (c) at (8,0) {$c$};
+        
+                \draw[edge] (s) edge (a);
+                \draw[edge] (s) edge (b);
+                \draw[edge] (a) edge (c);
+                \draw[edge] (b) edge (a);
+                \draw[edge] (b) edge (c);
+            \end{tikzpicture}
+        \end{minipage}%
+        \begin{minipage}{0.4\textwidth}
+            \centering
+            \begin{tabular}{c|ccc}
+                Nodes & $a$ & $b$ & $c$ \\
+                \hline
+                Preds. & UD & UD & UD             
+            \end{tabular}
+        \end{minipage}
+    \end{minipage}
+
+    \underline{Iteration 1:} $\overline{w}_{sa} = 1 - y_a = -\infty < 0$, so we correct $sa$ by setting $y_a = -1$. The predecessor for $a$ is set to be $s$
+    
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{minipage}{0.6\textwidth}
+            \centering
+            \begin{tikzpicture}[scale = 0.6]
+                \node[vertex][label = left:{$0$}] (s) at (0,0) {$s$};
+                \node[vertex][label = above:{$\infty$}] (a) at (4,2) {$a$};
+                \node[vertex][label = below:{$\infty$}] (b) at (4,-2) {$b$};
+                \node[vertex][label = right:{$\infty$}] (c) at (8,0) {$c$};
+        
+                \draw[edge, red] (s) edge (a);
+                \draw[edge] (s) edge (b);
+                \draw[edge] (a) edge (c);
+                \draw[edge] (b) edge (a);
+                \draw[edge] (b) edge (c);
+            \end{tikzpicture}
+        \end{minipage}%
+        \begin{minipage}{0.4\textwidth}
+            \centering
+            \begin{tabular}{c|ccc}
+                Nodes & $a$ & $b$ & $c$ \\
+                \hline
+                Preds. & UD & UD & UD             
+            \end{tabular}
+        \end{minipage}
+    \end{minipage}
+
+    \underline{Iteration 2:} $\overline{w}_{ac} = -1 + 5 - y_c = -\infty < 0$, so we correct $ac$ by setting $y_c = 4$. The predecessor for $c$ is set to be $a$
+    
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{minipage}{0.6\textwidth}
+            \centering
+            \begin{tikzpicture}[scale = 0.6]
+                \node[vertex][label = left:{$0$}] (s) at (0,0) {$s$};
+                \node[vertex][label = above:{$-1$}] (a) at (4,2) {$a$};
+                \node[vertex][label = below:{$\infty$}] (b) at (4,-2) {$b$};
+                \node[vertex][label = right:{$\infty$}] (c) at (8,0) {$c$};
+        
+                \draw[edge] (s) edge (a);
+                \draw[edge] (s) edge (b);
+                \draw[edge, red] (a) edge (c);
+                \draw[edge] (b) edge (a);
+                \draw[edge] (b) edge (c);
+            \end{tikzpicture}
+        \end{minipage}%
+        \begin{minipage}{0.4\textwidth}
+            \centering
+            \begin{tabular}{c|ccc}
+                Nodes & $a$ & $b$ & $c$ \\
+                \hline
+                Preds. & $s$ & UD & UD             
+            \end{tabular}
+        \end{minipage}
+    \end{minipage}
+
+    \underline{Iteration 3:} $\overline{w}_{sb} = 2 - \infty = -\infty < 0$, so we correct $sb$ by setting $y_b = 2$. The predecessor for $b$ is set to be $s$
+    
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{minipage}{0.6\textwidth}
+            \centering
+            \begin{tikzpicture}[scale = 0.6]
+                \node[vertex][label = left:{$0$}] (s) at (0,0) {$s$};
+                \node[vertex][label = above:{$-1$}] (a) at (4,2) {$a$};
+                \node[vertex][label = below:{$\infty$}] (b) at (4,-2) {$b$};
+                \node[vertex][label = right:{$4$}] (c) at (8,0) {$c$};
+        
+                \draw[edge] (s) edge (a);
+                \draw[edge, red] (s) edge (b);
+                \draw[edge] (a) edge (c);
+                \draw[edge] (b) edge (a);
+                \draw[edge] (b) edge (c);
+            \end{tikzpicture}
+        \end{minipage}%
+        \begin{minipage}{0.4\textwidth}
+            \centering
+            \begin{tabular}{c|ccc}
+                Nodes & $a$ & $b$ & $c$ \\
+                \hline
+                Preds. & $s$ & UD & $a$             
+            \end{tabular}
+        \end{minipage}
+    \end{minipage}
+
+    \underline{Iteration 4:} $\overline{w}_{ba} = 2 + (-4) - (-1) < 0$, so we correct $ba$ by setting $y_a = -2$. The predecessor for $a$ is set to be $b$
+    
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{minipage}{0.6\textwidth}
+            \centering
+            \begin{tikzpicture}[scale = 0.6]
+                \node[vertex][label = left:{$0$}] (s) at (0,0) {$s$};
+                \node[vertex][label = above:{$-1$}] (a) at (4,2) {$a$};
+                \node[vertex][label = below:{$2$}] (b) at (4,-2) {$b$};
+                \node[vertex][label = right:{$4$}] (c) at (8,0) {$c$};
+        
+                \draw[edge] (s) edge (a);
+                \draw[edge] (s) edge (b);
+                \draw[edge] (a) edge (c);
+                \draw[edge, red] (b) edge (a);
+                \draw[edge] (b) edge (c);
+            \end{tikzpicture}
+        \end{minipage}%
+        \begin{minipage}{0.4\textwidth}
+            \centering
+            \begin{tabular}{c|ccc}
+                Nodes & $a$ & $b$ & $c$ \\
+                \hline
+                Preds. & $s$ & $s$ & $a$             
+            \end{tabular}
+        \end{minipage}
+    \end{minipage}
+
+    \underline{Iteration 5:} $\overline{w}_{ac} = -2 + 5 - 4 < 0$, so we correct $ac$ by setting $y_c = 3$. The predecessor for $c$ stays the same.
+    
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{minipage}{0.6\textwidth}
+            \centering
+            \begin{tikzpicture}[scale = 0.6]
+                \node[vertex][label = left:{$0$}] (s) at (0,0) {$s$};
+                \node[vertex][label = above:{$-2$}] (a) at (4,2) {$a$};
+                \node[vertex][label = below:{$2$}] (b) at (4,-2) {$b$};
+                \node[vertex][label = right:{$4$}] (c) at (8,0) {$c$};
+        
+                \draw[edge] (s) edge (a);
+                \draw[edge] (s) edge (b);
+                \draw[edge, red] (a) edge (c);
+                \draw[edge] (b) edge (a);
+                \draw[edge] (b) edge (c);
+            \end{tikzpicture}
+        \end{minipage}%
+        \begin{minipage}{0.4\textwidth}
+            \centering
+            \begin{tabular}{c|ccc}
+                Nodes & $a$ & $b$ & $c$ \\
+                \hline
+                Preds. & $b$ & $s$ & $a$             
+            \end{tabular}
+        \end{minipage}
+    \end{minipage}
+
+    And ... we're done! We can check that the red arcs are all equality arcs and that the node potentials are feasible.
+    
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{minipage}{0.6\textwidth}
+            \centering
+            \begin{tikzpicture}[scale = 0.6]
+                \node[vertex][label = left:{$0$}] (s) at (0,0) {$s$};
+                \node[vertex][label = above:{$-2$}] (a) at (4,2) {$a$};
+                \node[vertex][label = below:{$2$}] (b) at (4,-2) {$b$};
+                \node[vertex][label = right:{$3$}] (c) at (8,0) {$c$};
+        
+                \draw[edge] (s) edge (a);
+                \draw[edge, red] (s) edge (b);
+                \draw[edge, red] (a) edge (c);
+                \draw[edge, red] (b) edge (a);
+                \draw[edge] (b) edge (c);
+            \end{tikzpicture}
+        \end{minipage}%
+        \begin{minipage}{0.4\textwidth}
+            \centering
+            \begin{tabular}{c|ccc}
+                Nodes & $a$ & $b$ & $c$ \\
+                \hline
+                Preds. & $b$ & $s$ & $a$             
+            \end{tabular}
+        \end{minipage}
+    \end{minipage}
+\end{example}
+
+\subsubsection{Correctness}
+We want to show that the algorithm actually produces a spanning tree rooted at $s$.
+
+Let's first make the following definition.
+\begin{definition}{Predecessor Digraph}{}
+    Let $D = (N,A)$ be the input digraph for our algorithm. At any point in the algorithm, the \underline{predecessor digraph}, denoted $D_p$, is a digraph with node set $N(D_p) = N$ and arc set $A(D_p) = \{p_vv\::\: v\in N\setminus\{s\}\}$.
+\end{definition}
+
+\begin{remark}
+    $y_v$ never increases in the algorithm
+\end{remark}
+And this is since we only modify $y_v$ if we find an arc $uv$ with $y_v > y_u + w_{uv}$. This operation only ever decreases $y_v$
+
+We'll need the following fact in later proofs:
+\begin{proposition}{}{}
+    Throughout the algorithm, $\overline{w}_e \leq 0$ for all arcs in $D_p$.
+\end{proposition}
+\begin{proof}
+    Focus on an arbitrary node $v$ and its unique predecessor $p_v = u$ (if it exists). When $v$ was corrected, $\overline{w}_{uv} = 0$. Then, until $u$ changes, the reduced cost on $\overline{w}_{uv}$ stays non-positive, \textit{and} only a change in $y_u$ can change the reduced cost on $\overline{w}_{uv}$. By the remark, $y_u$ decreases, so the reduced cost $\overline{w}_{uv} = w_{uv} + y_u - y_v$ also decreases.
+\end{proof}
+
+\begin{proposition}{}{}
+    If $D_p$ contains a dicycle (at any point in the algorithm), then $D$ contains a negative dicycle and the algorithm does not terminate.
+\end{proposition}
+\begin{proof}
+    Suppose we produce a dicycle $C$ in $D_p$ by correcting the arc $uv$, and let $C$ be $v = v_1,v_2,\ldots,v_k = u,v_1$.
+
+    Since we corrected $uv$, it must have been the case that $y_u + w_{vu} - y_v < 0$. So, $y_{v_k} + w_{v_1v_k} - y_{v_1} < 0$.
+
+    And, we also just showed that $\overline{w}_e \leq 0$ for all $e \in A(D_p)$, so for each $i = 1, 2, \ldots, k -1: \: y_{v_i} + w_{v_iv_{i+1}} - y_{v_{i+1}} < 0$. Taking the sum of these $k$ inequalities, we get:
+    $w_{v_1v_2} + \ldots + w_{v_kv_1} < 0$, so $C$ is a negative dicycle.
+
+    And, if there is a negative dicycle, then there is no feasible potential (Try summing up the dual constraints that correspond to the dicycle). As such, the algorithm will never terminate.
+\end{proof}
+
+And, there is one more case where the algorithm will not terminate:
+\begin{proposition}{}{}
+    If $s$ has a predecessor, then $D$ contains a negative dicycle and the algorithm does not terminate.
+\end{proposition}
+\begin{proof}
+    TODO!/Exercise?
+\end{proof}
+
+But, in the absence of negative dicycles, the algorithm will terminate. Does it properly give us a spanning tree rooted at $s$?
+\begin{proposition}{}{}
+    If the algorithm terminates, then $D_p$ is a spanning tree of shortest dipaths rooted at $s$, with $y_v$ as the cost of the shortest $s,v$-dipath.
+\end{proposition}
+\begin{proof}
+    Since the algorithm terminates, $D_p$ does not contain a cycle and $s$ does not have a predecessor. So, $D_p$ is indeed a spanning tree. Further, since all nodes other than $s$ has a predecessor, the in-degree is $1$, so $D_p$ is rooted at $s$.
+
+    Now, all arcs in $D_p$ are equality arcs, since we know $\overline{w}_e \leq 0$ and $\overline{w}_e < 0$ is impossible, since the algorithm has terminated and so $y$ is feasible. 
+
+    For $v \in N$, let $P$ be the $s,v$-dipath in $D_p$. Consider the LP formulation of the shortest $s,v$-dipath problem. $x^P$ is feasible for the primal, and $y$ is feasible for the dual. The CS conditions hold since all arcs in $P$ are equality arcs, so $x^P$ is optimal. The objective of the dual is $y_v - y_s = y_v - 0 = y_v$, so $y_v$ is the cost of the shortest $s,v$-dipath.
+\end{proof}

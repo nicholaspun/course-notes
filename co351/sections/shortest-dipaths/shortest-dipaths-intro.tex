@@ -1,0 +1,176 @@
+\subsection{Introduction}
+
+We'll now switch gears to the problem of finding shortest dipaths between two nodes $s$ and $t$ in our digraph.
+Solving this problem will require some of the tools we've built so far, and we will work our way towards $3$ different algorithms that solve this problem.
+
+\underline{\textbf{Problem: }}Given a digraph $D = (N,A)$, arc costs $w \in R^A$ and $2$ distinct nodes $s,t \in N$, find the minimum cost $s,t$-dipath.
+
+\begin{note}
+    Negative arc costs are allowed!
+\end{note}
+
+\begin{remark}
+    Assume that every node can be reached from $s$ via a dipath.
+\end{remark}
+
+\begin{example}{}{intro_st-dipath}
+    Below is a digraph with its arcs labelled with its arc cost.
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 0.75]
+            \node[vertex] (s) at (0,0) {s};
+            \node[vertex] (a) at (4,2) {a};
+            \node[vertex] (b) at (4,-2) {b};
+            \node[vertex] (t) at (8,0) {t};
+    
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (s) to node {$3$} (a);
+                \draw[edge] (s) to node {$2$} (b);
+                \draw[edge] (a) to node {$-2$} (b);
+                \draw[edge] (a) to node {$3$} (t);
+                \draw[edge] (b) to node {$4$} (t);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+
+    $s,a,t$ is a valid dipath of cost $6$.
+
+    $s,b,t$ is also a valid dipath of cost $6$.
+
+    $s,a,b,t$ is a minimum cost dipath of cost $5$.
+\end{example}
+
+\underline{\textbf{LP Formulation:}}
+\begin{definition}{Characteristic Vector of a Path}{}
+    Let $P$ be an $s,t$-dipath. Then, the \underline{characteristic vector} of $P$ is $x^P \in \R^A$ such that
+    \[
+        x^P_e = \begin{cases}
+            1 \:\text{if}\:e\in A(P) \\ 
+            0 \:\text{if}\:e\not\in A(P) \\ 
+        \end{cases}    
+    \]
+    (where $A(P)$ is the arc set of $P$)
+\end{definition}
+We can treat $x^P$ as a flow. We set node $s$ to have demand $-1$ (or supply of $1$), node $t$ to have demand $1$, and all other nodes to have demand $0$.
+This suggests the following LP formulation for our problem.
+\begin{equation}\label{eq:shortest-dipath_lp-formulation}
+\begin{aligned}
+    \min \quad &w^\intercal x \\
+    \text{s.t} \quad &x(\delta(\overline{v})) - x(\delta(v)) = \begin{cases}
+        -1 \:\text{if}\:v=s \\
+        1 \:\text{if}\:v=t \\
+        0 \:\text{otherwise} \\
+    \end{cases}\quad \forall v \in N \\
+    &x \geq 0
+\end{aligned}
+\end{equation}
+And, this LP gives the dual:
+\begin{equation}\label{eq:shortest-dipath_dual-formulation}
+\begin{aligned}
+    \max \quad &y_t - y_s \\
+    \text{s.t} \quad &y_v - y_u \leq w_{uv} \quad \forall uv \in A \\
+    &y\:\text{free}
+\end{aligned}
+\end{equation}
+\begin{note} 
+    This LP is just a special case of a TP
+\end{note}
+We also note that the characteristic vector of any $s,t$-dipath is an integral feasible solution. (Any $s,t$-dipath will send exactly $1$ unit of flow from $s$ through the path until it reaches $t$)
+
+However, the converse of this may not be true!
+That is, integral feasible solutions to the LP might not be an $s,t$-dipath
+For example, we could consider the following digraph and flow:
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex] (s) at (0,0) {s};
+        \node[vertex] (a) at (1.5,2) {a};
+        \node[vertex] (b) at (3,0) {b};
+        \node[vertex] (c) at (6,0) {c};
+        \node[vertex] (t) at (9,0) {t};
+
+        \begin{scope}[every node/.style={fill = white, ellipse}]
+            \draw[edge] (s) to node {$6$} (b);
+            \draw[edge] (a) to node {$5$} (s);
+            \draw[edge] (b) to node {$5$} (a);
+            \draw[edge] (b) to node {$3$} (c);
+            \draw[edge] (c) to node {$3$} (t);
+            \draw[edge, bend right] (t) to node {$2$} (b);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+
+This flow is a feasible solution to our LP, but we clearly don't have an $s,t$-dipath.
+
+However, this solution \textit{contains} an $s,t$-dipath: $s \rightarrow b \rightarrow c \rightarrow t$. Let's call this $P$. If we subtract $x^P$ from this flow, we obtain the following:
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex] (s) at (0,0) {s};
+        \node[vertex] (a) at (1.5,2) {a};
+        \node[vertex] (b) at (3,0) {b};
+        \node[vertex] (c) at (6,0) {c};
+        \node[vertex] (t) at (9,0) {t};
+
+        \begin{scope}[every node/.style={fill = white, ellipse}]
+            \draw[edge] (s) to node {$5$} (b);
+            \draw[edge] (a) to node {$5$} (s);
+            \draw[edge] (b) to node {$5$} (a);
+            \draw[edge] (b) to node {$2$} (c);
+            \draw[edge] (c) to node {$2$} (t);
+            \draw[edge, bend right] (t) to node {$2$} (b);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+
+This is a set of dicycles!
+
+\begin{theorem}{}{}
+    If $\overline{x}$ is an integral feasible solution to our LP ($\Cref{eq:shortest-dipath_lp-formulation}$), then $\overline{x}$ is a sum of the characteristic vector of an $s,t$-dipath and a collection of dicycles.
+\end{theorem}
+\begin{proof}
+    Let $F = \{e \in A\::\overline{x}_e > 0\}$ (since our flow is feasible, this set will be non-empty).
+    Let $\delta(S)$ be an $s,t$-cut.
+    The net flow of $S$ is $-1$ (since the supply is $-1$), so there must be at least one arc in $\delta(S)$ with non-zero flow, i.e. $|F \cap \delta(S)| \geq 1$.
+
+    So, there is an $s,t$-dipath $P$ using the arcs of $F$. 
+    Let $x' = \overline{x} - x^P$. 
+    Since $\overline{x}, x^P$ satisfy the flow constraints, then:
+    \begin{itemize}
+        \item $x'(\delta(\overline{s})) - x'(\delta(s)) = (\overline{x} - x^P)(\delta(\overline{s})) - (\overline{x} - x^P)(\delta(s)) = -1 - (-1) = 0$, and
+        \item $x'(\delta(\overline{t})) - x'(\delta(t)) = (\overline{x} - x^P)(\delta(\overline{t})) - (\overline{x} - x^P)(\delta(t)) = 1 - 1 = 0$, and
+        \item $x'(\delta(\overline{v})) - x'(\delta(v)) = (\overline{x} - x^P)(\delta(\overline{v})) - (\overline{x} - x^P)(\delta(v)) = 0$, for all other $v \in N$ 
+    \end{itemize} 
+    So, $x'(\delta(\overline{v})) - x'(\delta(v)) = 0$ for all $v \in N$.
+    
+    So, we've found our $s,t$-dipath, it remains to show what remains in the flow are all dicycles.
+
+    Let $F' = \{e \in A\::x'_e > 0\}$.
+    If $F' = \emptyset$, then we're done.
+    So, suppose $F' \neq \emptyset$, and take the longest dipath $v_1\ldots v_k$ in $F'$.
+
+    Since $x'(\delta(\overline{v})) - x'(\delta(v)) = 0$, there is an arc $v_kv_i$ for some $i < k$ (and such $v_i$ cannot be from outside the path since we have taken the longest dipath). This forms a dicycle $C: v_iv_{i+1}\ldots v_kv_i$.
+
+    Then, $x'' = x' - x^C$ satisfies $x''(\delta(\overline{v})) - x''(\delta(v)) = 0$ for all $v \in N$, and the sum of the flow has decreased by at least $1$, so by induction, we are done.
+\end{proof} 
+
+So, suppose $\overline{x}$ is an optimal integral solution to our LP.
+By this theorem, we can decompose $\overline{x}$ into an $s,t$-dipath and a collection of dicycles, that is: $\overline{x} = x^P + x^{C_1} + \ldots + x^{C_k}$, where $P$ is an $s,t$-dipath and $C_1, \ldots, C_k$ are dicycles.
+
+If $\overline{x} = x^P$, then we're done, so suppose there is at least one dicycle.
+
+If there are \underline{no} negative dicycles, then $w^\intercal \overline{x} \geq w^\intercal x^P$, and so $P$ is an optimal solution in the form of an $s,t$-dipath.
+We can find $P$ by using the method described in the proof above.
+
+However, if there are negative dicycles, then our problem is unbounded! (Since we can just send arbitrary amounts of flow through the cycle to decrease our cost).
+
+So, our previous techniques can only help us solve this problem if there are \underline{no} negative dicycles. Let's summarize this.
+
+\begin{theorem}{}{}
+    If there are no negative dicycles, then our LP formulation has an optimal solution that is the characteristic vector of an $s,t$-dipath
+\end{theorem}
+
+One of our goals in the rest of this section will be to tackle the issue of negative dicycles. Our algorithm should be able to detect that there is a negative dicycle and report it to us.

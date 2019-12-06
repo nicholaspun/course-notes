@@ -1,0 +1,77 @@
+\subsection{Bellman-Ford}
+Bellman-Ford is a modification of Ford's algorithm that can handle the case of negative dicycles.
+As well, we can provide an upper bound on the runtime of this algorithm
+
+\subsubsection{The Algorithm}
+The idea for Bellman-Ford is to go through the arcs in (a finite amount of) ``passes''.
+In each pass, we perform the same action as with Ford's algorithm.
+
+\IncMargin{1em}
+\begin{algorithm}[H]\label{alg:bellman-ford}  
+  \nl \textbf{Initialization:}
+  \begin{itemize}
+      \item Set $y_s = 0$ and $y_v = \infty\:\forall v \in N\setminus\{s\}$ 
+      \item Set $p_v =$ undefined $\forall v \in N$
+      \item Set $i \leftarrow 0$
+  \end{itemize}
+
+  \nl \While{$i < |N| - 1$}{
+    \begin{enumerate}[label=(\alph*)]
+        \item For each arc $uv \in A$, if $\overline{w}_{uv} < 0$, then set $y_v = y_u + w_{uv}$ and $p_v = u$
+        \item Set $i \leftarrow i + 1$
+    \end{enumerate}
+  }
+
+  \caption{Bellman-Ford Algorithm}
+\end{algorithm}
+
+The while loops runs a maximum of $|N|$ times, and in each iteration, we check every arc in $A$. So in total the runtime of this algorithm is: $\mathcal{O}(|N||A|)$.
+
+If a feasible potential is found once the algorithm terminates, then everything we've proved about Ford's algorithm applies and so we have our optimal rooted tree.
+
+However, if we still have an infeasible potential by termination, then there is a negative dicycle in our digraph.
+
+\subsubsection{Correctness}
+\underline{Notation:} We'll use $d_v$ to denote the cost of a shortest $s,v$-dipath.
+
+First, we'll show a lemma:
+\begin{lemma}{}{}
+    Suppose there are no negative dicycles. Then, at any point in the algorithm $y_v \geq d_v$
+\end{lemma}
+\begin{proof}
+    This clearly holds at initialization since $\infty \geq d_v$ (and $d_v$ is finite).
+
+    If $y_v \neq\infty$, then we can trace $v$ back to $s$ using $D_p$. For each of these arcs $\overline{w}_e \leq 0$. Adding all of these inequalities for each arc in this $s,v$-dipath, we get: 
+    \begin{equation*}
+        \sum_{ab \in P} \overline{w}_{ab} = \sum_{ab \in P} w_{ab} + y_a - y_b = w(P) - y_v \leq 0 \Rightarrow w(P) \leq y_v
+    \end{equation*}
+    But, $w(P) \geq d_v$, since $d_v$ is the cost of the a shortest $s,v$-dipath, so $d_v \leq y_v$, as required.
+\end{proof}
+
+\begin{theorem}{}{}
+    Suppose there are no negative dicycles. After the $i$-th iteration, if there is a shortest $s,v$-dipath using at most $i$ arcs, then $y_v = d_v$
+\end{theorem}
+\begin{proof}
+    We'll prove this by induction on $i$. The statement holds for $i = 0$. Assume the statement holds after the $i$-th iteration.
+
+    We want to show that the statement holds for $(i+1)$-th iteration. Pick $v$ which has a shortest $s,v$-dipath that uses at most $i+1$ arcs.
+
+    If the dipath uses at most $i$ arcs, then by induction, $y_v = d_v$ and by lemma, $y_v$ will not change.
+
+    So, suppose the shortest $s,v$-dipath uses exactly $i+1$ arcs and let $P: s=v_1\ldots v_{i+1} =v$. Since there are no negative dicycles, $v_1\ldots v_i$ is a shortest $s,v_i$-dipath that uses $i$ arcs and by induction, $y_{v_i} = d_{v_i}$ after the $i$-th iteration. This does not change in the $(i+1)$-th iteration.
+
+    Consider  $\overline{w}_{v_iv_{i+1}}$, there are three cases:
+    \begin{enumerate}
+        \item $\overline{w}_{v_iv_{i+1}} = 0$: Then, $y_{v_{i+1}} = y_{v_i} + w_{v_iv_{i+1}} = d_{v_i} + w_{v_iv_{i+1}} = w(P) = d_{v_{i+1}}$. The arc was already corrected before the $(i+1)$-th iteration, and will not change in this iteration (or future ones).
+        \item $\overline{w}_{v_iv_{i+1}} > 0$: Then, $y_{v_{i+1}} < d_{v_{i+1}}$. But, this contradicts the lemma, so this case does not happen
+        \item $\overline{w}_{v_iv_{i+1}} < 0$: Then, in the $(i+1)$-th iteration, the algorithm corrects this arc, and so $y_{v_{i+1}} = d_{v_{i+1}}$.
+    \end{enumerate}
+    By induction, we're done!
+\end{proof}
+
+\begin{corollary}{}{}
+    At the end of Bellman-Ford, if $y$ is feasible, then $y_v = d_v$ for all $v \in N$. Otherwise, you can conclude there is a negative dicycle.
+\end{corollary}
+\begin{proof}
+    Any shortest dipath uses at most $|N| - 1$ arcs. So, if $y$ is feasible by the end of the $|N| -1$ passes in Bellman-Ford, there must be no negative dicycles and by theorem $y_v = d_v \:\forall v \in N$. If $y$ is not feasible, then it must be the case that there is a negative dicycle.
+\end{proof}
