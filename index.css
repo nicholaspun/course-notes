@@ -1,0 +1,37 @@
+body {
+  margin: 0;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.backdrop {
+  position: relative;
+  height: 200px;
+  width: 100%;
+  background-color: black;
+}
+
+.circle {
+  z-index: 2;
+  position: absolute;
+  height: 250px;
+  width: 250px;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+}
+
+.main-body {
+  margin: 115px 20px 20px 20px;
+  padding-left: 200px;
+  padding-right: 200px;
+  text-align: center;
+}
+
+.logo-container {
+  margin-top: 35px;
+}
+
+.logo-container > a {
+  margin: 8px;
+}
