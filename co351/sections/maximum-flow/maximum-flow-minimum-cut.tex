@@ -1,0 +1,76 @@
+\subsection{Max-flow, Min-cut Theorem (and Combinatorial Applications)}
+We now introduce a very important theorem in this course: the Max-flow, Min-cut theorem.
+It's an awesome result that shows how awesome duality is \textit{and} relates two classes of problems in network flow theory.
+
+\begin{theorem}{Max-flow, Min-cut Theorem}{max-flow-min-cut}
+    The maximum value of an $s,t$-flow is equal to the minimum capacity of an $s,t$-cut.
+\end{theorem}
+\begin{proof}
+    The maximum flow always exists since the LP (\Cref{eq:max-flow_lp-formulation}) is feasible and not unbounded (the $c_e$'s are finite). 
+    Then, by the proof of \Cref{th:ff-correctness}, if $x$ is a max $s,t$-flow, then there exists a corresponding $s,t$-cut $\delta(Z)$ with $x(\delta(s)) - x(\delta(\overline{s})) = c(\delta(Z))$
+\end{proof}
+
+We'll now show how we can use this theorem to derive other interesting results in combinatorics.
+
+\subsubsection{Menger's Theorem}
+There are multiple versions of Menger's theorem. Here we'll prove the \textit{arc-disjoint} and \textit{node-disjoint} versions.
+
+Menger's theorem is concerned with the following question: Given a digraph $D = (N, A)$ and nodes $s,t \in N$, how many arcs (or nodes) do we need to remove to disconnect $s$ from $t$?
+
+\begin{definition}{Disconnect (for arcs)}{}
+    $A' \subseteq A$ \underline{disconnects} $s$ from $t$ if there is no $s,t$-dipath in $D' = (N, A - A')$
+\end{definition}
+
+\begin{definition}{Arc-disjoint}{}
+    A set of $s,t$-dipaths is \underline{arc-disjoint} if no two of the dipaths share an arc.
+\end{definition}
+
+\begin{theorem}{Menger's Theorem - Arc-disjoint Version}{menger-arc-disjoint}
+    Given $D = (N,A)$ and nodes $s,t \in N$, the maximum number of arc-disjoint $s,t$-dipaths is equal to the minimum number of arcs that disconnect $s$ from $t$.
+\end{theorem}
+We'll prove this using the Max-flow, Min Cut theorem and the help of the following proposition
+
+\begin{proposition}{Flow Decomposition}{}
+    Given $D = (N,A)$, nodes $s,t \in N$ and integer arc capacities, if $x$ is an $s,t$-flow of value $k$ and $x$ is integral, then $x$ is the characteristic vector of $k$ $s,t$-dipaths and a collection of dicycles.
+\end{proposition}
+\begin{proof}
+    TODO (Incomplete)
+
+    When $k = 0$ (i.e. $x$ is a circulation), then $x$ is the sum of characteristic vectors of dicycles (TODO: Expand)
+
+    If $k > 0$, then there is an $s,t$-dipath $P$ (TODO: Expand, similar to previous decomposition theorem) and $x - x^P$ is an $s,t$-flow of value $k-1$, so we are done by induction on $k$.
+\end{proof}
+
+\begin{proof}{(of \Cref{th:menger-arc-disjoint})}
+    \newline
+    If there are $k$ arc-disjoint $s,t$-dipaths, then we must remove at least one arc from each of these dipaths. So the maximum number of arc-disjoint $s,t$-dipaths is at least the minimum number of arcs that disconnect $s$ from $t$. So, we just have to show equality.
+
+    Let our digraph, along with arc capacities of $1$ on all the arcs be an instance of the maximum flow problem. Then, by max-flow, min-cut theorem on our digraph, there exists an $s,t$-flow with the same value $k$ as the capacity of an $s,t$-cut $\delta(Z)$. We may assume that $x$ is integral, since the capacities are all integral. Then, by Flow Decomposition, $x$ is the sum of $k$ $s,t$-dipaths and a collection of dicycles.
+
+    Since $c = 1$, each arc is used in at most $1$ $s,t$-dipath (splitting a flow of $1$ amongst more than one arc would imply that $x$ is a rational flow). So, these $s,t$-dipaths are all arc-disjoint. If we remove all $k$ arcs in $\delta(Z)$, then $s$ is disconnected from $t$.
+\end{proof}
+
+The node-disjoint version of this theorem is similar! Instead of removing arcs, we remove nodes (and incident arcs) until we disconnect the digraph.
+
+\begin{theorem}{Menger's Theorem - Node-disjoint Version}{menger-node-disjoint}
+    If $st$ is not an arc, then the maximum number of node-disjoint $s,t$-dipaths is equal to the minimum number of nodes whose removal disconnects $s$ from $t$
+\end{theorem}
+\begin{note}
+    The set of nodes that we remove is sometimes called an $s,t$-separating set.
+\end{note}
+\begin{proof}
+    TODO
+\end{proof}
+
+\subsubsection{K\"{o}nig's Theorem}
+\begin{definition}{Vertex Cover}{}
+    A \underline{vertex cover} is a set of vertices such that every edge has at least one endpoint in the set.
+\end{definition}
+\underline{Observation:} The size of a matching is at most the size of a vertex cover (Since a vertex cover will use at least one end of each edge in the matching). So, the size of a maximum matching must be at most the size of a minimum vertex cover.
+\begin{theorem}{K\"{o}nig's Theorem}{}
+    In a bipartite graph, the size of a max matching is equal to the size of a minimum vertex cover
+\end{theorem}
+\begin{proof}
+    TODO
+\end{proof}
+

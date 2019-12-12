@@ -1,0 +1,22 @@
+\subsection{Introduction}
+For the maximum flow problem, we are given a digraph $D = (N,A)$, arc capacities $c \in \R^A$, and a source and sink node $s,t \in N$.
+The goal is to push as much flow as we can from $s$ to $t$.
+
+\underline{LP Formulation:}
+
+As always, we'll formulate the LP for this problem:
+\begin{equation}\label{eq:max-flow_lp-formulation}
+\begin{aligned}
+      \max \quad &x(\delta(s)) - x(\delta(\overline{s}))\\
+      \text{s.t} \quad &x(\delta(\overline{v})) - x(\delta(v)) = 0 \quad&\forall v \in N \setminus \{s, t\}\\
+      &x_e \leq c_e \quad &\forall e \in A \\
+      &x \geq 0
+\end{aligned}
+\end{equation}
+Our objective function reflects our goal by maximizing flow out of $s$.
+
+\underline{Exercise:} Formulate this as an MCFP. (TODO)
+
+There are 2 main classes of algorithms for this problem: the augmenting-path based algorithms and the ``push-relabel'' type algorithms.
+We will go over both types. 
+Further, in this section, we will derive and prove the \textit{Max Flow, Min Cut Theorem} and apply it towards some interesting combinatorial results.

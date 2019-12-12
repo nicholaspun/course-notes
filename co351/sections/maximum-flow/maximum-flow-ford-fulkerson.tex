@@ -1,0 +1,229 @@
+\subsection{Ford-Fulkerson Algorithm}
+The Ford-Fulkerson algorithm belongs to the class of algorithms that uses augmenting paths to continually improve upon the flow.
+The idea is based on the following two examples:
+\begin{enumerate}
+    \item Suppose we are given the flow (where the arcs are labelled $(x_e, c_e)$):
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \node[vertex] (s) at (0,0) {$s$};
+            \node[vertex] (a) at (4,0) {$a$};
+            \node[vertex] (t) at (8,0) {$t$};
+    
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (s) to node {$(1,4)$} (a);
+                \draw[edge] (a) to node {$(1,2)$} (t);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+    
+    It is clear that we can push more flow through the arcs not yet at capacity. 
+    In this case, we can improve our flow by pushing $1$ extra flow through both arcs as we are constrained by the capacity of $at$
+
+    \item Now, suppose we are given the (slightly more complicated) flow:
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \node[vertex] (s) at (0,0) {$s$};
+            \node[vertex] (a) at (4,2) {$a$};
+            \node[vertex] (b) at (4,-2) {$b$};
+            \node[vertex] (t) at (8,0) {$t$};
+    
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (s) to node {$(10,10)$} (a);
+                \draw[edge, red] (s) to node {$(0,10)$} (b);
+                \draw[edge, red] (a) to node {$(10,10)$} (b);
+                \draw[edge, red] (a) to node {$(0,10)$} (t);
+                \draw[edge] (b) to node {$(10,10)$} (t);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+
+    Here, we can imagine pushing a flow of $10$ through the path $s\rightarrow b\rightarrow a\rightarrow t$. Note that $ba$ is a backwards arc with respect to our digraph, so instead of adding flow, we subtract flow. Once we're done, this gives us the flow:
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \node[vertex] (s) at (0,0) {$s$};
+            \node[vertex] (a) at (4,2) {$a$};
+            \node[vertex] (b) at (4,-2) {$b$};
+            \node[vertex] (t) at (8,0) {$t$};
+    
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (s) to node {$(10,10)$} (a);
+                \draw[edge, red] (s) to node {$(10,10)$} (b);
+                \draw[edge, red] (a) to node {$(0,10)$} (b);
+                \draw[edge, red] (a) to node {$(10,10)$} (t);
+                \draw[edge] (b) to node {$(10,10)$} (t);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+
+    which is better than what we started out with!
+\end{enumerate}
+
+To formalize this idea, we define the following digraph:
+\begin{definition}{Residual Digraph}{}
+    Given a digraph $D = (N,A)$, arc capacities $c \in R^A$, and a flow $x$, the corresponding \underline{residual digraph} (with respect to $x$) $D' = (N', A')$ is defined:
+    \begin{enumerate}
+        \item $N(D') = N(D)$
+        \item For each arc $uv \in A$
+        \begin{itemize}
+            \item If $c_{uv} > x_{uv}$, then add $uv$ with capacity (known as the residual) $c_{uv} - x_{uv}$. We call this a forward arc
+            \item If $x_{uv} > 0$, then add $vu$ with residual $x_{uv}$. We call this a backward arc.
+        \end{itemize}
+    \end{enumerate}
+    We may sometimes write $D(x)$ to denote this digraph.
+\end{definition}
+
+Looking back at the example above, the residual digraph before we modify the flow looks like:
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex] (s) at (0,0) {$s$};
+        \node[vertex] (a) at (4,2) {$a$};
+        \node[vertex] (b) at (4,-2) {$b$};
+        \node[vertex] (t) at (8,0) {$t$};
+
+        \begin{scope}[every node/.style={fill = white, ellipse}]
+            \draw[edge] (a) to node {$10$} (s);
+            \draw[edge, red] (s) to node {$10$} (b);
+            \draw[edge, red] (b) to node {$10$} (a);
+            \draw[edge, red] (a) to node {$10$} (t);
+            \draw[edge] (t) to node {$10$} (b);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+
+Observe that the dipath $s\rightarrow b\rightarrow a\rightarrow t$ in this residual digraph directly encodes the series of additions and subtractions of flow we performed.
+
+\begin{definition}{Augmenting Path}{}
+    An \underline{augmenting path} is an $s,t$-dipath in $D'$
+\end{definition}
+
+\subsubsection{The Algorithm}
+
+\IncMargin{1em}
+\begin{algorithm}[H]\label{alg:ford-fulkerson}  
+    \nl \textbf{Initialization:}
+    \begin{itemize}
+        \item Set $x_e = 0\:\forall e \in A$
+    \end{itemize}
+
+    \nl \While{$D'$ has an augmenting path}{
+        \begin{enumerate}[label=(\alph*)]
+            \item Find an augmenting path $P$ in $D'$
+            \item Let $\gamma$ be the minimum residual in $P$. Push $\gamma$ flow along $P$ in $D$---increasing flow in $D$ for forward arcs and decreasing flow in $D$ for reverse arcs
+            \item Update $D'$ given this new flow
+        \end{enumerate}
+    }
+
+    \caption{Ford-Fulkerson Algorithm}
+\end{algorithm}
+
+\subsubsection{Correctness}
+First, note that we have yet to give a runtime for this algorithm.
+Each step in the while loop can be done in polynomial time.
+However, will the while loop ever terminate?
+\begin{itemize}
+    \item If $c$ integral, then at each step, we increase the flow by at least $1$, so eventually, the algorithm terminates
+    \item If $c$ rational, then we can multiple $c$ by its GCD to obtain integer capacities
+    \item If $c$ is irrational, it's possible that our algorithm never terminates!
+\end{itemize}
+
+However, even if $c$ is integral, our algorithm may still not terminate in polynomial time with respect to the size of our digraph.
+Consider the following digraph (labelled with arc capacities and $M$ is some very large number):
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}
+        \node[vertex] (s) at (0,0) {$s$};
+        \node[vertex] (a) at (4,2) {$a$};
+        \node[vertex] (b) at (4,-2) {$b$};
+        \node[vertex] (t) at (8,0) {$t$};
+
+        \begin{scope}[every node/.style={fill = white, ellipse}]
+            \draw[edge] (s) to node {$M$} (a);
+            \draw[edge] (s) to node {$M$} (b);
+            \draw[edge, red] (a) to node {$1$} (b);
+            \draw[edge] (a) to node {$M$} (t);
+            \draw[edge] (b) to node {$M$} (t);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+
+Suppose $ab$ is always included in our augmenting path.
+Then, in each iteration, we will push at most $1$ unit of flow, so the algorithm will perform at least $M$ iterations. 
+Since $M$ can be as large as we want, this algorithm runs in \textit{pseudopolynomial} time.
+
+We can fix this by picking \textit{shortest} augmenting paths:
+\begin{proposition}{Edmonds-Karp Algorithm}{}
+    If we pick an augmenting path with the fewest number of arcs, then we only need $|N||A|$ iterations
+\end{proposition}
+\begin{proof}
+    TODO!/Exercise
+\end{proof}
+
+Now, suppose we use the shortest path rule and the algorithm terminates. We want to show that the resulting flow is a maximum flow.
+\begin{theorem}{}{ff-correctness}
+    $x$ is a maximum $s,t$-flow if and only if there are no augmenting paths
+\end{theorem}
+
+To prove this theorem, we'll need a lemma:
+\begin{lemma}{}{}
+    Given digraph $D = (N,A)$, arc capacities $c \in \R^A$, and nodes $s,t \in N$. The value of any $s,t$-flow is at most the capacity of any $s,t$-cut.
+\end{lemma}
+\begin{proof}
+    Let $x$ be any $s,t$-flow and $\delta(S)$ be any $s,t$-cut. The net flow of $S$ is equal to the net flow of $s$ (since the net flow on the other nodes is $0$).
+
+    Then, the value of flow $x$ is:
+    \begin{align*}
+        x(\delta(s)) - x(\delta(\overline{s})) &= x(\delta(S)) - x(\delta(\overline{S})) \\
+        &\leq x(\delta(S)) \\
+        &\leq c(\delta(S))
+    \end{align*}
+\end{proof}
+
+\begin{proof}{(of \Cref{th:ff-correctness})}
+    \newline
+    $(\Rightarrow)$ If there exists an augmenting path $P$, then we can push flow from $s$ to $t$ through $P$, hence increasing the flow from $s$ to $t$. 
+    So, $x$ is not a maximum $s,t$-flow.
+
+    $(\Leftarrow)$ Suppose there are no augmenting paths. Let $Z$ be the set of all nodes reachable from $s$ in $D'$. 
+    Then, $s \in Z, t \not\in Z$ and $\delta_{D'}(Z) = \emptyset$.
+    \begin{itemize}
+        \item Consider an arc $uv$ in $\delta_D(Z)$, since $uv \not\in \delta_{D'}(Z)$, $x_{uv} = c_{uv}$. 
+        \item Consider an arc $ab$ in $\delta_D(\overline{Z})$, since $ba \not\in \delta_{D'}(Z)$, $x_{ab} = 0$.
+    \end{itemize} 
+
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \begin{tikzpicture}[node distance = 2cm]
+          \node[vertex] (s) at (0.2,0) {$s$};
+          \node[vertex] (t) at (5,0) {$t$};
+          \node[vertex, minimum size = 2.5cm][label=below left:{$Z$}] (Z) at (1,0) {};
+    
+          \draw[edge] (4, 1) to (Z); 
+          \draw[edge] (4, 0) to (Z); 
+          \draw[edge] (4, -1) to (Z); 
+        \end{tikzpicture}
+        \captionof*{figure}{Residual Digraph $D'$}
+      \end{minipage}
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \begin{tikzpicture}[node distance = 2cm]
+            \node[vertex] (s) at (0.2,0) {$s$};
+            \node[vertex] (t) at (5,0) {$t$};
+            \node[vertex, minimum size = 2.5cm][label=below left:{$Z$}] (Z) at (1,0) {};
+            
+            \draw[edge, out = 135, in = 45] (4, 1) to node[above] {$x_e = 0$} (Z); 
+            \draw[edge, out = -45, in = -135] (Z) to node[below] {$x_e = c_e$} (4, -1); 
+        \end{tikzpicture}
+        \captionof*{figure}{Digraph $D$}
+      \end{minipage}
+    
+      So, the net flow out of $s$ is: $x(\delta(s)) - x(\delta(\overline{s})) = x(\delta(Z)) - x(\delta(\overline{Z})) = c(\delta(Z))$, and by the lemma, $x$ is a maximum flow. (And, $\delta(Z)$ is a minimum capacity$s,t$-cut)
+\end{proof}
