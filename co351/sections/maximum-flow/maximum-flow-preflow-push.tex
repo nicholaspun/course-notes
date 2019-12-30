@@ -1,1 +1,215 @@
-\subsection{Preflow-Push Algorithm}
+\subsection{Push-Relabel Algorithm}
+While proving the correctness of Ford-Fulkerson, we established the optimality condition: we have a maximum flow once we can no longer find an $s,t$-dipath in the residual digraph. (i.e. There are no more augmenting paths)
+To that end, Ford-Fulkerson maintains a feasible flow and incrementally increases the flow until this optimality condition is reached.
+
+The Push-Relabel (also called Preflow-Push) algorithm uses a complementary approach.
+We start with an infeasible flow, but maintain the optimality condition until a feasible flow is reached.
+Once this occurs, because we have maintained the optimality condition, our feasible flow is, in fact, optimal.
+We call this intermediate, infeasible flow a \underline{preflow}:
+\begin{definition}{Preflow, Excess}{}
+    An \underline{$s,t$-preflow} $x$ is a flow that satisfies:
+    \begin{itemize}
+        \item $0 \leq x_e \leq c_e$ (the flow does not exceed capacity), and 
+        \item $x(\delta(\overline{v})) \geq x(\delta(v))$ for all $v \in N \setminus \{s,t\}$. (There can be more inflow than outflow.)
+    \end{itemize}
+
+    The \underline{excess} at $v$ is $e_x(v) = x(\delta(\overline{v})) - x(\delta(v))$
+\end{definition}
+Given a preflow, our algorithm does one of two actions:
+\begin{enumerate}
+    \item \textbf{Push:} Push flow out from nodes that have greater than $0$ excess...subject to some requirements, or
+    \item \textbf{Relabel:} If said requirements aren't met, we relabel the node.
+\end{enumerate}
+This label we'll have on the nodes will be called its ``height''.
+And the requirement for pushing out excess is always push flow downwards (i.e. From a node of greater height to a node of lesser height).
+For every node $v \in N$, we associate it with its height $h(v)$.
+\begin{definition}{Compatible}{}
+    A set of heights $h$ is \underline{compatible} with a preflow $x$ if:
+    \begin{enumerate}[label=(\alph*)]
+        \item $h(s) = |N|$
+        \item $h(t) = 0$
+        \item $h(v) \geq h(u) - 1 \quad \forall uv \in A(D')$
+    \end{enumerate}
+\end{definition}
+Turns out, compatibility is all we need to ensure the optimality condition holds.
+\begin{lemma}{}{compatible-implies-no-dipath}
+    If a preflow $x$ and height $h$ are compatible, then the residual digraph $D'$ has no $s,t$-dipath.
+\end{lemma}
+We'll prove this in a bit. Let's state the algorithm first.
+
+\subsubsection{The Algorithm}
+\begin{note}
+    We'll use $r_{uv}$ to denote the residual on $uv$ in $D'$
+\end{note}
+
+\IncMargin{1em}
+\begin{algorithm}[H]\label{alg:push-relabel}
+    \nl \textbf{Initialization:}
+    \begin{itemize}
+        \item Set $h(s) = |N|$ and $h(v) = 0$ for all other nodes 
+        \item Set preflow $x$ to be $x_e = c_e$ if $e \in \delta_D(s)$ and $x_e = 0$ otherwise. 
+        
+        (That is, push out as much as possible out of $s$)
+    \end{itemize}
+
+    \BlankLine  
+  
+    \nl \While{$\exists u \in N \setminus \{s,t\}$ with $e_x(u) > 0$}{
+        \begin{enumerate}[label=(\alph*)]
+            \item \textbf{If} $\exists uv \in A(D')$ where $h(v) = h(u) - 1$, then \textbf{push} $\min\{r_{uv}, e_x(u)\}$ on $uv$. 
+            
+            (``Push'' means to add flow on forward arcs and subtract flow on backward arcs)
+            \item \textbf{Else} increment $h(u)$ by $1$ (\textbf{Relabel})
+        \end{enumerate}
+    }
+
+    \caption{Push-Relabel Algorithm}
+\end{algorithm}
+
+\subsubsection{Correctness}
+First we'll prove \Cref{lem:compatible-implies-no-dipath}.
+\begin{proof}
+    Suppose there \textit{does} exist an $s,t$-dipath in $D'$, let's call it $P : v_0v_1\ldots v_{k-1}v_k$ (where $s = v_0$ and $t = v_k$). Since $x, h$ are compatible $h(v_i) \geq h(v_{i-1}) - 1$ for $i = 1, \ldots k$. So in fact:
+    \begin{align*}
+        h(t) = h(v_k) &\geq h(v_{k-1}) - 1 \\
+        &\geq h(v_{k-2}) - 1 - 1 \\
+        &\ldots \\
+        &\geq h(s) - k
+    \end{align*}
+    So, $h(s) - k \leq h(t)$, but again, because of compatibility, $h(s) = |N|$ and $h(t) = 0$, so we can rewrite this inequality as $|N| - k \leq 0 \Rightarrow |N| \leq k$, which is a contradiction! 
+\end{proof}
+
+The following corollary is an easy statement to verify:
+\begin{corollary}{}{}
+    If $x$ is a feasible flow with compatible heights $h$, then $x$ is a maximum flow
+\end{corollary}
+
+We stated earlier that the algorithm maintains the optimality condition. Let's show that this is actually true:
+\begin{theorem}{}{}
+    The algorithm maintains a preflow and a height function that are compatible with each other.
+\end{theorem}
+\begin{proof}
+    This is true at initialization.
+
+    Suppose we perform a push operation on arc $uv$. 
+    The resulting flow is a preflow since we only push $\min\{e_x(u), r_{uv}\}$. 
+    We also only push when $h(v) = h(u) - 1$, so the heights were compatible before the push. 
+    After the push, the only new arc we need to consider in $D'$ is $vu$. 
+    But the heights have not changed after the push operation, so $h(u) = h(v) + 1 \geq h(v) - 1$, as required.
+    
+    Suppose we perform a relabel operation on node $u$.
+    It must have been the case that $h(u) \leq h(v)$ for all $uv \in A(D')$.
+    Then, incrementing $h(u)$ by $1$ gives $h(u) - 1 \leq h(v)$ for all $uv \in A(D')$.
+\end{proof}
+
+So, \textit{if} the algorithm terminates, then there is no excess flow nodes other than $s,t$, so this is a feasible flow.
+Also, we've just showed that we always maintain a compatible height function.
+Hence, this flow must also be optimal.
+
+It remains to show that the algorithm \textit{does} terminate.
+To do so, we'll bound the number of relabel and push operations.
+
+\textbf{\underline{Relabel}:} The total number of relabel operations is at most $2|N|^2$
+
+We start with a lemma:
+\begin{lemma}{}{}
+    If $e_x(u) > 0$, then there is a $u,s$-dipath in $D'$
+\end{lemma}
+\begin{remark}
+    $e_x(u) \geq 0 \quad \forall u \in N \setminus\{s,t\}$ 
+\end{remark}
+\begin{proof}
+    We'll prove the contrapositive. Suppose there are no $u,s$-dipaths in $D'$.
+
+    Let $Z$ be the set of all nodes $u \in N$ with no $u,s$-dipath in $D'$. We note that the cut: $\delta_{D'}(Z) = \emptyset$, as nodes outside of our set can reach $s$, so if the cut were not empty we would be able to find a dipath to $s$ via nodes in the cut.
+
+    So, there are only incoming arcs into $Z$. For every arc $vu \in \delta_{D'}(\overline{Z})$:
+    \begin{itemize}
+        \item If $vu \in A(D)$, then $x_{vu} = 0$
+        \item If $uv \in A(D)$, then $x_{uv} = c_{uv}$ 
+    \end{itemize}
+
+    Then:
+    \begin{align*}
+        \sum_{u \in Z} e_x(u) &= \sum_{u \in Z} (x(\delta(\overline{u})) - x(\delta(u))) \quad (\text{By definition of excess}) \\
+        &= x(\delta(\overline{T})) - x(\delta(T)) \\
+        &= 0 - c(\delta(T)) \leq 0
+    \end{align*}
+    
+    But, by remark, $e_x(u) \geq 0$, so it must be that $e_x(u) = 0$
+\end{proof}
+
+This helps us to give a bound on the height function.
+\begin{proposition}{}{}
+    $h(u) \leq 2|N| - 1$
+\end{proposition}
+\begin{proof}
+    Suppose we increase the height $h(u)$ to $2|N|$.
+    This means that $e_x(u) > 0$.
+    By the lemma, there exists a $u,s$-dipath in $D'$, which has length at most $|N| - 1$.
+    Using the same argument as in the proof of \Cref{lem:compatible-implies-no-dipath}, $h(s) \geq h(u) - |N| + 1 \Rightarrow |N| \geq |N| + 1$, which is a contradiction. 
+\end{proof}
+
+So, each node can be relabelled at most $2|N| - 1$ times. There are also  at most $|N|$ nodes to relabel. This gives our bound on the total number of relabel operations:
+\begin{corollary}{}{}
+    The total number of relabel operations is at most $2|N|^2$
+\end{corollary}
+
+We now bound the maximum number of pushes.
+Let's start with a definition:
+\begin{definition}{Saturating and Non-Saturating Pushes}{}
+    A push on an arc $uv \in A(D')$ is called:
+    \begin{itemize}
+        \item \underline{saturating} if we push $r_{uv}$, and
+        \item \underline{non-saturating} if we push $e_x(u)$
+    \end{itemize} 
+\end{definition}
+
+We'll bound the number of each type of push individually.
+
+\underline{\textbf{Saturating Push}}: 
+\begin{theorem}{}{}
+    The total number of saturating pushes is at most $2|N||A|$. 
+\end{theorem}
+\begin{proof}
+    Suppose we perform a saturating push on an arc $uv$. Then,
+    \begin{itemize}
+        \item It must be that $h(u) = h(v) + 1$, and
+        \item Since the push is saturating, after the push, the arc $uv$ has residual $0$ and is removed from the residual digraph.
+    \end{itemize}
+    So, in order to push along $uv$ again, we must first push along $vu$. 
+    This requires at least 2 relabels: the first relabelling $v$ and the second relabelling $u$.
+    So, between any $2$ saturating pushes, there are at least $2$ relabel operations.
+    But, each node can be relabelled at most $2|N|$ times, so there are at most $|N|$ saturating pushes on $uv$
+
+    And, since there are at most $2|A|$ possible arcs in $D'$, there can be at most $2|N||A|$ saturating pushes in total.
+\end{proof}
+
+\underline{\textbf{Non-Saturating Push}}: 
+\begin{theorem}{}{}
+    The total number of non-saturating pushes is at most $4|N|^2|A|$. 
+\end{theorem}
+\begin{proof}
+    Define the following function:
+    \begin{equation*}
+        \Phi(x,h) = \sum_{\substack{v \in N \\ e_x(v) > 0}} h(v)
+    \end{equation*}
+    Note that at initialization $\Phi = 0$ and otherwise always non-negative.
+
+    We will determine the effect on $\Phi(x,h)$ by each type of operation:
+    \begin{itemize}
+        \item \textbf{Relabel}: Relabels are only done on nodes with excess, and so $\Phi(x,h)$ increases by $1$ for every relabel. There are at most $2|N|^2$ relabels so the maximum increase of $\Phi$ due to relabel operations is $2|N|^2$
+        \item \textbf{Saturating Push}: Consider a saturating push on $uv$. This decreases $e_x(u)$ and increases $e_x(v)$. If $e_x(v) = 0$ before the push, then after the push, we add $h(v)$ to $\Phi(x,h)$. Since $h(v) \leq 2|N| - 1$, we add at most $2|N| - 1$. There are at most $2|N||A|$ saturating pushes, so the maximum increase of $\Phi$ due to saturating pushes is $2|N||A|(2|N| - 1) \approx 4|N|^2|A|$.
+        \item \textbf{Non-Saturating Push}: Consider a non-saturating push on $uv$. $e_x(u)$ becomes $0$, so we subtract $h(u)$ from $\Phi(x,h)$. We may need to add $h(v)$ to $\Phi(x,h)$, but $h(u) = h(v) + 1$ so we'll see a decrease in $\Phi(x,h)$ by at least $1$.
+    \end{itemize}
+    
+    So, the maximum increase in $\Phi(x,h)$ due to relabels or saturating pushes is $4|N|^2|A| + 2|N|^2$. Since $\Phi(x,h)$ stays non-negative and each non-saturating push decreases $\Phi(x,h)$ by at least $1$, there are at most $4|N|^2|A| + 2|N|^2$ non-staturating pushes. (And, $4|N|^2|A|$ is the dominating term)
+\end{proof}
+
+\begin{corollary}{}{}
+    The algorithm takes at most $2|N|^2 + 2|N||A| + 4|N|^2|A|$ operations
+\end{corollary}
+
+\begin{example}{}{}
+    TODO!
+\end{example}
