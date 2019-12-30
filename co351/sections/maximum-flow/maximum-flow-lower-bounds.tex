@@ -1,3 +1,90 @@
-\subsection{Flows with lower bounds (and applications)}
-In this section, we generalize the maximum flow problem by introducing non-negative lower bounds $l \in \R^A$ for every arc.
-A flow must satisfy $l_e \leq x_e \leq c_e$ for all $e \in A$
+\subsection{Flows with Lower Bounds}
+In this section, we generalize the maximum flow problem by introducing non-negative lower bounds $\ell \in \R^A$ for every arc.
+This generalization will give us a bit more expressive power in the following section of applications of max flows.
+
+We now enforce that a flow must satisfy $\ell_e \leq x_e \leq c_e$ for all $e \in A$. 
+Below, on the left, we have a digraph where the arcs are labelled with its lower and upper bound $(\ell_e, c_e)$. 
+On the right, we have a feasible flow for the digraph.
+
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.85]
+        \node[vertex] (s) at (0,0) {$s$};
+        \node[vertex] (a) at (4,2) {$a$};
+        \node[vertex] (b) at (4,-2) {$b$};
+        \node[vertex] (t) at (8,0) {$t$};
+
+        \begin{scope}[every node/.style={fill = white, ellipse}]
+            \draw[edge] (s) to node {$(3, 9)$} (a);
+            \draw[edge] (s) to node {$(10, 20)$} (b);
+            \draw[edge] (a) to node {$(2, 3)$} (b);
+            \draw[edge] (a) to node {$(5, 7)$} (t);
+            \draw[edge] (b) to node {$(8, 17)$} (t);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.85]
+        \node[vertex] (s) at (0,0) {$s$};
+        \node[vertex] (a) at (4,2) {$a$};
+        \node[vertex] (b) at (4,-2) {$b$};
+        \node[vertex] (t) at (8,0) {$t$};
+
+        \begin{scope}[every node/.style={fill = white, circle}]
+            \draw[edge] (s) to node {$7$} (a);
+            \draw[edge] (s) to node {$10$} (b);
+            \draw[edge] (a) to node {$2$} (b);
+            \draw[edge] (a) to node {$5$} (t);
+            \draw[edge] (b) to node {$12$} (t);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+
+With the addition of the lower bound, it is no longer obvious that a feasible solution exists, since we can no longer just send the all-$0$ flow.
+But, let's assume that a feasible flow exists.
+
+In order to use Ford-Fulkerson, we'll have to make a modification to our residual digraph.
+The node set and forward arcs remain the same.
+For backward arcs, if $x_{uv} > l_{uv}$, then add $vu$ an arc with residual $x_{uv} - l_{uv}$.
+This will prevent us from decreasing flow past the lower bound.
+An example of this is given below using the flow above.
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.85]
+        \node[vertex] (s) at (0,0) {$s$};
+        \node[vertex] (a) at (4,2) {$a$};
+        \node[vertex] (b) at (4,-2) {$b$};
+        \node[vertex] (t) at (8,0) {$t$};
+        
+        \begin{scope}[every node/.style={fill = white, circle}]
+            \draw[edge, bend right] (s) to node {$2$} (a);
+            \draw[edge, bend right] (a) to node {$4$} (s);
+            \draw[edge] (s) to node {$10$} (b);
+            \draw[edge] (a) to node {$1$} (b);
+            \draw[edge] (a) to node {$2$} (t);
+            \draw[edge, bend right] (b) to node {$5$} (t);
+            \draw[edge, bend right] (t) to node {$4$} (b);
+        \end{scope}
+    \end{tikzpicture}
+\end{minipage}
+
+The rest of the algorithm remains the same, and when it terminates, we'll leave it to the reader to verify that $x$ is indeed a maximum $s,t$-flow.
+The following lemma may be useful:
+\begin{lemma}{}{}
+    For any $s,t$-flow $x$ and any $s,t$-cut $\delta(S)$, the value of $x$ is at most $c(\delta(S)) - \ell(\delta(\overline{S}))$
+\end{lemma}
+\begin{proof}
+    Same idea as \Cref{lem:ff-correctness}
+\end{proof}
+
+Further, the lemma above suggests the following generalized version of the max-flow, min-cut theorem:
+\begin{theorem}{Generalized Max-Flow, Min-Cut}{}
+    Given a digraph with lower bounds, the maximum value of an $s,t$-flow is equal to the minimum value of $c(\delta(S)) - \ell(\delta(\overline{S}))$ (provided a feasible solution exists)
+\end{theorem}
+
+As an aside, we can also generalize the feasibilty characterization for such networks:
+\begin{theorem}{Feasibility Characterization for Flows with Lower Bounds}{}
+    The network is infeasible if and only if there exists an $s,t$-cut such that $c(\delta(S)) < \ell(\delta(\overline{S}))$
+\end{theorem}
