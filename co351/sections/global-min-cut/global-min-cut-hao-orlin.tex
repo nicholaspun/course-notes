@@ -1,0 +1,33 @@
+\subsection{Hao-Orlin}
+Our goal in this section is to find a minimum capacity non-trivial cut in $D = (N, A)$.
+
+\begin{example}{}{}
+    Suppose we are given the following directed graph:
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \node[vertex] (a) at (0,0) {a};
+            \node[vertex] (b) at (0,3) {b};
+            \node[vertex] (c) at (3,3) {c};
+            \node[vertex] (d) at (3,0) {d};
+
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[edge] (a) to node {$8$} (b);
+                \draw[edge] (b) to node {$5$} (c);
+                \draw[edge] (c) to node {$7$} (d);
+                \draw[edge] (d) to node {$4$} (a);
+                \draw[edge] (a) to node {$10$} (c);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+
+    The cut $\delta(S)$ where $S = \{a,b\}$ has capacity $c(\delta(S)) = 10 + 5$ (We ignore incoming arcs)
+
+    The cut $\delta(T)$ where $T = \{c,d\}$ has capacity $c(\delta(T)) = 4$
+\end{example}
+
+\underline{Naive Algorithm}: We can pick all possible pairs of nodes $s,t$ and run a maximum flow algorithm on each pair. 
+There are $\mathcal{O}(|N|^2)$ such pairs, so we'll have to do this $\mathcal{O}(|N|^2)$ times.
+
+\underline{But}: we can be more efficient than that. Suppose we pick any $s \in N$. $s$ is either in set that makes the global minimum cut, or it isn't. 

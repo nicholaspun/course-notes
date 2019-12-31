@@ -1,0 +1,145 @@
+\subsection{Karger's Randomized Algorithm}
+We'll now consider minimum cuts in undirected graphs.
+The setup here is: Given an undirected graph $G = (V, E)$ and edge capacities $c \in \R_+^E$, we want to find the minimum capacity non-trivial cut in $G$.
+
+\begin{example}{}{}
+    Suppose we are given the following graph:
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \node[vertex] (a) at (0,0) {$a$};
+            \node[vertex] (b) at (0,3) {$b$};
+            \node[vertex] (d) at (3,3) {$d$};
+            \node[vertex] (c) at (3,0) {$c$};
+
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw (a) to node {$2$} (b);
+                \draw (b) to node {$3$} (c);
+                \draw (b) to node {$7$} (d);
+                \draw (d) to node {$4$} (c);
+                \draw (a) to node {$8$} (c);
+            \end{scope}
+        \end{tikzpicture}
+    \end{minipage}
+
+    The cut $\delta(\{a\})$ has capacity $c(\delta(\{a\})) = 2 + 8 = 10$.
+
+    The cut $\delta(\{a, c\})$ has capacity $c(\delta(\{a, c\})) = 2 + 3 + 4 = 10$.
+\end{example}
+
+We first define the operation of edge contraction:
+\begin{definition}{Edge Contraction}{}
+    A contraction on edge $e = uv$ is removing the edge $e$, then merging $u$ and $v$ into one vertex $w$ and the edges incident to $u$ or $v$ are now incident to $w$
+\end{definition}
+\begin{example}{Edge Contraction}{}
+    An edge contraction of the edge $ab$ on the left graph gives the graph on the right:
+
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \begin{tikzpicture}[scale=0.8]
+            \node[vertex] (a) at (0,0) {$a$};
+            \node[vertex] (b) at (0,3) {$b$};
+            \node[vertex] (d) at (3,3) {$d$};
+            \node[vertex] (c) at (3,0) {$c$};
+
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw (a) to node {$2$} (b);
+                \draw (b) to node {$3$} (c);
+                \draw (b) to node {$7$} (d);
+                \draw (d) to node {$4$} (c);
+                \draw (a) to node {$8$} (c);
+            \end{scope}
+        \end{tikzpicture}
+        \captionof*{figure}{Original Graph}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \begin{tikzpicture}[scale=0.8]
+            \node[vertex] (ab) at (0,1.5) {$ab$};
+            \node[vertex] (d) at (3,3) {$d$};
+            \node[vertex] (c) at (3,0) {$c$};
+
+            \begin{scope}[every node/.style={fill = white, ellipse}]
+                \draw[bend left] (ab) to node {$3$} (c);
+                \draw (ab) to node {$7$} (d);
+                \draw (d) to node {$4$} (c);
+                \draw[bend right] (ab) to node {$8$} (c);
+            \end{scope}
+        \end{tikzpicture}
+        \captionof*{figure}{Resulting Graph}
+    \end{minipage}
+\end{example}
+
+The \underline{idea} for Karger's algorithm is to repeatedly contract edges until only $2$ vertices remain.
+The edges between the remaining two super-vertices represents a cut (and for some probability, it may also be a minimum cut).
+
+\IncMargin{1em}
+\begin{algorithm}[H]\label{alg:karger}  
+    \nl \While{$|V| > 2$}{
+        \begin{enumerate}[label=(\alph*)]
+            \item Pick an edge $uv$ with probability $\frac{c_{uv}}{\sum_{e \in E} c_e}$
+            \item Contract $uv$
+        \end{enumerate}
+    }
+
+    \nl Let $(S, V\setminus S)$ be the vertex sets corresponding to the $2$ vertices remaining. \Return $\delta(S)$ 
+
+    \caption{Karger's Algorithm}
+\end{algorithm}
+
+This is a randomized algorithm, so we want to ask how often the resulting cut will be a minimum cut. We'll need the following remark:
+\begin{remark}{}{}
+    Let $G = (V, E)$ be an undirected graph.
+    \begin{equation*}
+        \sum_{e \in E} c_e = \frac{1}{2}\sum_{v \in V} c(\delta(\{v\}))
+    \end{equation*} 
+\end{remark}
+\begin{proof}
+    Every edge $uv$ appears in $2$ such cuts: $\delta(\{u\})$ and $\delta(\{v\})$. The result follows.
+\end{proof}
+
+And now to the main result:
+\begin{theorem}{}{}
+    Let $\delta(S)$ be a specific minimum cut. The probability that the algorithm produces $\delta(S)$ is at least $\frac{1}{\binom{|V|}{2}}$
+\end{theorem}
+\begin{proof}
+    Consider the $(k + 1)$-th iteration of our algorithm when we have $|V| - k$ vertices remaining. Assume that we have not yet contracted any edge in $\delta(S)$ in iteration $1, \ldots, k$. Call our current graph $G' = (V', E')$. The probability of selecting an edge in $\delta(S)$ is:
+    \begin{align*}
+        \frac{c(\delta(S))}{\sum_{e \in E'} c_e} &= \frac{c(\delta(S))}{\sum_{v \in V'} c(\delta(\{v\}))} \quad &(\text{By remark})\\
+        &\leq \frac{c(\delta(S))}{\sum_{v \in V'} c(\delta(S))} \quad &(\text{Since } \delta(S) \text{ is a minimum cut}) \\
+        &= \frac{c(\delta(S))}{\frac{|V| - k}{2}c(\delta(S))} \\
+        &= \frac{2}{|V| - k}
+    \end{align*}
+
+    So the probabilty that $\delta(S)$ survives this iteration is at least $1 - \frac{2}{|V| - k}$
+
+    The largest possible $k$ is $|V| - 3$ (since the algorithm terminates when there are only $2$ vertices remaining).
+    Overall, the probability that $\delta(S)$ survives every contraction is at least:
+    \begin{align*}
+        &\prod_{k = 0}^{|V| - 3} (1 - \frac{2}{|V| - k}) \\
+        &= \prod_{k = 0}^{|V| - 3} (1 - \frac{|V| - k - 2}{|V| - k}) \\
+        &= \frac{|V| - 2}{|V|}\frac{|V| - 3}{|V| - 1}\frac{|V| - 4}{|V| - 2}\ldots\frac{2}{4}\frac{1}{3} \\
+        &= \frac{2}{|V|(|V| - 1)} \\
+        &= \frac{1}{\binom{|V|}{2}}
+    \end{align*}
+\end{proof}
+
+This probability is not too low. But, if we were to only run the algorithm once, we would most likely not obtain any minimum cut!
+
+To boost this probability, we want to re-run the algorithm at least $\alpha|V|^2$, and output the smallest capacity cut that we find.
+\begin{corollary}{}{}
+    The probability that the algorithm produces a specific minimum cut $\delta(S)$ after $\alpha|V|^2$ runs is at least $1 - e^{-2\alpha}$ $(\alpha \geq 1)$
+\end{corollary}
+\begin{proof}
+    We'll use the inequality $1 - x \leq e^{-x}$.
+
+    The probability of not producing $\delta(S)$ is at most:
+    \begin{align*}
+        \left(1 - \frac{1}{\binom{|V|}{2}}\right)^{\alpha|V|^2} &\leq \left(1 - \frac{2}{|V|^2}\right)^{\alpha|V|^2} \\
+        &\leq \left(e^{-\frac{2}{|V|^2}}\right)^{\alpha|V|^2} \\
+        &= e^{-2k}
+    \end{align*}
+
+    And so our desired result follows.
+\end{proof}
