@@ -1,5 +1,5 @@
 # Course Notes
 
-Collection of the notes I've taken in classes I've attended or sat into.
+Collection of undergraduate notes
 
-Completeness of the notes may vary :)
+Visit me: [https://nicholaspun.github.io/course-notes](https://nicholaspun.github.io/course-notes)
