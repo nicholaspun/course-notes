@@ -1,6 +1,6 @@
 \subsection{Review of LP theory}
 A \underline{linear program} (LP) is an optimization problem of the form:
-\begin{equation}\label{eq:intro-review-lp}
+\begin{equation}\label{eq:intro-review-lp}\tag{P}
 \begin{aligned}
     \max \quad c^\intercal x & \\
     \text{s.t.} \quad Ax &\leq b \\
@@ -16,8 +16,8 @@ where $x \in \R^n, \ A \in M_{m \times n}(\R) $, and the objective function and 
 Any LP has 3 possible outcomes:
 \begin{enumerate}
     \item The LP is \underline{infeasible}
-    \item The LP is \underline{unbounded}, i.e. We can achieve feasible solutions of arbitrarily ``good" objective value. (For \Cref{eq:intro-review-lp}, this means that $\forall v \in \R$ there exists a feasible solution $x$ s.t $c^\intercal x > v$)
-    \item The LP has an \underline{optimal solution}. (For \Cref{eq:intro-review-lp}, this means there is a feasible solution $x^*$ such that $c^\intercal x^* \geq c^\intercal x \ \forall \ \text{feasible solutions} \ x$)
+    \item The LP is \underline{unbounded}, i.e. We can achieve feasible solutions of arbitrarily ``good" objective value. (For (\ref{eq:intro-review-lp}), this means that $\forall v \in \R$ there exists a feasible solution $x$ s.t $c^\intercal x > v$)
+    \item The LP has an \underline{optimal solution}. (For (\ref{eq:intro-review-lp}), this means there is a feasible solution $x^*$ such that $c^\intercal x^* \geq c^\intercal x \ \forall \ \text{feasible solutions} \ x$)
 \end{enumerate}
 
 \begin{theorem}{Fundamental Theorem of Linear Programming}{}
@@ -33,7 +33,7 @@ Any LP has 3 possible outcomes:
 
 \underline{Idea}: We can prove bounds by taking a suitable linear combination of constraints of the LP.
 
-For example, we can multiply the constraints of \Cref{eq:intro-review-lp} by some vector $y \geq 0$. This gives:
+For example, we can multiply the constraints of (\ref{eq:intro-review-lp}) by some vector $y \geq 0$. This gives:
 \begin{equation*}
     y^\intercal Ax \leq y^\intercal b \quad (y \geq 0)
 \end{equation*}
@@ -42,7 +42,7 @@ Notice that if we require that $c^\intercal \leq y^\intercal A$, then since $x \
     c^\intercal x \leq y^\intercal Ax \leq y^\intercal b 
 \end{equation*}
 And this is precisely the \underline{dual LP}.
-\begin{equation}\label{eq:intro-review-lp-dual}
+\begin{equation}\label{eq:intro-review-lp-dual}\tag{D}
 \begin{aligned}
     \min \quad b^\intercal y & \\
     \text{s.t.} \quad A^\intercal y &\geq c \\
