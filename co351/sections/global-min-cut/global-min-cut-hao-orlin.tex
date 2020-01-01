@@ -30,4 +30,111 @@ Our goal in this section is to find a minimum capacity non-trivial cut in $D = (
 \underline{Naive Algorithm}: We can pick all possible pairs of nodes $s,t$ and run a maximum flow algorithm on each pair. 
 There are $\mathcal{O}(|N|^2)$ such pairs, so we'll have to do this $\mathcal{O}(|N|^2)$ times.
 
-\underline{But}: we can be more efficient than that. Suppose we pick any $s \in N$. $s$ is either in set that makes the global minimum cut, or it isn't. 
+\underline{But}: we can be more efficient than that. Suppose we pick any $s \in N$. 
+$s$ is either in the set that makes the global minimum cut, or it isn't. 
+So, we just need to find all $s,t$-cuts and $t,s$-cuts and output the minimum.
+This only takes $2|N| - 1$ iterations of a maximum flow algorithm.
+
+We can do better still: Suppose we had an algorithm that gave the minimum cut containing $s$ (efficiently).
+Then, we only need to run this algorithm for every $s \in N$ to find the global minimum cut.
+
+We'll call this the \underline{minimum $s$-cut} problem:
+\begin{definition}{$s$-cut}{}
+    Given $s \in N$, an \underline{$s$-cut} has the form $\delta(S)$ where $s \in S$ and $S \neq N$
+\end{definition}
+
+The goal of Hao-Orlin is to solve the minimum $s$-cut problem quickly.
+It is a modification of the push-relabel algorithm
+
+\subsubsection{Preparatory Work}
+We'll need to tinker with the push-relabel algorithm a bit in order to make the algorithm do what we want.
+Here, we'll make some definitions and lay the groundwork for Hao-Orlin.
+
+\begin{definition}{$X,t$-cut}{}
+    Given $X \subseteq N$ and $t \not\in X$, an \underline{$X,t$-cut} has the form $\delta(S)$, where $X \subseteq S, t \not\in S$
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{tikzpicture}[node distance = 2cm]
+          \node[vertex, minimum size = 1.5cm] (X) at (1,0) {$X$};
+          \node[vertex] (t) at (5,0) {$t$};
+          \node[vertex, minimum size = 2.5cm, dotted][label=below left:{$S$}] (S) at (1,0) {};
+    
+          \draw[edge] (S) to (4, 1); 
+          \draw[edge] (S) to (4, 0); 
+          \draw[edge] (S) to (4, -1); 
+        \end{tikzpicture}
+        \captionof*{figure}{An $X,t$-cut}
+      \end{minipage}
+\end{definition}
+
+Suppose we are given the following algorithm:
+
+\IncMargin{1em}
+\begin{algorithm}[H]\label{alg:generic-s-cut}  
+    \nl Set $X = \{s\}$
+    
+    \nl \While{$X \neq N$}{
+        \begin{enumerate}[label=(\alph*)]
+            \item Pick $t \not\in X$, find a minimum $X,t$-cut
+            \item Add $t$ to $X$
+        \end{enumerate}
+    }
+    
+    \nl Output minimum cut over all cuts found. 
+
+    \caption{Generic Algorithm for minimum $s$-cut}
+\end{algorithm}
+
+We claim that this helps us find the minimum $s$-cut.
+
+Let $\delta(S)$ be a minimum $s$-cut.
+Consider the first time we pick some $t \not\in S$ in \Cref{alg:generic-s-cut}.
+The algorithm gives us a minimum $X,t$-cut $\delta(S^*)$ and since we started with $X = \{s\}$, this is also an $s$-cut.
+But, $\delta(S)$ is also an $X,t$-cut.
+So, both cuts must have the same capacity.
+
+In fact, Hao-Orlin will build on this algorithm.
+But first, we need to modify a couple more aspects of the push-relabel algorithm.
+
+\begin{definition}{$X$-preflow}{}
+    For $X \subseteq N$, an \underline{$X$-preflow} is a flow $x$ where $e_x(v) \geq 0$ whenever $v \not\in X$
+\end{definition}
+
+We will keep our definition of \underline{height} the same.
+But, we will need to redefine compatibility.
+
+\begin{definition}{Compatible}{}
+    Heights $h$ are \underline{compatible} with an $X$-preflow if:
+    \begin{enumerate}
+        \item $h(v) = |N|$ for all $v \in X$
+        \item $h(t) \leq |X| - 1$
+        \item $h(v) \geq h(u) - 1$ for all $uv \in D'$
+    \end{enumerate}
+\end{definition}
+
+And we'll introduce two new concepts:
+\begin{definition}{Level, Cut-Level}{}
+    A \underline{level} $k$ consists of all nodes with height $k$, denoted $H(k)$
+
+    A \underline{cut-level} is a level $k$ where no arc goes from $H(k)$ to $H(k-1)$ in $D'$
+\end{definition}
+
+These two definitions will allow us to rewrite the following lemma using terminology that will show up in our final algorithm:
+
+\begin{lemma}{}{}
+    If $\delta(S)$ is an $X,t$-cut with $\delta_{D'}(S) = \emptyset$ and $e_x(v) = 0$ for all $v \in N\setminus(S \cup \{t\})$, then $\delta(S)$ is a minimum $X,t$-cut.
+\end{lemma}
+
+Using the definitions of level and cut-level, the following is a simple corollary:
+\begin{corollary}{}{}
+    If $\ell$ is a cut level and $e_x(v) = 0$ for all $v$ with $h(v) < \ell$, except $t$, then $\{v\:|\:h(v) \geq \ell\}$ is a minimum $X,t$-cut.
+\end{corollary}
+
+Let's prove the lemma:
+\begin{proof}
+    
+\end{proof}
+
+\subsubsection{The Algorithm}
+\subsubsection{Correctness}
