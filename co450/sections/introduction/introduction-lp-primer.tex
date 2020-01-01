@@ -1,0 +1,27 @@
+\subsection{Review of LP theory}
+A \underline{linear program} (LP) is an optimization problem of the form:
+\begin{equation}\label{eq:intro-review-lp}
+\begin{aligned}
+    \max \quad c^\intercal x & \\
+    \text{s.t.} \quad Ax &\leq b \\
+    x &\geq 0
+\end{aligned}
+\end{equation}
+where $x \in \R^n, \ A \in M_{m \times n}(\R) $, and the objective function and constraints are linear. We must also require that:
+\begin{itemize}
+    \item There are a finite number of variables and constraints
+    \item The inequalities are non-strict
+\end{itemize}
+
+Any LP has 3 possible outcomes:
+\begin{enumerate}
+    \item The LP is \underline{infeasible}
+    \item The LP is \underline{unbounded}, i.e. We can achieve feasible solutions of arbitrarily ``good" objective value. (For \Cref{eq:intro-review-lp}, this means that $\forall v \in \R$ there exists a feasible solution $x$ s.t $c^\intercal x > v$)
+    \item The LP has an \underline{optimal solution}. (For \Cref{eq:intro-review-lp}, this means there is a feasible solution $x^*$ such that $c^\intercal x^* \geq c^\intercal x \ \forall \ \text{feasible solutions} \ x$)
+\end{enumerate}
+
+\begin{theorem}{Fundamental Theorem of Linear Programming}{}
+    There are only these $3$ possible outcomes
+\end{theorem}
+
+\subsubsection{Duality}
