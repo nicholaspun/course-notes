@@ -126,15 +126,94 @@ These two definitions will allow us to rewrite the following lemma using termino
     If $\delta(S)$ is an $X,t$-cut with $\delta_{D'}(S) = \emptyset$ and $e_x(v) = 0$ for all $v \in N\setminus(S \cup \{t\})$, then $\delta(S)$ is a minimum $X,t$-cut.
 \end{lemma}
 
-Using the definitions of level and cut-level, the following is a simple corollary:
-\begin{corollary}{}{}
+Using the definitions of level and cut-level, we can rewrite this lemma to the following:
+\begin{corollary}{}{cut-level-min-cut}
     If $\ell$ is a cut level and $e_x(v) = 0$ for all $v$ with $h(v) < \ell$, except $t$, then $\{v\:|\:h(v) \geq \ell\}$ is a minimum $X,t$-cut.
 \end{corollary}
 
 Let's prove the lemma:
 \begin{proof}
+    We want to show that $x$ is maximum $X,t$-flow.
+
+    First, let's establish some bounds. By \Cref{lem:ff-correctness}, we can bound the net outflow of $S$:
+    \begin{equation*}
+        x(\delta(S)) - x(\delta(\overline{S})) \leq c(\delta(S))
+    \end{equation*}
+
+    This flow goes to $N\setminus S$ so:
+    \begin{equation*}
+        \sum_{v \in N \setminus S} e_x(v) = x(\delta(S)) - x(\delta(\overline{S})) \leq c(\delta(S))
+    \end{equation*}
     
+    Finally, the excess at $t$ is at most the inflow from all nodes in $N \setminus S$, so:
+    \begin{equation}\label{eq:xt-flow-bound}
+        e(t) \leq \sum_{v \in N \setminus S} e_x(v) = x(\delta(S)) - x(\delta(\overline{S})) \leq c(\delta(S))
+    \end{equation}
+
+    We're done if we can show that the bounds in \Cref{eq:xt-flow-bound} are tight.
+    This shows that $x$ attains the upper bound and $t$ obtains all the excess.
+
+    Using the assumption $\delta_{D'}(S) = \emptyset$, it must be that:
+    \begin{equation*}
+        x(\delta(S)) - x(\delta(\overline{S})) = c(\delta(S))
+    \end{equation*}
+
+    Using the assumption that $e_x(v) = 0$ for all $v \in N\setminus(S \cup \{t\})$:
+    \begin{equation*}
+        e(t) = \sum_{v \in N \setminus S} e_x(v)
+    \end{equation*}
+
+    So, $\delta(S)$ is a minimum $X,t$-cut.
 \end{proof}
 
 \subsubsection{The Algorithm}
+\underline{Idea}: We want to use \Cref{corol:cut-level-min-cut}. To that end, we'll keep track of a cut-level $\ell$ and aim to get rid of excess on nodes below $\ell$ while running push-relabel.
+
+\begin{note}
+    We'll keep an \underline{invariant}: Non-empty levels will be kept consecutive (This will be useful later)
+\end{note}
+
+\begin{algorithm}[H]\label{alg:hao-orlin}
+    \nl \textbf{Initialization:}
+    \begin{itemize}
+        \item Set $X = \{s\}$ ($s$ arbitrary)
+        \item Choose $t \in N\setminus X$
+        \item Set $h(s) = |N|$ and $h(v) = 0$ otherwise
+        \item Set the cut level $\ell$ to be $|N| - 1$
+        \item Send as much flow out of $X$ as possible
+    \end{itemize}
+    
+    \nl \While{$X \neq N$}{
+        \begin{enumerate}
+            \item Run push-relabel with the following exceptions:
+            \begin{enumerate}
+                \item\label{item:hao-orlin-exception-1} Only select nodes $v$ such that $e(v) > 0$ and $h(v) < \ell$
+                \item\label{item:hao-orlin-exception-2} If we want to relabel $v$ and $v$ is the only node with height $h(v)$.
+                
+                Do not relabel. Instead, set $\ell = h(v)$
+                \item\label{item:hao-orlin-exception-3} If we want to relabel $v$ to $\ell$, then relabel and reset $\ell = |N| - 1$
+            \end{enumerate}
+
+            \item When no node satisfies $e(v) > 0$ and $h(v) < \ell$:
+            \begin{enumerate}
+                \item Store the cut $\{v \::\: h(v) \geq \ell \}$ (This is a min $X,t$-cut)
+                \item Add $t$ to $X$
+                \item Set $h(t) = |N|$, send as much flow out of $X$ as possible, and pick the new $t$ to be the node with the lowest height (This step maintains comp)
+                \item Reset $\ell = |N| - 1$
+            \end{enumerate}  
+        \end{enumerate}
+    }
+    
+    \nl Output minimum cut over all cuts found. 
+
+    \caption{Hao-Orlin Algorithm}
+\end{algorithm}
+Some notes on the exceptions:
+\begin{enumerate}
+    \item Step \ref{item:hao-orlin-exception-1} ensures that we can apply \Cref{corol:cut-level-min-cut}
+    \item Step \ref{item:hao-orlin-exception-2} maintains the invariant
+    \item Step \ref{item:hao-orlin-exception-3} is used to maintain the cut level. For example, suppose there is an arc $uv$ where $h(u) = h(v) = \ell - 1$, and we want to relabel $u$ to $\ell$. This would violate the condition as $uv$ is an arc going across $H(\ell)$ and $H(\ell - 1)$.
+\end{enumerate}
+    
+
 \subsubsection{Correctness}
