@@ -1,0 +1,84 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{co739}[2020/01/09 CO739 Notes Package]
+
+% -- Packages -- %
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[english]{babel}
+\RequirePackage{amsmath, amssymb, amsthm}
+\RequirePackage{fullpage}
+\RequirePackage{parskip}
+\RequirePackage{mdframed}
+\RequirePackage{blkarray}
+\RequirePackage{graphicx}
+\RequirePackage{enumitem}
+\RequirePackage{caption}
+\RequirePackage{tikz}
+\RequirePackage{hyperref}
+\RequirePackage{cleveref}
+\RequirePackage{bookmark}
+\RequirePackage[ruled,vlined]{algorithm2e}
+\RequirePackage{multirow}
+
+% -- References -- %
+\crefname{algocf}{alg.}{algs.}
+\Crefname{algocf}{Algorithm}{Algorithms}
+\crefname{algocfline}{alg.}{algs.}
+\Crefname{algocfline}{Algorithm}{Algorithms}
+
+% -- Theorems, Definitions, Examples -- %
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem*{note}{Note}
+\newtheorem{remark}{Remark}[section]
+
+\numberwithin{equation}{section}
+
+% -- Tikz Options -- %
+\usetikzlibrary{arrows.meta, shapes, positioning}
+\tikzset{vertex/.style = {shape=circle, draw, thick, minimum size=1.5em}}
+\tikzset{edge/.style = {->, > = stealth, shorten > = 1pt, thick}}
+
+% -- Shortcuts -- %
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+
+% -- Section Title -- %
+\makeatletter
+% we use \prefix@<level> only if it is defined
+\renewcommand{\@seccntformat}[1]{%
+\ifcsname prefix@#1\endcsname
+\csname prefix@#1\endcsname
+\else
+\csname the#1\endcsname\quad
+  \fi}
+  % define \prefix@section
+  \newcommand\prefix@section{Lecture \thesection: }
+  \makeatother
+  \endinput
+  
+% -- Other junk -- % 
+% \RequirePackage[many]{tcolorbox}
+% \RequirePackage{subfiles} % Best loaded last in the preamble
+% \crefname{tcb@cnt@example}{eg}{egs.}
+% \Crefname{tcb@cnt@example}{Example}{Examples}
+% \crefname{tcb@cnt@proposition}{prop.}{props.}
+% \Crefname{tcb@cnt@proposition}{Proposition}{Propositions}
+% \crefname{tcb@cnt@theorem}{thm.}{thms.}
+% \Crefname{tcb@cnt@theorem}{Theorem}{Theorems}
+% \crefname{tcb@cnt@lemma}{lem.}{lems.}
+% \Crefname{tcb@cnt@lemma}{Lemma}{Lemmas}
+% \crefname{tcb@cnt@definition}{defn.}{defns.}
+% \Crefname{tcb@cnt@definition}{Definition}{Definitions}
+% \tcbuselibrary{theorems}
+% \newtcbtheorem[number within=section]{definition}{Definition}{colback=black!5,colframe=lightgray!35!black,fonttitle=\bfseries,parbox=false,breakable}{defn}
+% \newtcbtheorem[number within=section]{theorem}{Theorem}{colback=black!5,colframe=yellow!35!black,fonttitle=\bfseries,parbox=false,breakable}{th}
+% \newtcbtheorem[number within=section]{proposition}{Proposition}{colback=black!5,colframe=yellow!50!black,fonttitle=\bfseries,parbox=false,breakable}{prop}
+% \newtcbtheorem[number within=section]{lemma}{Lemma}{colback=black!5,colframe=yellow!50!black,fonttitle=\bfseries,parbox=false,breakable}{lem}
+% \newtcbtheorem[number within=section]{corollary}{Corollary}{colback=black!5,colframe=yellow!35!black,fonttitle=\bfseries,parbox=false,breakable}{corol}
+% \newtcbtheorem[number within=section]{example}{Example}{colback=white,colframe=blue!25!black!50,fonttitle=\bfseries, parbox=false,breakable}{exmp}
