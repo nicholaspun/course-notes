@@ -1,0 +1,90 @@
+\section{Introduction}
+
+\subsection{Course Preview}
+\begin{example}[Simplyfying Rational Expressions]
+    Suppose we have the two following expressions:
+    \begin{align}
+        f &:= \frac{x+1}{x-1} - \frac{x^3 - 2x + x^2 + 2}{x^3 +2x -x^2 -2} + \frac{x^2 +3}{x-1} \\
+        g &:= \frac{(x-1)^2 - x^2 -x  +2x}{(x+y+2)^{100}}
+    \end{align}
+
+    \underline{Question:} How do we simplify these expressions to a single $\frac{poly}{poly}$ or return that it is $0$?
+
+    \underline{One idea:} Define a ``normal'' function:
+    \begin{enumerate}
+        \item If expression is $0$, the normal function will be $0$
+        \item If not, the normal function will be the simplest form
+    \end{enumerate}
+
+    \underline{(More) Questions:} What else do we need to consider?
+    \begin{itemize}
+        \item How do we represent polynomials (i.e. What data structure do we use?)
+        \item How do we perform polynomial operations computationally?
+        \item Do we need to consider the size of the integers in our computations?
+    \end{itemize}
+\end{example}
+
+\begin{example}[Solving Recurrences]
+    Suppose we have the recurrence:
+    \begin{equation}
+        T(n) = \begin{cases}
+            2 T(\frac{n}{2}) + \frac{n}{2} \quad & n > 1 \\
+            1 \quad & n = 1
+        \end{cases}
+    \end{equation}
+
+    We can solve this by hand (using Master theorem or other techniques) to obtain the answer:
+    \begin{equation}
+        T(n) = n(1 + \log_2(n))
+    \end{equation}
+
+    \underline{Question:} How do we do this computationally?
+\end{example}
+
+\begin{example}
+    Consider the following identities:
+    \begin{align}
+        \sum_{k = 0}^n k &= \frac{n(n-1)}{2} \\
+        \sum_{k = 0}^n k^4 &= \frac{n(n-1)(2n - 1)(3n^3 - 3n - 1)}{30}
+    \end{align}
+
+    \underline{Question:} Can we return a closed form (without involving the index $k$) for any general expression or report that one doesn't exist? 
+\end{example}
+
+
+\subsection{Representation of Integers}
+Current computers are based on architecture with $64$ bits (We will call this number of bits the \underline{word size})
+
+\begin{example}
+    The \underline{unsigned long} in C represents integers in exactly the range $[0, 2^{64} - 1]$
+\end{example}
+
+\underline{Question:} How do we represent larger numbers?
+
+\underline{Idea:} Use an array of word size numbers.
+
+Any integer $a$ can be expressed as the following summation:
+\begin{equation}
+    a = (-1)^s \sum_{i = 0}^n a_i 2^{64i}
+\end{equation}
+where $s \in \{0,1\}$ represents the sign of $a$ and $0 \leq a_i \leq 2^{64} - 1$ are the individual elements in the array.
+
+If we assume $0 \leq n + 1 \leq 2^{63}$, then we can encode $a$ as an array:
+\begin{equation}
+    [s \cdot 2^{63} + n + 1, a_0, a_1, \ldots, a_n]
+\end{equation}
+This is sufficient for all practical purposes.
+
+\begin{note}
+    The \underline{length} of $a$ is given by: $\left\lfloor\log_{2^{64}} |a|\right\rfloor + 1 \in \mathcal{O}\left(\log |a|\right)$ words
+\end{note}
+
+\underline{Addition of Integers:}
+
+Suppose our input is $a: a_0 + a_1\beta + a_2\beta + \ldots a_n\beta_n$ and $b: b_0 + b_1\beta + b_2\beta + \ldots b_m\beta_m$ (where $m \leq n$).
+
+\underline{Question:} How large can each individual nu
+
+
+\clearpage
+
