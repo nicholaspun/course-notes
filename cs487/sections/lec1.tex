@@ -79,12 +79,38 @@ This is sufficient for all practical purposes.
     The \underline{length} of $a$ is given by: $\left\lfloor\log_{2^{64}} |a|\right\rfloor + 1 \in \mathcal{O}\left(\log |a|\right)$ words
 \end{note}
 
-\underline{Addition of Integers:}
+\subsection{Addition of Integers}
 
-Suppose our input is $a: a_0 + a_1\beta + a_2\beta + \ldots a_n\beta_n$ and $b: b_0 + b_1\beta + b_2\beta + \ldots b_m\beta_m$ (where $m \leq n$).
+Suppose our input is $a: a_0 + a_1\beta + a_2\beta^2 + \ldots a_n\beta^n$ and $b: b_0 + b_1\beta + b_2\beta^2 + \ldots b_m\beta^m$ (where $m \leq n$).
+Let $c = a + b = c_0 + c_1\beta + c_2\beta^2 + \ldots c_n\beta^n$, each $c_i = a_i + b_i$ if $i \leq m$ and $c_i = a_i$ otherwise.
 
-\underline{Question:} How large can each individual nu
+$a_i + b_i$ may be greater than $\beta$. In this case, the addition creates a \textit{carry} to the $(i+1)$-th term.
 
+\underline{Question:} How large can $c$ get?
+
+In particular, will our array drastically change in size?
+
+We can begin with the case of $\beta = 2$.
+This gives us binary strings, a case we may be familiar with.
+We can simply every bit equal to 1 to obtain:
+\begin{equation*}
+    1 + 1 \cdot 2 + 1 \cdot 2^2 + \ldots + 1 \cdot 2^m = 2^{m+1} - 1
+\end{equation*}
+
+For general $\beta$ this suggests the following:
+\begin{equation}
+    \sum_{i = 0}^m = (\beta - 1)\beta^i = \beta^{m+1} - 1
+\end{equation}
+
+So, given two equal length (array-wise) integers $a, b$:
+\begin{equation}
+\begin{aligned}
+    (a_0 + a_1\beta + \ldots + a_m\beta^m) + (b_0 + b_1\beta + \ldots + b_m\beta^m) &\leq 2(\beta^{m+1} - 1) \\
+    &= (\beta^{m+1} - 2) + \beta^{m + 1}
+\end{aligned}
+\end{equation}
+
+This implies that the largest the carry bit can be is $1$.
 
 \clearpage
 
