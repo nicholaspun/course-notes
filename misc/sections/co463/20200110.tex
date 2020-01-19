@@ -1,0 +1,77 @@
+\section{2020/01/10 - Linear Algebra and Calculus Review}
+
+\begin{definition}
+    The \underline{closed ball} with center $\overline{x} \in \E$ and radius $\delta$ is
+    \begin{equation*}
+        B_\delta(\overline{x}) = \{x\::\:||x - \overline{x} \leq \delta \}
+    \end{equation*}
+\end{definition}
+The \underline{unit ball} is denoted $B(\overline{x})$
+
+We say $S \subseteq \E$ is \underline{bounded} if $\exists \gamma > 0$ such that $x \in S \Rightarrow ||x|| \leq \gamma$
+
+Let $\E = M^{m \times n}$ ($m \times n$ matrices) with the trace inner product and the frobenius norm.
+If we have a mapping $L: \E \rightarrow \mathbb{F}$ between Euclidean spaces, this is called a \underline{linear transformation} if:
+\begin{equation*}
+    L(ax + by) = aL(x) + bL(y)
+\end{equation*}
+$\forall a, b \in \R, \ \forall x, y \in \E$
+
+There are many examples of linear transformations:
+\begin{example}
+    Matrix-Vector multiplication, i.e. Let $A: \R^n \rightarrow \R^m$ be an $m \times n$ matrix. $A$ is a linear transformation.
+\end{example}
+
+\begin{example}
+    Let $L: \mathcal{S}^n \rightarrow \R^n$ (where $\mathcal{S}$ is the set of $n \times n$ real symmetric matrices). 
+    $L(x) = diag(x)$ is a linear transformation.
+\end{example}
+
+Let $L: \E \rightarrow \mathbb{F}$ be a linear transformation, the \underline{adjoint} of $L$ is $L^*$, defined by $\langle L(x), y \rangle = \langle x, L^*(y) \rangle \ \forall x \in \E, \ \forall y \in \mathbb{F}$
+
+What is $diag^*$?: Let $A \in M^{n \times n}$,
+\begin{align*}
+    diag(A) &= \begin{pmatrix}
+        A_{11} \\ \vdots \\ A_{nn}      
+    \end{pmatrix} \\
+    diag^*\left(\begin{pmatrix}
+        A_{11} \\ \vdots \\ A_{nn}
+    \end{pmatrix}\right) &= \begin{bmatrix}
+        A_{11} & & 0 \\
+        & \ddots & \\ 
+        0 & & A_{nn}
+    \end{bmatrix}
+\end{align*}
+We can verify this by computing: $\langle diag(A), v \rangle = \langle A, diag^*(v) \rangle$
+
+\begin{definition}
+    If $L: \E \rightarrow \mathbb{F}$ is a linear transformation, then $L$ is called a \underline{linear operator}.
+\end{definition}
+
+\begin{definition}
+    If $L: \E \rightarrow \mathbb{F}$ and $L = L^*$, then $L$ is a \underline{self-adjoint operator} and $\E = \mathbb{F}$
+\end{definition}
+
+\subsection{Differentiation}
+Let $f: \E \rightarrow \R$ be a real-valued function.
+
+We say $f$ is $\mathcal{C}^1$ if its first partial derivatives are continuous.
+Similarly, we say $f$ is $\mathcal{C}^2$ if the second partial derivatives are continuous.
+
+WLOG, assume $A = A^\intercal$, and say we have the following quadratic function:
+\begin{equation*}
+    q(x) = 
+    \underbrace{\frac{1}{2}x^\intercal A x}_{= \langle x, Ax \rangle} +
+    \underbrace{b^\intercal x}_{= \langle b, x \rangle} +
+    c 
+\end{equation*}
+Then,
+\begin{align*}
+    q(x + d) &= \frac{1}{2}(x + d)^\intercal A (x + d) + b^\intercal (x + d) + c \\
+    &= \frac{1}{2}x^\intercal A x + b^\intercal x + c + (Ax)^\intercal + b^\intercal d + \frac{1}{2} d^\intercal A d \\
+    &= q(x) + \langle Ax + b, d \rangle + \frac{1}{2}d^\intercal A d
+\end{align*}
+This is a Taylor series! $\langle Ax + b, d \rangle$ is linear in $d$ and $\frac{1}{2}d^\intercal A d$ is in $o(||d||)$ if $A \neq 0$
+
+$\nabla q(x) = Ax + b$ is the \underline{gradient} of $q$ at $x$, and in general, if $f(x + d) = f(x) + \langle v, d \rangle + o(||d||)$, then $v = \nabla f(x)$.
+
