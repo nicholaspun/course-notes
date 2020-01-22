@@ -1,0 +1,297 @@
+\section{Extended Euclidean Algorithm}
+
+\subsection{Definitions}
+Went over definitions of: units, associates, zero divisors, integral domain, GCD, LCM, and Euclidean domain.
+
+\begin{note}
+    ~
+    \begin{itemize}
+        \item On GCDs and LCMs: Often convenient to define them to be nonnegative to make them unique
+        \item On $a = qb + r$, the quotient and remainder are not necessarily unique over $\Z$. (e.g. $7 = 5 \cdot 1 + 2 = 5 \cdot 2 - 3)$. However, over $R = F[x]$ ($F$ field), the quotient and remainder \textit{are} unique.
+    \end{itemize}
+\end{note}
+
+\subsection{Extended Euclidean Algorithm}
+\underline{Input:} $a, b \in R, \ b \neq 0$, $R$ Euclidean Domain (e.g. $R = \Z \text{ or } R = F[x]$)
+
+\underline{Output:} $s,t,g \in R$ such that $sa + tb = g$, where $g = \gcd(a,b)$
+
+\begin{example}
+    One may recall the algorithm from MATH135 which begins with the following table:
+
+    \begin{center}
+        \begin{tabular}{|c|c|c|c|}
+            \hline
+            $s$ & $t$ & $r$ & $q$ \\
+            \hline 
+            1 & 0 & $a$ & 0 \\
+            \hline
+            0 & 1 & $b$ & 0 \\
+            \hline
+        \end{tabular}
+    \end{center}
+
+    At each step of the algorithm, we perform the operation: $Row_{i + 1} \leftarrow Row_{i - 1} - q_iRow_i$, where $q_i = \lfloor \frac{r_i}{r_{i - 1}} \rfloor$.
+    And we stop once the remainder is $0$ and our answer can be read from the second last row.
+
+    For example, we can find $\gcd(91, 63)$:
+    \begin{center}
+        \begin{tabular}{|c|c|c|c|}
+            \hline
+            $s$ & $t$ & $r$ & $q$ \\
+            \hline 
+            1 & 0 & $91$ & 0 \\
+            \hline
+            0 & 1 & $63$ & 0 \\
+            \hline
+            1 & $-1$ & $28$ & 1 \\
+            \hline
+            $-2$ & 3 & 7 & 2 \\
+            \hline
+            9 & $-13$ & 0 & 4 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    So, $(-2)(91) + 3(63) = 7$
+\end{example}
+
+\begin{note}
+    Behind the operation $Row_{i + 1} \leftarrow Row_{i - 1} - q_iRow_i$, we are really performing the $3$ operations:
+    \begin{enumerate}
+        \item $r_{i + 1} \leftarrow r_{i - 1} - q_ir_i$
+        \item $s_{i + 1} \leftarrow s_{i - 1} - q_is_i$
+        \item $t_{i + 1} \leftarrow t_{i - 1} - q_it_i$
+    \end{enumerate}
+\end{note}
+
+We build our way towards a matrix formulation of the algorithm.
+Consider the matrix:
+\[
+    Q_i = 
+    \begin{bmatrix}
+        0 & 1 \\
+        1 & -q_i
+    \end{bmatrix}
+\]
+Observe that the matrix encodes the information of the $Row$ operations above.
+To encode the operations on $r_i$, consider the matrix-vector multiplication:
+\[
+    Q_i
+    \begin{bmatrix}
+        r_{i - 1} \\ r_i
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        0 & 1 \\
+        1 & -q_i
+    \end{bmatrix}
+    \begin{bmatrix}
+        r_{i - 1} \\ r_i
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        r_i \\ r_{i-1} - q_ir_i
+    \end{bmatrix}
+    \begin{bmatrix}
+        r_i \\ r_{i+1}
+    \end{bmatrix}
+\]
+To encode the information on $s_i$ and $t_i$, let $R_i = Q_i \ldots Q_1$.
+We claim that:
+\[
+    R_i =
+    \begin{bmatrix}
+        s_i & t_i \\
+        s_{i+1} & t_{i+1}
+    \end{bmatrix}
+\]
+\begin{proof}
+    We proceed by induction on $i$.
+    This holds for $R_1 = Q_1$ since $s_1 = 0, t_1 = 1, s_2 = 1, t_2 = -q_1$.
+    
+    Now suppose the statement holds for $R_1, \ldots, R_{i-1}$. Then,
+    \begin{align*}
+        R_i 
+        &= Q_iQ_{i-1}\ldots Q_1 \\
+        &= Q_i R_{i-1} \\
+        &=
+        \begin{bmatrix}
+            0 & 1 \\
+            1 & -q_i
+        \end{bmatrix}
+        \begin{bmatrix}
+            s_{i-1} & t_{i-1} \\
+            s_i & t_i
+        \end{bmatrix} \\
+        &=
+        \begin{bmatrix}
+            s_i & t_i \\
+            s_{i-1} - q_is_i & t_{i-1} - q_it_i
+        \end{bmatrix} \\
+        &=
+        \begin{bmatrix}
+            s_i & t_i \\
+            s_{i+1} & t_{i+1}
+        \end{bmatrix}
+    \end{align*}
+\end{proof}
+
+Let's formalize this:
+
+\IncMargin{1em}
+\begin{algorithm}[H]
+    Our input is: $a,b \in R, b \neq 0, d(a) \geq d(b))$ and $R$ a Euclidean Domain
+
+    \nl \textbf{Initialization:}
+    \begin{itemize}
+        \item Set $r_0 \leftarrow a$
+        \item Set $r_1 \leftarrow b$
+    \end{itemize}
+
+    \nl \For{$i = 1 \ldots$}{
+        \begin{itemize}
+            \item Compute $q_i = \lfloor \frac{r_i}{r_{i - 1}} \rfloor$
+            \item Compute $r_{i+1}$ from $Q_i\begin{bmatrix}
+                r_{i-1} \\ r_i
+            \end{bmatrix}$
+        \end{itemize}
+    }
+    
+    \nl Stop loop at $i = \ell$ such that $r_{\ell + 1} = 0$
+
+    \caption{Extended Euclidean Algorithm}
+\end{algorithm}
+
+\begin{example}
+    We can compute $\gcd(91,63)$ using the matrix formulation:
+    \[
+    Q_1 =
+    \begin{bmatrix}
+        0 & 1\\
+        1 & -1
+    \end{bmatrix}, \
+    Q_2 =
+    \begin{bmatrix}
+        0 & 1\\
+        1 & -2
+    \end{bmatrix}, \
+    Q_3 =
+    \begin{bmatrix}
+        0 & 1\\
+        1 & -4
+    \end{bmatrix}
+    \]
+    \[
+    R_3 
+    \begin{bmatrix}
+        91 \\ 63
+    \end{bmatrix} 
+    = 
+    Q_3Q_2Q_1
+    \begin{bmatrix}
+        91 \\ 63
+    \end{bmatrix}
+    = 
+    \begin{bmatrix}
+        -2 & 3\\
+        9 & -13
+    \end{bmatrix}
+    \begin{bmatrix}
+        91 \\ 63
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        7 \\ 0
+    \end{bmatrix}
+    \]
+    so $(-2)(91) + 3(63) = 7$, which matches what we had before
+\end{example}
+
+\subsection{Correctness}
+\begin{proposition}
+    $r_{\ell} = \gcd(r_0, r_1)$
+\end{proposition}
+\begin{proof}
+    We want to show:
+    \begin{enumerate}
+        \item $r_\ell | r_0$ and $r_\ell | r_1$
+        \item If $d | r_0$ and $d | r_1$, then $d | r_\ell$ for all $d \in R$
+    \end{enumerate}
+    From the algorithm: $Q_\ell \ldots Q_1 \begin{bmatrix}r_0 \\ r_1 \end{bmatrix} = \begin{bmatrix}
+        r_\ell \\ 0
+    \end{bmatrix}$
+
+    Let $R_i = Q_i\ldots Q_1 = \begin{bmatrix}
+        s_i & t_i \\
+        s_{i+1} & t_{i+1}
+    \end{bmatrix}$
+
+    Then, $r_\ell \begin{bmatrix}
+        r_0 \\ r_1
+    \end{bmatrix} = 
+    \begin{bmatrix}
+        s_\ell & t_\ell \\
+        s_{\ell+1} & t_{\ell+1}
+    \end{bmatrix}
+    = 
+    \begin{bmatrix}
+        r_\ell \\ 0
+    \end{bmatrix}$
+
+    So $s_\ell r_0 + t_\ell r_1 = r_\ell$ (i.e. The second statment is true)
+
+    For the 1st statement:
+    Each $Q_i$ is invertible over $R$ (Check!) So, each $R_i$ is invertible over $R$ and so in particular $\begin{bmatrix}
+        r_0 \\ r_1
+    \end{bmatrix} = R_\ell^{-1}\begin{bmatrix}
+        r_\ell \\ 0
+    \end{bmatrix}$
+\end{proof}
+
+\subsection{Cost Analysis}
+Consider $R = F[x]$. Assume $\deg(r_0) \geq \deg(r_1)$.
+
+We want to compute the cost of computing $(q_i, r_{i+1})_{1 \leq i \leq \ell}$
+
+How many division steps $\ell$?: $\ell \leq 1 + \deg(r_1)$ since $-\infty = \deg(r_{i+1}) < \deg(r_\ell) < \ldots < \deg(r_1)$
+
+And dividing $r_{i-1}$ by $r_i$ with remainder costs $C(\deg(r_i + 1)(\deg(q_i + 1)))$ operations ($C$ constant) from $F$.
+
+Key observation: $\sum_{i = 1}^\ell \deg(q_i) = \sum_{i =1}^\ell \left(\deg(r_{i -1}) - \deg(r_i) \right)$ = $\deg(r_0)$
+
+So the total cost is thus: 
+\begin{align*}
+    &\leq \sum_{i=1}^\ell C(\deg(r_i + 1))(\deg(q_i + 1)) \\
+    &\leq C(\deg(r_1 + 1))\sum_{i=1}^\ell (\deg(q_i +1)) \quad &(r_i \text{ decreases by 1 in each iteration in the worst case}) \\
+    &\leq C(\deg(r_1 + 1))(\deg(r_0) + \ell) \\
+    &\in \mathcal{O}((1 + \deg r_0)(1 + \deg r_1))
+\end{align*}
+
+Extension: what is the cost of computing $Q_\ell \ldots Q_1$ (Exercise: Can be done in approximately the same time)
+
+\subsection{Applications of the EEA}
+\underline{Computing over finite field} (over a prime), given nonzero $a \in \Z_p$, use EEA to find $s,t \in \Z$ such that $sa + tp = 1$, then $sa \equiv 1 \mod p \Rightarrow s = a^{-1} \in \Z_p$
+
+
+\underline{Rational Number Reconstruction}:
+$\frac{-4}{5} \equiv 40 \mod 51$, call $\frac{-4}{5}$ the signed fraction, $30$ the modular image and $51$ the modulos $m$.
+
+\underline{Input}:
+\begin{itemize}
+    \item A modulos $m \in \Z_{> 0}$
+    \item An image $u \in \Z_{\geq 0}$ such that $0 \leq u < m$
+    \item Bounds $N, D \in \Z_{> 0}$ such that $2ND < m$
+\end{itemize}
+
+\underline{Output}: A signed and reduced rational number $n/d$ such that $n/d \equiv u \mod m$, $|n| \leq N$, $d \leq D$
+
+\underline{Fact}: There is a unique $n/d$, if it exists, that satisfy the bounds.
+
+\underline{Algorithm}: Use EEA on $m$ and $u$ 
+\begin{example}
+    $u = 40, m = 51, N = D = 5$
+    There are $6$ Q's. Look at $R_3 = Q_3Q_2Q_1$
+
+\end{example}
+
+\newpage
