@@ -110,7 +110,7 @@ Let's see an example of this:
     \begin{algorithm}[H]
         \nl Compute $\alpha^2, \alpha^3, \ldots, \alpha^m$ ($m \approx \sqrt{n}$ non-scalar operations)
 
-        \nl Compute $\beta_i = F_i(\alpha^i) \ \text{for } 0 \leq i \leq k - 1$ ($0$ non-scalar operations since $\alpha$ precomputed)
+        \nl Compute $\beta_i = F_i(\alpha) \ \text{for } 0 \leq i \leq k - 1$ ($0$ non-scalar operations since powers of $\alpha$ precomputed)
 
         \nl Compute $f(\alpha) = \beta_{k-1}(\alpha^m)^{k-1} + \beta_{k-2}(\alpha^m)^{k-2} + \ldots + \beta_0$
 
