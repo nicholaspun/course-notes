@@ -29,13 +29,9 @@
 
 % -- Theorems, Definitions, Examples -- %
 \theoremstyle{definition}
-% \newtheorem{theorem}{Theorem}[section]
-% \newtheorem{proposition}{Proposition}[section]
-% \newtheorem{lemma}{Lemma}[section]
-% \newtheorem{corollary}{Corollary}[section]
 \newtheorem{definition}{Definition}[section]
-% \newtheorem{example}{Example}[section]
 \newtheorem*{note}{Note}
+\newtheorem*{idea}{Idea}
 \newtheorem{remark}{Remark}[section]
 
 \tcbset{
@@ -65,10 +61,6 @@
 \DeclareMathOperator{\F}{\mathbb{F}}
 \DeclareMathOperator{\bigO}{\mathcal{O}}
 
-% -- New Commands -- %
-\newcommand{\Idea}{\underline{Idea}: }
-\newcommand{\lecture}[1]{\input{#1}\clearpage}
-
 % -- Section Title -- %
 \makeatletter
 % we use \prefix@<level> only if it is defined
@@ -94,7 +86,6 @@
 \Crefname{tcb@cnt@lemma}{Lemma}{Lemmas}
 
 % -- Other junk -- % 
-% \RequirePackage{subfiles} % Best loaded last in the preamble
 % \crefname{tcb@cnt@definition}{defn.}{defns.}
 % \Crefname{tcb@cnt@definition}{Definition}{Definitions}
 % \newtcbtheorem[number within=section]{definition}{Definition}{colback=black!5,colframe=lightgray!35!black,fonttitle=\bfseries,parbox=false,breakable}{defn}
