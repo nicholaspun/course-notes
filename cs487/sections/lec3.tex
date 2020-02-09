@@ -7,16 +7,16 @@ Went over definitions of: units, associates, zero divisors, integral domain, GCD
     ~
     \begin{itemize}
         \item On GCDs and LCMs: Often convenient to define them to be nonnegative to make them unique
-        \item On $a = qb + r$, the quotient and remainder are not necessarily unique over $\Z$. (e.g. $7 = 5 \cdot 1 + 2 = 5 \cdot 2 - 3)$. However, over $R = F[x]$ ($F$ field), the quotient and remainder \textit{are} unique.
+        \item On $a = qb + r$, the quotient and remainder are not necessarily unique over $\Z$. (e.g. $7 = 5 \cdot 1 + 2 = 5 \cdot 2 - 3)$. However, over $R = \F[x]$ ($F$ field), the quotient and remainder \textit{are} unique.
     \end{itemize}
 \end{note}
 
 \subsection{Extended Euclidean Algorithm}
-\underline{Input:} $a, b \in R, \ b \neq 0$, $R$ Euclidean Domain (e.g. $R = \Z \text{ or } R = F[x]$)
+\underline{Input:} $a, b \in R, \ b \neq 0$, $R$ Euclidean Domain (e.g. $R = \Z \text{ or } R = \F[x]$)
 
 \underline{Output:} $s,t,g \in R$ such that $sa + tb = g$, where $g = \gcd(a,b)$
 
-\begin{example}
+\begin{example}{}{}
     One may recall the algorithm from MATH135 which begins with the following table:
 
     \begin{center}
@@ -162,7 +162,7 @@ Let's formalize this:
     \caption{Extended Euclidean Algorithm}
 \end{algorithm}
 
-\begin{example}
+\begin{example}{}{}
     We can compute $\gcd(91,63)$ using the matrix formulation:
     \[
     Q_1 =
@@ -208,7 +208,7 @@ Let's formalize this:
 \end{example}
 
 \subsection{Correctness}
-\begin{proposition}
+\begin{proposition}{}{}
     $r_{\ell} = \gcd(r_0, r_1)$
 \end{proposition}
 \begin{proof}
@@ -249,7 +249,7 @@ Let's formalize this:
 \end{proof}
 
 \subsection{Cost Analysis}
-Consider $R = F[x]$. Assume $\deg(r_0) \geq \deg(r_1)$.
+Consider $R = \F[x]$. Assume $\deg(r_0) \geq \deg(r_1)$.
 
 We want to compute the cost of computing $(q_i, r_{i+1})_{1 \leq i \leq \ell}$
 
@@ -264,7 +264,7 @@ So the total cost is thus:
     &\leq \sum_{i=1}^\ell C(\deg(r_i + 1))(\deg(q_i + 1)) \\
     &\leq C(\deg(r_1 + 1))\sum_{i=1}^\ell (\deg(q_i +1)) \quad &(r_i \text{ decreases by 1 in each iteration in the worst case}) \\
     &\leq C(\deg(r_1 + 1))(\deg(r_0) + \ell) \\
-    &\in \mathcal{O}((1 + \deg r_0)(1 + \deg r_1))
+    &\in \bigO((1 + \deg r_0)(1 + \deg r_1))
 \end{align*}
 
 Extension: what is the cost of computing $Q_\ell \ldots Q_1$ (Exercise: Can be done in approximately the same time)
@@ -288,10 +288,8 @@ $\frac{-4}{5} \equiv 40 \mod 51$, call $\frac{-4}{5}$ the signed fraction, $30$ 
 \underline{Fact}: There is a unique $n/d$, if it exists, that satisfy the bounds.
 
 \underline{Algorithm}: Use EEA on $m$ and $u$ 
-\begin{example}
+\begin{example}{}{}
     $u = 40, m = 51, N = D = 5$
     There are $6$ Q's. Look at $R_3 = Q_3Q_2Q_1$
 
 \end{example}
-
-\newpage

@@ -2,7 +2,7 @@
 
 We want to talk about basic operations (i.e. $\{+, -, \times, \div \}$) over a \underline{ring}. (Note: Division may not always be possible)
 
-\begin{example}
+\begin{example}{Rings}{}
     The following rings will come up:
     \begin{enumerate}
         \item Integers ($\Z$)
@@ -13,7 +13,7 @@ We want to talk about basic operations (i.e. $\{+, -, \times, \div \}$) over a \
     \end{enumerate}
 \end{example}
 
-\subsection{Naive upper bounds on costs}
+\subsection{Naïve upper bounds on costs}
 For polynomials, we are interested in $a,b \in R[x]$. We will let $n = deg(a),\ m = deg(b)$ and we will count ring operations from $R$.
 
 For integers, we will count bit operations.
@@ -69,7 +69,7 @@ Within the shaded region of the trapezoid, no changes are made to the polynomial
 In each step of the long division, we only perform changes to $m$ terms within the unshaded band in the trapezoid.
 There are a total of $n-m$ steps (This is the resulting degree of $q$).
 
-So, in total, long division of polynomials can be done in $\mathcal{O}((m+1)(n-m+1))$ operations.
+So, in total, long division of polynomials can be done in $\\bigO{O}((m+1)(n-m+1))$ operations.
 
 \begin{note}
     Why do we not just reuse our subtraction operation? We want this division operation to be primitive. The operation only performs ring operations as needed.
@@ -83,12 +83,12 @@ Suppose $a \in \Z$, $p_1, \ldots, p_k \in \Z_{> 1}$, with $a < p := p_1\ldots p_
 \underline{Rough Bound:} We can use the division with remainder operation.
 Both $a$ and the $p_i$'s are bounded by $p$.
 Since there are $k$ $p_i$'s, we will perform the operation at most $k$ times.
-This gives the bound $\mathcal{O}(k(\lg p)^2)$
+This gives the bound $\bigO(k(\lg p)^2)$
 
 But, of course we can be more accurate with this bound.
-In total, the $k$ division with remainders require $\sum_{i = 1}^k C\left(\lg \frac{a}{p_i}\right)\left(\lg p\right)$ operations (The $C$ comes from the big-$\mathcal{O}$ of the division with remainder operation).
+In total, the $k$ division with remainders require $\sum_{i = 1}^k C\left(\lg \frac{a}{p_i}\right)\left(\lg p\right)$ operations (The $C$ comes from the big-$\bigO$ of the division with remainder operation).
 We get:
-\begin{equation}
+\begin{equation*}
 \begin{aligned}
     &\sum_{i = 1}^k C\left(\lg \frac{a}{p_i}\right)\left(\lg p\right)\\
     &= C \sum_{i = 1}^k \left(\lg \frac{a}{p_i}\right)\left(\lg p\right) \\
@@ -97,6 +97,4 @@ We get:
     &\leq C (2\log p) \sum_{i = 1}^k (2\log p) \quad & (\text{If } x > 1, 1 + \log x \leq 2\log x)\\
     &=4C(\log p)^2
 \end{aligned}
-\end{equation}
-
-\clearpage
+\end{equation*}

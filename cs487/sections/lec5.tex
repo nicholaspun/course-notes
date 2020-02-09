@@ -1,3 +1,32 @@
-\section{Polynomial Multiplication}
+\section{Lagrange Interpolants for Polynomial Multiplications}
+We continue our discussion on polynomial multiplication.
+Again, the motivation for the following algorithm is to reduce the \underline{non-scalar cost}.
 
-\newpage
+\subsection{Using Lagrange Interpolants}
+\begin{theorem}{}{}
+    Given $a,b \in \F[x]$, $\deg a, \deg b < n$, multiplying $a \times b$ has cost $2n - 1$ non-scalar multiplications if $\#\F \geq 2n - 1$
+\end{theorem}
+\begin{note}
+    The non-scalar multiplications refer to the coefficients of the polynomials we want to multiply
+\end{note}
+
+\Idea Use Polynomial Evaluation and Interpolation.
+Let's see an example of this:
+
+\begin{example}{}{}
+    We want to multiply the following polynomials $a(x) = 2 + 3x, b(x) = 1 + 2x$. 
+
+    First, we note that $\deg a \times b = 2$ so we'll need 3 evaluation points.
+    Let $u_0 = 0, u_1 = 1, u_2 = 2$ be our evaluation points.
+    Evaluating our polynomials $a$ and $b$ at these 3 points give:
+    \begin{align*}
+        &a(u_0) = 2, \ b(u_0) = 1 \ \Rightarrow \ a(u_0)b(u_0) = 2 \\
+        &a(u_1) = 5, \ b(u_1) = 3 \ \Rightarrow \ a(u_1)b(u_1) = 15 \\
+        &a(u_2) = 8, \ b(u_2) = 5 \ \Rightarrow \ a(u_2)b(u_2) = 40 \\
+    \end{align*}
+
+    Then, using the Lagrange interpolants:  
+    % \begin{equation*}
+        
+    % \end{equation*}
+\end{example}

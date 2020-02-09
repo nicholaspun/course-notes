@@ -1,7 +1,7 @@
 \section{Introduction}
 
 \subsection{Course Preview}
-\begin{example}[Simplyfying Rational Expressions]
+\begin{example}{Simplyfying Rational Expressions}{}
     Suppose we have the two following expressions:
     \begin{align}
         f &:= \frac{x+1}{x-1} - \frac{x^3 - 2x + x^2 + 2}{x^3 +2x -x^2 -2} + \frac{x^2 +3}{x-1} \\
@@ -24,24 +24,24 @@
     \end{itemize}
 \end{example}
 
-\begin{example}[Solving Recurrences]
+\begin{example}{Solving Recurrences}{}
     Suppose we have the recurrence:
-    \begin{equation}
+    \begin{equation*}
         T(n) = \begin{cases}
             2 T(\frac{n}{2}) + \frac{n}{2} \quad & n > 1 \\
             1 \quad & n = 1
         \end{cases}
-    \end{equation}
+    \end{equation*}
 
     We can solve this by hand (using Master theorem or other techniques) to obtain the answer:
-    \begin{equation}
+    \begin{equation*}
         T(n) = n(1 + \log_2(n))
-    \end{equation}
+    \end{equation*}
 
     \underline{Question:} How do we do this computationally?
 \end{example}
 
-\begin{example}
+\begin{example}{}{}
     Consider the following identities:
     \begin{align}
         \sum_{k = 0}^n k &= \frac{n(n-1)}{2} \\
@@ -55,28 +55,28 @@
 \subsection{Representation of Integers}
 Current computers are based on architecture with $64$ bits (We will call this number of bits the \underline{word size})
 
-\begin{example}
+\begin{example}{}{}
     The \underline{unsigned long} in C represents integers in exactly the range $[0, 2^{64} - 1]$
 \end{example}
 
 \underline{Question:} How do we represent larger numbers?
 
-\underline{Idea:} Use an array of word size numbers.
+\Idea Use an array of word size numbers.
 
 Any integer $a$ can be expressed as the following summation:
-\begin{equation}
+\begin{equation*}
     a = (-1)^s \sum_{i = 0}^n a_i 2^{64i}
-\end{equation}
+\end{equation*}
 where $s \in \{0,1\}$ represents the sign of $a$ and $0 \leq a_i \leq 2^{64} - 1$ are the individual elements in the array.
 
 If we assume $0 \leq n + 1 \leq 2^{63}$, then we can encode $a$ as an array:
-\begin{equation}
+\begin{equation*}
     [s \cdot 2^{63} + n + 1, a_0, a_1, \ldots, a_n]
-\end{equation}
+\end{equation*}
 This is sufficient for all practical purposes.
 
 \begin{note}
-    The \underline{length} of $a$ is given by: $\left\lfloor\log_{2^{64}} |a|\right\rfloor + 1 \in \mathcal{O}\left(\log |a|\right)$ words
+    The \underline{length} of $a$ is given by: $\left\lfloor\log_{2^{64}} |a|\right\rfloor + 1 \in \bigO\left(\log |a|\right)$ words
 \end{note}
 
 \subsection{Addition of Integers}
@@ -103,14 +103,11 @@ For general $\beta$ this suggests the following:
 \end{equation}
 
 So, given two equal length (array-wise) integers $a, b$:
-\begin{equation}
+\begin{equation*}
 \begin{aligned}
     (a_0 + a_1\beta + \ldots + a_m\beta^m) + (b_0 + b_1\beta + \ldots + b_m\beta^m) &\leq 2(\beta^{m+1} - 1) \\
     &= (\beta^{m+1} - 2) + \beta^{m + 1}
 \end{aligned}
-\end{equation}
+\end{equation*}
 
 This implies that the largest the carry bit can be is $1$.
-
-\clearpage
-
