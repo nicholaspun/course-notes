@@ -9,27 +9,33 @@
 \RequirePackage{parskip}
 \RequirePackage{mdframed}
 \RequirePackage{blkarray}
+\RequirePackage{bigstrut}
 \RequirePackage{graphicx}
 \RequirePackage{enumitem}
 \RequirePackage{caption}
 \RequirePackage{tikz}
-\RequirePackage{hyperref}
-\RequirePackage{cleveref}
 \RequirePackage{bookmark}
 \RequirePackage[ruled,vlined]{algorithm2e}
 \RequirePackage{multirow}
 \RequirePackage[many]{tcolorbox}
 \tcbuselibrary{theorems}
+\RequirePackage{hyperref}
+\RequirePackage{cleveref}
 
 % -- References -- %
-\crefname{algocf}{alg.}{algs.}
-\Crefname{algocf}{Algorithm}{Algorithms}
-\crefname{algocfline}{alg.}{algs.}
-\Crefname{algocfline}{Algorithm}{Algorithms}
+\crefname{tcb@cnt@example}{eg}{egs.}
+\Crefname{tcb@cnt@example}{Example}{Examples}
+\crefname{tcb@cnt@proposition}{prop.}{props.}
+\Crefname{tcb@cnt@proposition}{Proposition}{Propositions}
+\crefname{tcb@cnt@theorem}{thm.}{thms.}
+\Crefname{tcb@cnt@theorem}{Theorem}{Theorems}
+\crefname{tcb@cnt@lemma}{lem.}{lems.}
+\Crefname{tcb@cnt@lemma}{Lemma}{Lemmas}
+\crefname{tcb@cnt@definition}{defn.}{defns.}
+\Crefname{tcb@cnt@definition}{Definition}{Definitions}
 
 % -- Theorems, Definitions, Examples -- %
 \theoremstyle{definition}
-\newtheorem{definition}{Definition}[section]
 \newtheorem*{note}{Note}
 \newtheorem*{idea}{Idea}
 \newtheorem{remark}{Remark}[section]
@@ -38,13 +44,16 @@
   colback=white,
   fonttitle=\bfseries,
   parbox=false,
-  breakable
+  breakable,
+  description delimiters parenthesis
 }
+
 \newtcbtheorem[number within=section]{example}{Example}{colframe=blue!15!black!50}{exmp}
-\newtcbtheorem[number within=section]{theorem}{Theorem}{colframe=red!15!black!50,description delimiters parenthesis}{th}
-\newtcbtheorem[number within=section]{proposition}{Proposition}{colframe=red!15!black!50,description delimiters parenthesis}{prop}
-\newtcbtheorem[number within=section]{lemma}{Lemma}{colframe=colframe=red!15!black!50,description delimiters parenthesis}{lem}
-\newtcbtheorem[number within=section]{corollary}{Corollary}{colframe=colframe=red!15!black!50,description delimiters parenthesis}{corol}
+\newtcbtheorem[number within=section]{theorem}{Theorem}{colframe=red!15!black!50}{th}
+\newtcbtheorem[number within=section]{proposition}{Proposition}{colframe=red!15!black!50}{prop}
+\newtcbtheorem[number within=section]{lemma}{Lemma}{colframe=red!15!black!50}{lem}
+\newtcbtheorem[number within=section]{corollary}{Corollary}{colframe=red!15!black!50}{corol}
+\newtcbtheorem[number within=section]{definition}{Definition}{colframe=black!35}{defn}
   
 \numberwithin{equation}{section}
 
@@ -55,6 +64,7 @@
 
 % -- Math Shortcuts -- %
 \DeclareMathOperator{\R}{\mathbb{R}}
+\DeclareMathOperator{\C}{\mathbb{C}}
 \DeclareMathOperator{\N}{\mathbb{N}}
 \DeclareMathOperator{\Q}{\mathbb{Q}}
 \DeclareMathOperator{\Z}{\mathbb{Z}}
@@ -74,18 +84,3 @@
 \newcommand\prefix@section{Lecture \thesection: }
 \makeatother
 \endinput
-
-% -- References Definitions --%
-\crefname{tcb@cnt@example}{eg}{egs.}
-\Crefname{tcb@cnt@example}{Example}{Examples}
-\crefname{tcb@cnt@proposition}{prop.}{props.}
-\Crefname{tcb@cnt@proposition}{Proposition}{Propositions}
-\crefname{tcb@cnt@theorem}{thm.}{thms.}
-\Crefname{tcb@cnt@theorem}{Theorem}{Theorems}
-\crefname{tcb@cnt@lemma}{lem.}{lems.}
-\Crefname{tcb@cnt@lemma}{Lemma}{Lemmas}
-
-% -- Other junk -- % 
-% \crefname{tcb@cnt@definition}{defn.}{defns.}
-% \Crefname{tcb@cnt@definition}{Definition}{Definitions}
-% \newtcbtheorem[number within=section]{definition}{Definition}{colback=black!5,colframe=lightgray!35!black,fonttitle=\bfseries,parbox=false,breakable}{defn}

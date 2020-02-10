@@ -1,10 +1,11 @@
 % !TeX root = ../cs487.tex
 
-\section{Lagrange Interpolants for Polynomial Multiplications}
+\section{Polynomial Multiplication using Lagrange Interpolation, Vandermonde Matrix}
+
+\subsection{Polynomial Multiplication using Lagrange Interpolation}
 We continue our discussion on polynomial multiplication.
 Again, the motivation for the following algorithm is to reduce the \underline{non-scalar cost}.
 
-\subsection{Using Lagrange Interpolants}
 \begin{theorem}{}{}
     Given $a,b \in \F[x]$, $\deg a, \deg b < n$, multiplying $a \times b$ has cost $2n - 1$ non-scalar multiplications if $\#\F \geq 2n - 1$
 \end{theorem}
@@ -20,18 +21,223 @@ Let's see an example of this:
 \begin{example}{}{}
     We want to multiply the following polynomials $a(x) = 2 + 3x, b(x) = 1 + 2x$ using Lagrange Interpolation.
 
-    Let $c(x) = a(x) \times b(x)$ be the resulting polynomial
-    First, we note that $\deg a \times b = 2$ so we'll need 3 evaluation points.
-    Let $u_0 = 0, u_1 = 1, u_2 = 2$ be our evaluation points.
+    Let $c(x) = a(x) \times b(x)$ be the resulting polynomial.
+    Note that $\deg c = 2$ so we'll need 3 evaluation points.
+    Let $u_0 = 0, u_1 = 1, u_2 = 2$ be the 3 such points. 
+
     Evaluating our polynomials $a$ and $b$ at these 3 points give:
     \begin{align*}
-        &a(u_0) = 2, \ b(u_0) = 1 \ \Rightarrow \ a(u_0)b(u_0) = 2 \\
-        &a(u_1) = 5, \ b(u_1) = 3 \ \Rightarrow \ a(u_1)b(u_1) = 15 \\
-        &a(u_2) = 8, \ b(u_2) = 5 \ \Rightarrow \ a(u_2)b(u_2) = 40 \\
+        &a(u_0) = 2, \ b(u_0) = 1 \\
+        &a(u_1) = 5, \ b(u_1) = 3 \\
+        &a(u_2) = 8, \ b(u_2) = 5 
+    \end{align*}
+    which gives us the value of $c$ at the 3 points:
+    \begin{align*}
+        c(u_0) &= a(u_0) \times b(u_0) = 2 \\
+        c(u_1) &= a(u_1) \times b(u_1) = 15 \\
+        c(u_2) &= a(u_2) \times b(u_2) = 40 \\
+    \end{align*}
+    We're nearly there! 
+    Now we have 3 data points:$(0, 2), (1, 15), (2, 40)$.
+    Define the following Lagrange basis polynomials:
+    \begin{equation*}
+        L_0 =  \frac{(x-1)(x-2)}{(0-1)(0-2)}, \
+        L_1 =  \frac{(x-0)(x-2)}{(1-0)(1-2)}, \
+        L_2 =  \frac{(x-0)(x-1)}{(2-0)(2-1)} \
+    \end{equation*}
+    Then,
+    \begin{equation*}
+        c(x) = 2 \times L_0 + 15 \times L_1 + 40 \times L_2 = 2 + 7x + 6x^2
+    \end{equation*}
+\end{example}
+
+\begin{proof}
+Consider the following algorithm:
+
+\begin{algorithm}[H]
+    \caption{Polynomial Multiplication using Lagrange Interpolation}\label{alg:poly-mult-lagrange}
+
+    (Our input is: $a,b \in \F[x]$ with $\deg a, \deg b < n$)
+
+    \BlankLine
+    \nl Choose $2n - 1$ evaluation points: $u_1, \ldots u_{2n - 1} \in \F$
+
+    \nl Compute $\alpha_i = a(u_i)$ and $\beta_i = b(u_i)$ for $i = 1,\ldots, 2n - 1$
+
+    \nl \label{step:non-scalar-mults} Compute $\gamma_i = \alpha_i\beta_i$ for $i = 1,\ldots, 2n - 1$ 
+
+    \nl Interpolate to get $c = a \times b$ using Lagrange's formula:
+    \begin{equation}
+        c = \sum_{1 \leq i \leq 2n-1} \gamma_i L_i
+    \end{equation}
+    where $L_i$ is defined as:
+    \begin{equation}
+        L_i = \prod_{j \neq i} \frac{x - u_j}{u_i - u_j} \in \F[x]
+    \end{equation}
+\end{algorithm}
+Only \Cref{step:non-scalar-mults} contributes to the non-scalar cost, and only $2n - 1$ multiplications are made.
+\end{proof}
+
+\subsection{A Slight Detour: The Vandermonde Matrix}
+\begin{definition}{Vandermonde Matrix}{}
+    We define the \underline{Vandermonde Matrix} to be the following $n \times n$ matrix:
+    \begin{equation}
+        VDM(u_1, u_2, \ldots, u_n) = 
+        \begin{bmatrix}
+            1 & u_1^1 & \ldots & u_1^{n-1} \\
+            1 & u_2^1 & \ldots & u_2^{n-1} \\
+            \vdots & \vdots & \ddots & \vdots \\
+            1 & u_n^1 & \ldots & u_n^{n-1} \\
+        \end{bmatrix}
+    \end{equation}
+\end{definition}
+
+Now, given $a(x) = a_0 + a_1x + \ldots a_{n-1}x^{n-1}$, observe that we can express both polynomial evaluation and interpolation using the Vandermonde matrix.
+
+\subsubsection{Polynomial Evaluation}
+Given $a$ as above and $n$ evaluation points: $u_0, \ldots u_{n - 1}$, the evaluation of $a$ at these $n$ points is:
+\begin{equation}\label{eq:vandermonde-poly-eval}
+    VDM(u_0, \ldots, u_{n-1})
+    \begin{bmatrix}
+        a_0 \\ \vdots \\ a_{n-1}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        a(u_0) \\ \vdots \\ a(u_{n-1})
+    \end{bmatrix}
+\end{equation}
+
+\subsubsection{Polynomial Interpolation}
+\begin{proposition}{Determinant of a Vandermonde Matrix}{det-vandermonde}
+    Let $V = VDM(u_1, \ldots, u_n)$. The determinant $\det(V)$ is:
+    \begin{equation}\label{eq:vandermonde-poly-interp}
+        \det(V) = \prod_{1 \leq i < j \leq n} (u_j - u_i)
+    \end{equation}
+\end{proposition}
+\begin{remark}
+    Observe that when $u_1, \ldots, u_n$ are all distinct, then $\det(V)$ is non-zero and the matrix is invertible.
+\end{remark}
+Given $(u_0, \alpha_0), (u_1, \alpha_1), \ldots, (u_{n-1}, \alpha_{n-1})$, where $u_0, \ldots u_{n-1}$ are all distinct, the interpolation of $a$ at these $n$ points is:
+\begin{equation}
+    \begin{bmatrix}
+        a_0 \\ \vdots \\ a_{n-1}
+    \end{bmatrix}
+    =
+    VDM(u_0, \ldots, u_{n-1})^{-1}
+    \begin{bmatrix}
+        \alpha_0 \\ \vdots \\ \alpha_{n-1}
+    \end{bmatrix}
+\end{equation}
+(The inverse exists by \Cref{prop:det-vandermonde})
+
+\subsection{Another View on Polynomial Multiplication}
+We can rewrite the steps \Cref{alg:poly-mult-lagrange} as expressions involving the Vandermonde matrix.
+Here, we'll just look at an example, and leave writing the algorithm out formally as an exercise to the reader.
+
+\begin{example}{}{}
+    We will work over the field $\Z_7$.
+    Consider the following polynomials:
+    \begin{align*}
+        f(x) &= 2x^2 + 3x + 1 \\
+        g(x) &= x^2 + 5x + 2
     \end{align*}
 
-    Then, using the Lagrange interpolants:  
-    % \begin{equation*}
+    Let $h(x) = f(x) \times g(x) = h_0 + h_1x + \ldots + h_4x^4$ and let's choose the evaluation points: 0, 1, 2, 3, 4 (We'll see very soon that we can choose better points)
+    \begin{enumerate}
+        \item \underline{Evaluation}:
+
+        To evaluate $f, g$ at the 4 evaluation points, we'll use \Cref{eq:vandermonde-poly-eval}:
+        \begin{equation*}
+            VDM(0,1,2,3,4)
+            \begin{blockarray}{cc}
+                f & g \\
+                \begin{block}{[c|c]}
+                    \bigstrut[t] 1 & 2 \\
+                    3 & 5 \\
+                    2 & 1 \\
+                    0 & 0 \\
+                    0 & 0 \bigstrut[b] \\
+                \end{block}
+            \end{blockarray}
+            =
+            \begin{blockarray}{cc}
+                f & g \\
+                \begin{block}{[c|c]}
+                    \bigstrut[t] 1 & 2 \\
+                    6 & 1 \\
+                    1 & 2 \\
+                    4 & 2 \\
+                    4 & 4 \bigstrut[b] \\
+                \end{block}
+            \end{blockarray}
+        \end{equation*} 
+        (Note that the $0$'s are used for padding since we want to evaluate $5$ points but our polynomials are only of length $3$)
+
+        \item \underline{Pointwise Multiplication}:
+
+        Now we take the resulting evaluated points and perform pointwise multiplication to obtain $h(x)$.
+        That is:
+        \begin{align*}
+            h(0) = f(0) \times g(0) &= 1 \times 2 = 2 \\
+            h(1) = f(1) \times g(1) &= 6 \times 1 = 6 \\ 
+            h(2) = f(2) \times g(2) &= 1 \times 2 = 2 \\
+            h(3) = f(3) \times g(3) &= 4 \times 2 = 1 \\
+            h(4) = f(4) \times g(4) &= 4 \times 4 = 2
+        \end{align*}
+
+        \item \underline{Interpolation}:
         
-    % \end{equation*}
+        Finally, use \Cref{eq:vandermonde-poly-interp} to find $h_0, \ldots, h_4$:
+        \begin{equation*}
+            VDM(0,1,2,3,4)^{-1}
+            \begin{bmatrix}
+                2 \\ 6 \\ 2 \\ 1 \\ 2
+            \end{bmatrix}
+            = 
+            \begin{bmatrix}
+                2 \\ 4 \\ 6 \\ 6 \\ 2
+            \end{bmatrix}
+            = 
+            \begin{bmatrix}
+                h_0 \\ h_1 \\ h_2 \\ h_3 \\ h_4
+            \end{bmatrix}
+        \end{equation*}
+    \end{enumerate}
+
+    So, $h(x) = 2x^4 + 6x^3 + 6x^2 + 4x + 2$
 \end{example}
+
+\subsection{Choosing ``Good'' Evaluation Points}
+\begin{definition}{Primitive $n$-th root of unity}{}
+    Let $n \in \N$ and $w \in \F$. $w$ is a \underline{primitive $n$-th root of unity} ($n$-PRU) if:
+    \begin{enumerate}
+        \item $w^n = 1$
+        \item $n$ is a unit in $\F$
+        \item $w^k \neq 1$ for $1 \leq k < n$
+    \end{enumerate}
+\end{definition}
+
+\begin{example}{PRUs}{}
+    \begin{enumerate}
+        \item Let $\F = \C$:
+        \begin{itemize}
+            \item $w = e^{\frac{2\pi i}{8}}$ is an $8$-PRU
+            \item $w = -1$ is an $4$-PRU
+            \item $w = i$ is an $2$-PRU
+        \end{itemize}
+
+        \item Let $\F = \Z_{17}$:
+        \begin{itemize}
+            \item $w = 3$ is an $16$-PRU
+            \item $w = 7$ is an $4$-PRU
+        \end{itemize}
+    \end{enumerate}
+\end{example}
+
+\begin{proposition}{}{}
+    \begin{enumerate}
+        \item If $w$ is an $n$-PRU, then $w^{-1}$ is also an $n$-PRU
+        \item If $w$ is an $n$-PRU and $n$ is even, then $w^2$ is an $\frac{n}{2}$-PRU
+    \end{enumerate}
+\end{proposition}
+
