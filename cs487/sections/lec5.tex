@@ -216,12 +216,18 @@ Here, we'll just look at an example, and leave writing the algorithm out formall
         \item $w^k \neq 1$ for $1 \leq k < n$
     \end{enumerate}
 \end{definition}
+\begin{remark}
+    For the 2nd property, we mean the $n$-fold sum of the additive identity $1_{\F}$ in $\F$.
+    Further, we can define primitive $n$-th roots of unity arbitrary rings as well.
+    In this case, the requirement that $n$ is a unit is more significant.
+    We will see later that the inverse of such $n$ must exist for our particular usage of these elements.
+\end{remark}
 
 \begin{example}{PRUs}{}
     \begin{enumerate}
         \item Let $\F = \C$:
         \begin{itemize}
-            \item $w = e^{\frac{2\pi i}{8}}$ is an $8$-PRU
+            \item $w = e^{\frac{2\pi i}{8}}$ is an $8$-PRU.
             \item $w = -1$ is an $4$-PRU
             \item $w = i$ is an $2$-PRU
         \end{itemize}

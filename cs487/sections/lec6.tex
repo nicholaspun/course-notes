@@ -1,0 +1,70 @@
+% !TeX root = ../cs487.tex
+
+\section{Discrete Fourier Transform}
+
+\begin{definition}{}{}
+    Let $w$ be an $n$-PRU in $\F$.
+    Define $V(w)$ to be the following $n$-by-$n$ matrix:
+    \begin{equation}
+        V(w) = 
+        \begin{bmatrix}
+            1 & 1 & \ldots & 1 \\    
+            1 & w^1 & \ldots & w^{n-1} \\    
+            1 & w^2 & \ldots & w^{2(n-1)} \\    
+            \vdots & \vdots & \ddots & \vdots \\    
+            1 & w^{(n-1)} & \ldots & w^{(n-1)^2} \\    
+        \end{bmatrix}
+        =
+        VDM(w^0, w^1, \ldots, w^{n-1})
+    \end{equation}
+    and likewise for $V(w^{-1})$.
+\end{definition}
+
+\begin{theorem}{}{}
+    Let $w$ be an $n$-PRU, then $V(w)\cdot V(w^{-1}) = nI$
+\end{theorem}
+\begin{proof}
+    \begin{align*}
+        \left(V(w)V(w^{-1})\right) &= i\text{-th row of }V(w) \times j\text{-th col of }V(w^{-1}) \\
+        &= \sum_{0 \leq k < n} w^{ik}w^{-jk} \\ 
+        &= \sum_{0 \leq k < n} w^{(i - j)k}
+    \end{align*}
+    If $i = j$, then the sum is $\sum_k 1 = n$
+
+    If $i \neq j$, then this is a geometric series:
+    \begin{equation*}
+        \sum_{0 \leq k < n} w^{(i - j)k} = \frac{w^{(i-j)n} - 1}{w^{(i - j)} - 1} = 0
+    \end{equation*}
+    since $w^{(i - j)n} = 1$ as $w$ is an $n$-PRU
+\end{proof}
+
+\begin{definition}{Discrete Fourier Transform}{}
+    Let $w \in \F$ be an $n$-PRU. $\DFT(w)$ is the linear map $F^n \rightarrow F^n$ defined by:
+    \begin{equation}
+        \begin{bmatrix}
+            a_0 \\ a_1 \\ \vdots \\ a_{n-1}
+        \end{bmatrix}
+        \longmapsto
+        \begin{bmatrix}
+            b_0 \\ b_1 \\ \vdots \\ b_{n-1}
+        \end{bmatrix}
+        =
+        V(w)
+        \begin{bmatrix}
+            a_0 \\ a_1 \\ \vdots \\ a_{n-1}
+        \end{bmatrix}
+    \end{equation}
+    i.e. $b_j = \sum_{0 \leq k < n} a_kw^{jk}$
+\end{definition}
+
+Our goal is to develop a fast way to evaluate this.
+Let's look at a motivating example:
+
+Let $f = a_0 + a_1x + \ldots + a_kx^k$ and consider evaluating $f(1)$ and $f(-1)$.
+$1, -1$ weren't picked at random, observe that $(-1)^2 = 1^2$, and likewise for any even power.
+This suggests that we can save some computations on even exponents.
+
+Decompose $f$ like so:
+\begin{equation*}
+    f(x) = 
+\end{equation*}
