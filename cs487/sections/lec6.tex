@@ -60,11 +60,85 @@
 Our goal is to develop a fast way to evaluate this.
 Let's look at a motivating example:
 
-Let $f = a_0 + a_1x + \ldots + a_kx^k$ and consider evaluating $f(1)$ and $f(-1)$.
-$1, -1$ weren't picked at random, observe that $(-1)^2 = 1^2$, and likewise for any even power.
+Let $f = a_0 + a_1x + \ldots + a_kx^k$ (with $k$ even) and consider evaluating $f(1)$ and $f(-1)$.
+Observe that $(-1)^2 = 1^2$ ($1, -1$ weren't picked at random!), and in fact, this holds for an even power.
 This suggests that we can save some computations on even exponents.
 
 Decompose $f$ like so:
+\begin{align*}
+    f(x) &= (a_0 + a_2x^2 + a_4x^4 + \ldots) + x(a_1 + a_3x^2 + a_5x^4 + \ldots) \\
+    &= \sum_{0 \leq i \leq k/2} a_{2i}x^{2i} + x\sum_{0 \leq j \leq k/2} a_{2j + 1}x^{2j}
+\end{align*}
+Now, we only have even exponents in the sums!
+Define the following two functions:
+\begin{align}
+    f_{even}(x) &= \sum_{0 \leq i \leq k/2} a_{2i}x^{i} \\
+    f_{odd}(x) &= \sum_{0 \leq j \leq k/2} a_{2j + 1}x^{j}
+\end{align}
+Then, $f$ can be rewritten using these two functions like so:
+\begin{equation}\label{eq:lec6-function-decompose}
+    f(x) = f_{even}(x^2) + xf_{odd}(x^2)
+\end{equation}
+
+What happens if we try using \Cref{eq:lec6-function-decompose} to evaluate $f$ at $1, -1$?
+Let's try it:
+
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \begin{align*}
+        f(1) &= f_{even}(1^2) + (1)f_{odd}(1^2) \\
+        &= f_{even}(1) + (1)f_{odd}(1)
+    \end{align*}
+\end{minipage}
+\begin{minipage}{0.6\textwidth}
+    \centering
+    \begin{align*}
+        f(-1) &= f_{even}((-1)^2) + (-1)f_{odd}((-1)^2) \\
+        &= f_{even}(1) + (-1)f_{odd}(1)
+    \end{align*}
+\end{minipage}
+
+~\newline So, the evaluation of $f_{even}(1)$ and $f_{odd}(1)$ can be reused between the two computations!
+Further observe that $f_{even}$ and $f_{odd}$ are of half the degree of $f$.
+We've reduced the evaluation of $f$ at the two points ($1$ and $-1$), to evaluating two polynomials, of half the degree, at a single point (just $1$).
+
+Let's look at another example using the $4$ points: $1, i, - 1, - i$.
+Plugging these $4$ values into equation \Cref{eq:lec6-function-decompose}, we get the following expressions:
+\begin{align*}
+    f(1) &= f_{even}(1) + (1)f_{odd}(1) \\
+    f(i) &= f_{even}(i^2) + (i)f_{odd}(1^2) \\
+    f(1) &= f_{even}(1) + (-1)f_{odd}(1) \\
+    f(1) &= f_{even}(i^2) + (-i)f_{odd}(i^2)
+\end{align*}
+which suggests that we can limit our evaluations to only the points $1$ and $i$. (So we pair up the points $(1, -1), (i, -i)$)
+
+In general, it seems that we can use \Cref{eq:lec6-function-decompose} to save evaluations if we have $n$ points of the form:
 \begin{equation*}
-    f(x) = 
+    (u_1, -u_1), (u_2, -u_2), \ldots, (u_{\frac{n}{2}}, -u_{\frac{n}{2}})
 \end{equation*}
+
+\begin{theorem}{}{}
+    Let $n$ be a power of $2$. Let $w \in \F$ be an $n$-PRU. Then, $\DFT(w)$ can be computed in $\bigO(n\log n)$ field operations.
+\end{theorem}
+
+\begin{lemma}{}{}
+    
+\end{lemma}
+
+\textcolor{red}{TODO: Finish this lecture ... }
+
+\begin{definition}{}{}
+    We say $\F$ \ul{supports} the FFT (\textcolor{red}{TODO: Add Cref here}), if $\F$ has a $2^\ell$-PRU for any $\ell \in \N$
+\end{definition}
+
+\begin{theorem}{}{}
+    If $\F$ supports the FFT, the polynomials of degree at most $n$ can be multiplied ... \textcolor{red}{wut this theorem makes no sense ... hmmm i'll fix this later}
+\end{theorem}
+
+\begin{theorem}{Sch\"{o}nhage \& Strassen, 1971}{}
+    Integer Multiplication can be done in time $\bigO(n\log n \log\log n)$ 
+\end{theorem}
+
+\begin{theorem}{Cantor \& Kaltofen, 1991}{}
+    Over any ring, polynomials of degree $n$ can be multiplied in $\bigO(n \log n \log\log n)$
+\end{theorem}

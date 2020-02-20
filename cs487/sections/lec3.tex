@@ -14,9 +14,9 @@ Went over definitions of: units, associates, zero divisors, integral domain, GCD
 \end{note}
 
 \subsection{Extended Euclidean Algorithm}
-\underline{Input:} $a, b \in R, \ b \neq 0$, $R$ Euclidean Domain (e.g. $R = \Z \text{ or } R = \F[x]$)
+\ul{Input:} $a, b \in R, \ b \neq 0$, $R$ Euclidean Domain (e.g. $R = \Z \text{ or } R = \F[x]$)
 
-\underline{Output:} $s,t,g \in R$ such that $sa + tb = g$, where $g = \gcd(a,b)$
+\ul{Output:} $s,t,g \in R$ such that $sa + tb = g$, where $g = \gcd(a,b)$
 
 \begin{example}{}{}
     One may recall the algorithm from MATH135 which begins with the following table:
@@ -272,24 +272,24 @@ So the total cost is thus:
 Extension: what is the cost of computing $Q_\ell \ldots Q_1$ (Exercise: Can be done in approximately the same time)
 
 \subsection{Applications of the EEA}
-\underline{Computing over finite field} (over a prime), given nonzero $a \in \Z_p$, use EEA to find $s,t \in \Z$ such that $sa + tp = 1$, then $sa \equiv 1 \mod p \Rightarrow s = a^{-1} \in \Z_p$
+\ul{Computing over finite field} (over a prime), given nonzero $a \in \Z_p$, use EEA to find $s,t \in \Z$ such that $sa + tp = 1$, then $sa \equiv 1 \mod p \Rightarrow s = a^{-1} \in \Z_p$
 
 
-\underline{Rational Number Reconstruction}:
+\ul{Rational Number Reconstruction}:
 $\frac{-4}{5} \equiv 40 \mod 51$, call $\frac{-4}{5}$ the signed fraction, $30$ the modular image and $51$ the modulos $m$.
 
-\underline{Input}:
+\ul{Input}:
 \begin{itemize}
     \item A modulos $m \in \Z_{> 0}$
     \item An image $u \in \Z_{\geq 0}$ such that $0 \leq u < m$
     \item Bounds $N, D \in \Z_{> 0}$ such that $2ND < m$
 \end{itemize}
 
-\underline{Output}: A signed and reduced rational number $n/d$ such that $n/d \equiv u \mod m$, $|n| \leq N$, $d \leq D$
+\ul{Output}: A signed and reduced rational number $n/d$ such that $n/d \equiv u \mod m$, $|n| \leq N$, $d \leq D$
 
-\underline{Fact}: There is a unique $n/d$, if it exists, that satisfy the bounds.
+\ul{Fact}: There is a unique $n/d$, if it exists, that satisfy the bounds.
 
-\underline{Algorithm}: Use EEA on $m$ and $u$ 
+\ul{Algorithm}: Use EEA on $m$ and $u$ 
 \begin{example}{}{}
     $u = 40, m = 51, N = D = 5$
     There are $6$ Q's. Look at $R_3 = Q_3Q_2Q_1$

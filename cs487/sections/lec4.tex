@@ -9,9 +9,9 @@ Suppose we were given the following polynomial:
 \end{equation*}
 and an input $\alpha \in \Z_7^{300 \times 300}$ (i.e. 300-by-300 matrix with elements from $\Z_7$)
 
-\underline{Question}: What is the cost of evaluating $f(\alpha)$?
+\ul{Question}: What is the cost of evaluating $f(\alpha)$?
 
-\underline{Observations}:
+\ul{Observations}:
 \begin{itemize}
     \item The expensive operation is matrix multiplication
     \item It seems like we need at least 1000 multiplications to calculate each of: $\alpha^2, \alpha^3, \ldots, \alpha^{1000}$
@@ -22,9 +22,9 @@ However, by the end of the lecture, we will show a method that needs only $63$ m
 \subsubsection{Naïve Algorithm}
 \IncMargin{1em}
 \begin{algorithm}[H]
-    \underline{Input}: $\alpha, a_0, a_1, \ldots a_n \in R$ ($R$ ring)
+    \ul{Input}: $\alpha, a_0, a_1, \ldots a_n \in R$ ($R$ ring)
 
-    \underline{Output}: $f(\alpha) \in R$, where $f(x) = a_0 + a_1x + \ldots + a_nx^n \in \F[x]$
+    \ul{Output}: $f(\alpha) \in R$, where $f(x) = a_0 + a_1x + \ldots + a_nx^n \in \F[x]$
 
     \BlankLine
     \nl Compute $\alpha^2, \alpha^3, \ldots, \alpha^n$ ($n - 1$ multiplications)
@@ -51,12 +51,12 @@ This lead to the development of the non-scalar complexity model.
 
 \subsubsection{Non-scalar Complexity Model}
 Let $R = \F[x, a_0, \ldots, a_n]$ be the ring of polynomials in indeterminates $x, a_0, \ldots, a_n$.
-We define \underline{scalar} operations to be:
+We define \ul{scalar} operations to be:
 \begin{itemize}
     \item Additions of 2 elements of $R$
     \item Multiplications of elements of $R$ by fixed constants from $\F$
 \end{itemize}
-And, \underline{non-scalar} operations to be: the multiplication of 2 inputs or non-scalar quantities.
+And, \ul{non-scalar} operations to be: the multiplication of 2 inputs or non-scalar quantities.
 
 Roughly speaking, the non-scalar operations will be the costly operations.
 
@@ -78,7 +78,7 @@ However, we'll use even fewer non-scalar operations with the next method
 
 \subsubsection{Baby-Steps/Giant-Steps Method (By Patterson and Stockmeyer)}
 \begin{theorem}{Patterson and Stockmeyer, 1973}{}
-    Let $f \in \F[x]$ of degree $n$. Then $f(\alpha)$ can be evaluated at any $\alpha \in \F$ with $2\lceil \sqrt{n} \rceil - 1$ \underline{non-scalar} operations.
+    Let $f \in \F[x]$ of degree $n$. Then $f(\alpha)$ can be evaluated at any $\alpha \in \F$ with $2\lceil \sqrt{n} \rceil - 1$ \ul{non-scalar} operations.
 \end{theorem}
 We'll prove this by exhibiting the algorithm.
 The idea is to partition $f$ into $k \approx \sqrt{n}$ blocks of length $m \approx \sqrt{n}$.
@@ -128,11 +128,11 @@ Let's see an example of this:
 
 
 \subsection{Polynomial Multiplication}
-\underline{Input:} $f,g \in R[x]$ of degree $n > 0$
+\ul{Input:} $f,g \in R[x]$ of degree $n > 0$
 
-\underline{Output:} $f \times g$
+\ul{Output:} $f \times g$
 
-The \underline{standard algorithm} for this costs $\bigO(n^2)$ operations from $R$: $(n + 1)^2 \times's$ and $n^2 +'s$
+The \ul{standard algorithm} for this costs $\bigO(n^2)$ operations from $R$: $(n + 1)^2 \times's$ and $n^2 +'s$
 
 \subsubsection{Divide-and-Conquer Approach}
 Let us attempt to solve this using divide-and-conquer.
@@ -150,7 +150,7 @@ We will write $a = (A_1x^m + A_0), \ b = (B_1x^m + B_0)$, then $a \times b = A_1
     \end{align*}
 \end{example}
 
-The \underline{cost} of multiplying the two polynomials using this method is:
+The \ul{cost} of multiplying the two polynomials using this method is:
 \begin{equation}
     T(n) \leq
     \begin{cases}

@@ -10,15 +10,15 @@
         g &:= \frac{(x-1)^2 - x^2 -x  +2x}{(x+y+2)^{100}}
     \end{align}
 
-    \underline{Question:} How do we simplify these expressions to a single $\frac{poly}{poly}$ or return that it is $0$?
+    \ul{Question:} How do we simplify these expressions to a single $\frac{poly}{poly}$ or return that it is $0$?
 
-    \underline{One idea:} Define a ``normal'' function:
+    \ul{One idea:} Define a ``normal'' function:
     \begin{enumerate}
         \item If expression is $0$, the normal function will be $0$
         \item If not, the normal function will be the simplest form
     \end{enumerate}
 
-    \underline{(More) Questions:} What else do we need to consider?
+    \ul{(More) Questions:} What else do we need to consider?
     \begin{itemize}
         \item How do we represent polynomials (i.e. What data structure do we use?)
         \item How do we perform polynomial operations computationally?
@@ -40,7 +40,7 @@
         T(n) = n(1 + \log_2(n))
     \end{equation*}
 
-    \underline{Question:} How do we do this computationally?
+    \ul{Question:} How do we do this computationally?
 \end{example}
 
 \begin{example}{}{}
@@ -50,18 +50,18 @@
         \sum_{k = 0}^n k^4 &= \frac{n(n-1)(2n - 1)(3n^3 - 3n - 1)}{30}
     \end{align}
 
-    \underline{Question:} Can we return a closed form (without involving the index $k$) for any general expression or report that one doesn't exist? 
+    \ul{Question:} Can we return a closed form (without involving the index $k$) for any general expression or report that one doesn't exist? 
 \end{example}
 
 
 \subsection{Representation of Integers}
-Current computers are based on architecture with $64$ bits (We will call this number of bits the \underline{word size})
+Current computers are based on architecture with $64$ bits (We will call this number of bits the \ul{word size})
 
 \begin{example}{}{}
-    The \underline{unsigned long} in C represents integers in exactly the range $[0, 2^{64} - 1]$
+    The \ul{unsigned long} in C represents integers in exactly the range $[0, 2^{64} - 1]$
 \end{example}
 
-\underline{Question:} How do we represent larger numbers?
+\ul{Question:} How do we represent larger numbers?
 
 \begin{idea}
     Use an array of word size numbers.
@@ -80,7 +80,7 @@ If we assume $0 \leq n + 1 \leq 2^{63}$, then we can encode $a$ as an array:
 This is sufficient for all practical purposes.
 
 \begin{note}
-    The \underline{length} of $a$ is given by: $\left\lfloor\log_{2^{64}} |a|\right\rfloor + 1 \in \bigO\left(\log |a|\right)$ words
+    The \ul{length} of $a$ is given by: $\left\lfloor\log_{2^{64}} |a|\right\rfloor + 1 \in \bigO\left(\log |a|\right)$ words
 \end{note}
 
 \subsection{Addition of Integers}
@@ -90,7 +90,7 @@ Let $c = a + b = c_0 + c_1\beta + c_2\beta^2 + \ldots c_n\beta^n$, each $c_i = a
 
 $a_i + b_i$ may be greater than $\beta$. In this case, the addition creates a \textit{carry} to the $(i+1)$-th term.
 
-\underline{Question:} How large can $c$ get?
+\ul{Question:} How large can $c$ get?
 
 In particular, will our array drastically change in size?
 

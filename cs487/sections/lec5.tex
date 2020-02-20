@@ -4,7 +4,7 @@
 
 \subsection{Polynomial Multiplication using Lagrange Interpolation}
 We continue our discussion on polynomial multiplication.
-Again, the motivation for the following algorithm is to reduce the \underline{non-scalar cost}.
+Again, the motivation for the following algorithm is to reduce the \ul{non-scalar cost}.
 
 \begin{theorem}{}{}
     Given $a,b \in \F[x]$, $\deg a, \deg b < n$, multiplying $a \times b$ has cost $2n - 1$ non-scalar multiplications if $\#\F \geq 2n - 1$
@@ -80,7 +80,7 @@ Only \Cref{step:non-scalar-mults} contributes to the non-scalar cost, and only $
 
 \subsection{A Slight Detour: The Vandermonde Matrix}
 \begin{definition}{Vandermonde Matrix}{}
-    We define the \underline{Vandermonde Matrix} to be the following $n \times n$ matrix:
+    We define the \ul{Vandermonde Matrix} to be the following $n \times n$ matrix:
     \begin{equation}
         VDM(u_1, u_2, \ldots, u_n) = 
         \begin{bmatrix}
@@ -144,7 +144,7 @@ Here, we'll just look at an example, and leave writing the algorithm out formall
 
     Let $h(x) = f(x) \times g(x) = h_0 + h_1x + \ldots + h_4x^4$ and let's choose the evaluation points: 0, 1, 2, 3, 4 (We'll see very soon that we can choose better points)
     \begin{enumerate}
-        \item \underline{Evaluation}:
+        \item \ul{Evaluation}:
 
         To evaluate $f, g$ at the 4 evaluation points, we'll use \Cref{eq:vandermonde-poly-eval}:
         \begin{equation*}
@@ -173,7 +173,7 @@ Here, we'll just look at an example, and leave writing the algorithm out formall
         \end{equation*} 
         (Note that the $0$'s are used for padding since we want to evaluate $5$ points but our polynomials are only of length $3$)
 
-        \item \underline{Pointwise Multiplication}:
+        \item \ul{Pointwise Multiplication}:
 
         Now we take the resulting evaluated points and perform pointwise multiplication to obtain $h(x)$.
         That is:
@@ -185,7 +185,7 @@ Here, we'll just look at an example, and leave writing the algorithm out formall
             h(4) = f(4) \times g(4) &= 4 \times 4 = 2
         \end{align*}
 
-        \item \underline{Interpolation}:
+        \item \ul{Interpolation}:
         
         Finally, use \Cref{eq:vandermonde-poly-interp} to find $h_0, \ldots, h_4$:
         \begin{equation*}
@@ -209,7 +209,7 @@ Here, we'll just look at an example, and leave writing the algorithm out formall
 
 \subsection{Choosing ``Good'' Evaluation Points}
 \begin{definition}{Primitive $n$-th root of unity}{}
-    Let $n \in \N$ and $w \in \F$. $w$ is a \underline{primitive $n$-th root of unity} ($n$-PRU) if:
+    Let $n \in \N$ and $w \in \F$. $w$ is a \ul{primitive $n$-th root of unity} ($n$-PRU) if:
     \begin{enumerate}
         \item $w^n = 1$
         \item $n$ is a unit in $\F$

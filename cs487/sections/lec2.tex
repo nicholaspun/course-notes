@@ -2,7 +2,7 @@
 
 \section{Complexity of Arithmetic Operations}
 
-We want to talk about basic operations (i.e. $\{+, -, \times, \div \}$) over a \underline{ring}. (Note: Division may not always be possible)
+We want to talk about basic operations (i.e. $\{+, -, \times, \div \}$) over a \ul{ring}. (Note: Division may not always be possible)
 
 \begin{example}{Rings}{}
     The following rings will come up:
@@ -82,7 +82,7 @@ The same analysis can be performed on long division of integers.
 \subsection{Multimodular Reduction}
 Suppose $a \in \Z$, $p_1, \ldots, p_k \in \Z_{> 1}$, with $a < p := p_1\ldots p_k$. What is cost of computing $a \mod p_1$, $a \mod p_2$, $\ldots$, $a \mod p_k$? (i.e. Obtaining the remainders)
 
-\underline{Rough Bound:} We can use the division with remainder operation.
+\ul{Rough Bound:} We can use the division with remainder operation.
 Both $a$ and the $p_i$'s are bounded by $p$.
 Since there are $k$ $p_i$'s, we will perform the operation at most $k$ times.
 This gives the bound $\bigO(k(\lg p)^2)$
