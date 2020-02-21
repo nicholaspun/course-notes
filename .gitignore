@@ -6,4 +6,7 @@
 **/*.synctex.gz
 **/*.toc
 **/*.fdb_latexmk
+**/__latexindent_temp.tex
+**/*.bbl
+**/*.blg
 .vscode/
