@@ -1,4 +1,59 @@
 % !TeX root = ../cs487.tex
 
-\section{Multiplication Time, Newton's}
+\section{Multiplication Time, Newton Iteration and Fast Division with Remainder}
 
+\subsection{Multiplication Time}
+\begin{definition}{}{}
+    A function $M:\N_{> 0} \rightarrow \R_{>0}$ is a \ul{multiplication time} for $R[x]$ ($R$ ring) if polynomials in $R[x]$ of degree $< n$ can be multiplied using at most $M(n)$ ring operations in $R$.
+\end{definition}
+We'll use $M$ to add information to our cost estimates and improve our cost analysis for algorithms
+
+\begin{example}{}{}
+    We've seen a couple examples of multiplication time already:
+    \begin{itemize}
+        \item For \textbf{Na\"{i}ve Multiplication} of polynomials, we know that $M(n) \in \bigO(n^2)$
+        \item Using \textbf{Karatsuba's algorithm}, we can reduce that cost to $M(n) \in \bigO(n^{1.59})$
+        \item Cantor \& Kaltofen (\Cref{th:lec6-ring-poly-mult}) showed: $M(n) \in \bigO(n^2)$
+    \end{itemize}
+    And a couple interesting results for integers:
+    \begin{itemize}
+        \item Sch\"{o}hage \& Strassen (\Cref{th:lec6-fast-int-mult}) showed that: $M(n) \in \bigO(n\log n\log \log n)$
+        \item F\"{u}rer showed in 2007: $M(n) \in \bigO(n\log n K^{\log^* n})$, where $K$ is some constant $> 1$ and $\log^*$ is the iterated logarithm. (Harvey and Van Der Hoeven showed that $K = 4$ in 2018)
+        \item In March 2019, Harvey and Van Der Hoeven showed that $M(n) \in \bigO(n \log n)$ (Note that the result has yet to be officially peer-reviewed as of the time these notes were taken)
+    \end{itemize}
+\end{example}
+
+\ul{Useful Assumptions about $M$}:
+\begin{enumerate}
+    \item Superlinearity: 
+    
+    If $n \geq m$ 
+    \begin{equation}\label{eq:lec7-mult-time-superlinearity}
+        \frac{M(n)}{n} \geq \frac{M(m)}{m}
+    \end{equation}
+    
+    \item At most quadratic:
+    \begin{equation}\label{eq:lec7-mult-time-quadratic}
+        M(mn) \leq m^2M(n)
+    \end{equation}
+\end{enumerate}
+
+\begin{proposition}{}{lec7-mult-time}
+    \Cref{eq:lec7-mult-time-superlinearity} implies the following:
+    \begin{itemize}
+        \item $M(mn) \geq mM(n)$
+        \item $M(n + m) \geq M(n) + M(m)$
+        \item $M(n) \geq n$
+    \end{itemize}
+\end{proposition}
+
+\begin{example}{}{}
+    Using the assumptions and \Cref{prop:lec7-mult-time}, we can say the following:
+    \begin{itemize}
+        \item $nM(n) + M(n^2) \leq 2M(n^2) \in \bigO(M(n^2))$
+        \item $M(cn) \leq c^2M(n) \in \bigO(M(n))$ for constant $c$ 
+        \item $n^3 + nM(n) \geq M(n^3) + M(n^{\frac{3}{2}}) \in \Omega(M(n^3))$
+    \end{itemize}
+\end{example}
+
+\subsubsection{Fast Division with Remainder}
