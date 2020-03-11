@@ -18,6 +18,10 @@
 \RequirePackage{bookmark}
 \RequirePackage[ruled,vlined]{algorithm2e}
 \RequirePackage{multirow}
+\RequirePackage{xcolor}
+
+% -- Aliases -- %
+\newcommand{\ul}{\underline}
 
 % -- References -- %
 \crefname{algocf}{alg.}{algs.}
@@ -32,7 +36,10 @@
 \newtheorem{lemma}{Lemma}[section]
 \newtheorem{corollary}{Corollary}[section]
 \newtheorem{definition}{Definition}[section]
-\newtheorem{example}{Example}[section]
+\newtheorem{examplex}{Example}[section]
+\newenvironment{example}
+  {\pushQED{\qed}\renewcommand{\qedsymbol}{$\triangle$}\examplex}
+  {\popQED\endexamplex}
 \newtheorem*{note}{Note}
 \newtheorem{remark}{Remark}[section]
 
@@ -48,6 +55,7 @@
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand{\Z}{\mathbb{Z}}
+\newcommand{\B}{\mathcal{B}}
 
 % -- Section Title -- %
 \makeatletter

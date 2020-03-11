@@ -1,4 +1,155 @@
 \section{Introduction}
 
+This course is concerned with combinatorial objects satisfying certain regularity/balanced conditions.
+We will go over the following topics:
+\begin{itemize}
+    \item Classical results in design theory
+    \item Constructions of designs
+    \item Structural theorems
+    \item Non-existence results
+    \item Lots of algebra (abstract and linear)
+    \item Some number theory!
+\end{itemize}
+
+\subsection{The 36 Officers Problem (Euler, 1782)}
+\ul{Problem statement}: We have 36 pieces that are 
+\begin{itemize}
+    \item 1 of 6 chess pieces: King, Queen, Bishop, Rook, Knight, Pawn, and
+    \item 1 of 6 colors (one piece of each colour)
+\end{itemize}
+
+Can we arrange these on a 6-by-6 square such that each row and each column uses exactly one piece of each type and one piece of each colour?
+Euler thought this was impossible.
+
+Note that this is easy for 5 chess pieces and 5 colours.
+Consider (using numbers 1 through 5 in place of the different chess pieces):
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        \textcolor{cyan}{1} & \textcolor{red}{2} & \textcolor{yellow}{3} & \textcolor{green}{4} & \textcolor{pink}{5} \\
+        \hline
+        \textcolor{pink}{2} & \textcolor{cyan}{3} & \textcolor{red}{4} & \textcolor{yellow}{5} & \textcolor{green}{1} \\ 
+        \hline
+        \textcolor{green}{3} & \textcolor{pink}{4} & \textcolor{cyan}{5} & \textcolor{red}{1} & \textcolor{yellow}{2} \\ 
+        \hline
+        \textcolor{yellow}{4} & \textcolor{green}{5} & \textcolor{pink}{1} & \textcolor{cyan}{2} & \textcolor{red}{3} \\ 
+        \hline
+        \textcolor{red}{5} & \textcolor{yellow}{1} & \textcolor{green}{2} & \textcolor{pink}{3} & \textcolor{cyan}{4} \\ 
+        \hline
+    \end{tabular}
+\end{center}
+Which was constructed by taking the sequence 12345 and shifting it left each row.
+
+Further, this is impossible for 2 pieces and 2 colours.
+In fact, Euler conjectured that this is impossible for $n \equiv 2 \pmod{4}$
+
+However, this was wrong! (In fact, 2 ad 6 are the only numbers for which this is impossible, and we'll gain a better understanding of why through this course!)
+
+\subsection{Statistical Experimental Design}
+Here is a take on design theory.
+Consider the following scenario where:
+\begin{itemize}
+    \item We have \ul{$v$ kinds} of wine we want to compare,
+    \item But, we can only accurately compare \ul{$k$ kinds} per day.
+    \item And, we only want to compare each pair \ul{exactly once}.
+\end{itemize}
+Can we decide on what to drink each day in order to accomplish these tasks?
+
+\begin{example}[Fano Plane]
+    Suppose $v = 7, k = 3$.
+
+    We will call the objects we want to compare (in this case, the wines) \ul{points} and the experiment for the day a \ul{block}.
+
+    Here our points be labelled with numbers: $\{0, 1, 2, \ldots, 6\}$
+
+    And our blocks for each day will be:
+    \begin{enumerate}[label=]
+        \item Day 1: $\{0, 1, 3\}$
+        \item Day 2: $\{1, 2, 4\}$
+        \item Day 3: $\{2, 3, 5\}$
+        \item Day 4: $\{3, 4, 6\}$
+        \item Day 5: $\{4, 5, 0\}$
+        \item Day 6: $\{5, 6, 1\}$
+        \item Day 7: $\{6, 0, 2\}$
+    \end{enumerate}
+    Note that we can obtain the next day's experiment by adding 1 modulo 7.
+    And, finally we can check that every pair appears in exactly one block.
+\end{example}
+This example actually has a nice visualization:
+
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[scale = 0.7]
+        \node[vertex] (0) at (210:4) {0};
+        \node[vertex] (1) at (150:2) {1};
+        \node[vertex] (2) at (30:2) {2};
+        \node[vertex] (3) at (90:4) {3};
+        \node[vertex] (4) at (270:2) {4};
+        \node[vertex] (5) at (330:4) {5};
+        \node[vertex] (6) at (0:0) {6};
+
+        \draw (0) -- (1) -- (3) -- (2) -- (5) -- (4) -- (0) -- cycle;
+        \draw   (0) -- (6)
+                (1) -- (6)
+                (2) -- (6)
+                (3) -- (6)
+                (4) -- (6)
+                (5) -- (6);
+        \draw[bend left=45] (1) to (2)
+                            (2) to (4)
+                            (4) to (1);
+    \end{tikzpicture}
+\end{minipage}
+Note that each collinear line gives us a block (We count the line through 1, 2, and 4 as a ``straight'' line)
+How did we come up with this?
+We'll answer this through the course!
+For now, let's look at another example:
+
+\begin{example}[Game of Set]
+    In this game, we have 81 cards, each with 4 attributes:
+    \begin{itemize}
+        \item Colour: Red, Green, or Purple
+        \item Number: 1, 2, or 3
+        \item Shading: Open, Shaded, or Solid
+        \item Shape: Oval, Diamond, or Squiggle
+    \end{itemize}
+    
+    A \ul{Set} is a triple of cards with the property that in each attribute, they are all the same or all different.
+
+    \begin{note}
+        Each pair of cards is in a unique Set!
+    \end{note}
+    This is since on each attribute, the pair is either matching or different, and there is a unique third card that can complete the pattern.
+\end{example}
+
+How do the above examples compare?
+
+\begin{minipage}{\textwidth}
+    \captionof*{table}{\textbf{Balancing Properties of the Two Examples}}
+    \begin{center}        
+    \begin{tabular}{c|c}
+        Fano Plane & Set \\
+        \hline
+        Each block has 3 points & Each Set has 3 cards \\
+        Each point is in 3 blocks & Each card is in 40 different Sets* \\
+        Each pair of points is in exactly one block & Each pair of cards is in a unique set
+    \end{tabular}
+    \end{center}
+\end{minipage}
+
+*Why is this true? For every card, we can choose any other card in the deck (There are 80 such choices)
+But, we observed earlier that for every pair, there is a unique 3rd card that completes a Set.
+So, in fact, we'll treat the remaining 80 cards as pairs.
+
+\subsection{Basic Definitions}
+\begin{definition}[Design]
+    A \ul{design} is a pair $(V, \B)$ where
+    \begin{itemize}
+        \item $V$ is a finite set of elements called \ul{points}
+        \item $\B$ is a collection (multiset) of (usually non-empty) subsets of $V$, called \ul{blocks}
+    \end{itemize}
+\end{definition}
+
+We call a design \ul{simple} if $\B$ is a set (there are no repeated blocks)
 
 
