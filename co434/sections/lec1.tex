@@ -55,7 +55,7 @@ Consider the following scenario where:
 \end{itemize}
 Can we decide on what to drink each day in order to accomplish these tasks?
 
-\begin{example}[Fano Plane]
+\begin{example}[Fano Plane]\label{lec1:exmp-fano-plane}
     Suppose $v = 7, k = 3$.
 
     We will call the objects we want to compare (in this case, the wines) \ul{points} and the experiment for the day a \ul{block}.
@@ -80,11 +80,13 @@ This example actually has a nice visualization:
 \begin{minipage}{\textwidth}
     \centering
     \begin{tikzpicture}[scale = 0.7]
+        \draw (0:0) circle (2);
+
         \node[vertex] (0) at (210:4) {0};
-        \node[vertex] (1) at (150:2) {1};
-        \node[vertex] (2) at (30:2) {2};
+        \node[vertex, fill=white] (1) at (150:2) {1};
+        \node[vertex, fill=white] (2) at (30:2) {2};
         \node[vertex] (3) at (90:4) {3};
-        \node[vertex] (4) at (270:2) {4};
+        \node[vertex, fill=white] (4) at (270:2) {4};
         \node[vertex] (5) at (330:4) {5};
         \node[vertex] (6) at (0:0) {6};
 
@@ -95,11 +97,9 @@ This example actually has a nice visualization:
                 (3) -- (6)
                 (4) -- (6)
                 (5) -- (6);
-        \draw[bend left=45] (1) to (2)
-                            (2) to (4)
-                            (4) to (1);
     \end{tikzpicture}
 \end{minipage}
+
 Note that each collinear line gives us a block (We count the line through 1, 2, and 4 as a ``straight'' line)
 How did we come up with this?
 We'll answer this through the course!
@@ -142,7 +142,7 @@ But, we observed earlier that for every pair, there is a unique 3rd card that co
 So, in fact, we'll treat the remaining 80 cards as pairs.
 
 \subsection{Basic Definitions}
-\begin{definition}[Design]
+\begin{definition}
     A \ul{design} is a pair $(V, \B)$ where
     \begin{itemize}
         \item $V$ is a finite set of elements called \ul{points}
@@ -152,4 +152,16 @@ So, in fact, we'll treat the remaining 80 cards as pairs.
 
 We call a design \ul{simple} if $\B$ is a set (there are no repeated blocks)
 
+\begin{definition}
+    A \ul{$t$-design} ($t \in \N$) is a design $(V, \B)$ in which all blocks have the same size $k$, and there is a constant $\lambda_t$ such that every $t$-tuple of points lie in exactly $\lambda_t$ blocks.
+\end{definition}
 
+The two examples we just saw were $2$-designs with $\lambda_2 = 1$ and also $1$-designs with $\lambda_1 = 3$ for the Fano plane and $\lambda_1 = 40$ for the game of Set.
+
+\begin{definition}\label{lec1:defn-bibd}
+    A \ul{Balanced Incomplete Block Design} (BIBD) is a design that is a $2$-design and a $1$-design.
+\end{definition}
+
+\begin{exercise}
+    If $\lambda_2 \neq 0$, then show that every 2-design is automatically a 1-design
+\end{exercise}
