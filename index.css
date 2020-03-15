@@ -3,7 +3,11 @@ body {
   font-family: 'Ubuntu', sans-serif;
 }
 
-.backdrop {
+.header {
+  margin-bottom: -10%;
+}
+
+.header__backdrop {
   position: relative;
   height: 200px;
   width: 100%;
@@ -12,19 +16,17 @@ body {
 
 .circle {
   z-index: 2;
-  position: absolute;
-  height: 250px;
-  width: 250px;
-  top: 50px;
+  position: relative;
+  width: 25%;
+  min-width: 100px;
+  max-width: 250px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   border-radius: 50%;
 }
 
 .main-body {
-  margin: 115px 20px 20px 20px;
-  padding-left: 200px;
-  padding-right: 200px;
+  margin: 0px 5% 5% 5%;
   text-align: center;
 }
 
