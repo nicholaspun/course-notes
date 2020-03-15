@@ -1,6 +1,8 @@
 % !TeX root = ../cs487.tex
 
-\section{Discrete Fourier Transform}
+\section{Discrete Fourier Transform and Fast Fourier Transform}
+
+\subsection{Discrete Fourier Transform}
 
 \begin{definition}{}{}
     Let $w$ be an $n$-PRU in $\F$.
@@ -56,83 +58,162 @@
     \end{equation}
     i.e. $b_j = \sum_{0 \leq k < n} a_kw^{jk}$
 \end{definition}
+\begin{note}
+    We may write $\DFT(w)(f)$, where $f$ is a function with $\deg f = n - 1$, to denote performing the DFT on the coefficients of $f$
+\end{note}
 
-Our goal is to develop a fast way to evaluate this.
+\subsection{Fast Fourier Transform}
+Our goal is to develop a fast algorithm to evaluate $\DFT(w)(f)$.
+The main idea is to divide-and-conquer.
 Let's look at a motivating example:
 
-Let $f = a_0 + a_1x + \ldots + a_kx^k$ (with $k$ even) and consider evaluating $f(1)$ and $f(-1)$.
-Observe that $(-1)^2 = 1^2$ ($1, -1$ weren't picked at random!), and in fact, this holds for an even power.
-This suggests that we can save some computations on even exponents.
-
-Decompose $f$ like so:
+Let $f = a_0 + a_1x + \ldots + a_kx^k$ (with $k$ even).
+Consider the decomposition of $f$ like so:
 \begin{align*}
-    f(x) &= (a_0 + a_2x^2 + a_4x^4 + \ldots) + x(a_1 + a_3x^2 + a_5x^4 + \ldots) \\
+    f(x) &= (a_0 + a_2x^2 + a_4x^4 + \ldots) + (a_1x + a_3x^3 + a_5x^5 + \ldots) \\
+    &= (a_0 + a_2x^2 + a_4x^4 + \ldots) + x(a_1 + a_3x^2 + a_5x^4 + \ldots) \\
     &= \sum_{0 \leq i \leq k/2} a_{2i}x^{2i} + x\sum_{0 \leq j \leq k/2} a_{2j + 1}x^{2j}
 \end{align*}
-Now, we only have even exponents in the sums!
+
+That is, we divide the function into parts containing only even or only odd exponents.
+Then, we factor an $x$ out of the odd exponents so that we only have even exponents in the sums.
 Define the following two functions:
 \begin{align}
     f_{even}(x) &= \sum_{0 \leq i \leq k/2} a_{2i}x^{i} \\
     f_{odd}(x) &= \sum_{0 \leq j \leq k/2} a_{2j + 1}x^{j}
 \end{align}
+
 Then, $f$ can be rewritten using these two functions like so:
 \begin{equation}\label{eq:lec6-function-decompose}
     f(x) = f_{even}(x^2) + xf_{odd}(x^2)
 \end{equation}
 
-What happens if we try using \Cref{eq:lec6-function-decompose} to evaluate $f$ at $1, -1$?
-Let's try it:
-
-\begin{minipage}{0.4\textwidth}
-    \centering
-    \begin{align*}
-        f(1) &= f_{even}(1^2) + (1)f_{odd}(1^2) \\
-        &= f_{even}(1) + (1)f_{odd}(1)
-    \end{align*}
-\end{minipage}
-\begin{minipage}{0.6\textwidth}
-    \centering
-    \begin{align*}
-        f(-1) &= f_{even}((-1)^2) + (-1)f_{odd}((-1)^2) \\
-        &= f_{even}(1) + (-1)f_{odd}(1)
-    \end{align*}
-\end{minipage}
-
-~\newline So, the evaluation of $f_{even}(1)$ and $f_{odd}(1)$ can be reused between the two computations!
-Further observe that $f_{even}$ and $f_{odd}$ are of half the degree of $f$.
-We've reduced the evaluation of $f$ at the two points ($1$ and $-1$), to evaluating two polynomials, of half the degree, at a single point (just $1$).
-
-Let's look at another example using the $4$ points: $1, i, - 1, - i$.
+Now consider evaluating $f$ at the 4 points: $1, i, -1, -i$.
 Plugging these $4$ values into equation \Cref{eq:lec6-function-decompose}, we get the following expressions:
 \begin{align*}
     f(1) &= f_{even}(1) + (1)f_{odd}(1) \\
-    f(i) &= f_{even}(i^2) + (i)f_{odd}(1^2) \\
+    f(i) &= f_{even}(i^2) + (i)f_{odd}(i^2) \\
     f(1) &= f_{even}(1) + (-1)f_{odd}(1) \\
     f(1) &= f_{even}(i^2) + (-i)f_{odd}(i^2)
 \end{align*}
-which suggests that we can limit our evaluations to only the points $1$ and $i$. (So we pair up the points $(1, -1), (i, -i)$)
+Evaluating $1$ and $-1$ amounts to computing $f_{even}(1)$ and $f_{odd}(1)$ and the combining the results appropriately.
+Likewise, we can do the same with $i$ and $-i$
 
-In general, it seems that we can use \Cref{eq:lec6-function-decompose} to save evaluations if we have $n$ points of the form:
+This suggests that we can reuse the computations of $f_{even}$ and $f_{odd}$, which are polynomials of half the degree of $f$.
+
+In general, if we can ``pair up" our $n$ points in the form:
 \begin{equation*}
     (u_1, -u_1), (u_2, -u_2), \ldots, (u_{\frac{n}{2}}, -u_{\frac{n}{2}})
 \end{equation*}
-
-\begin{theorem}{}{}
-    Let $n$ be a power of $2$. Let $w \in \F$ be an $n$-PRU. Then, $\DFT(w)$ can be computed in $\bigO(n\log n)$ field operations.
-\end{theorem}
+we can use \Cref{eq:lec6-function-decompose} to save evaluations
 
 \begin{lemma}{}{}
-    
+    Let $w$ be an $n$-PRU. 
+    Then, there is always a pairing of points of the above form.
+    More precisely:
+    \begin{equation*}
+        w^{\frac{n}{2} + i} = -w^i
+    \end{equation*}
+    for $i = 1, \ldots, \frac{n}{2}$
 \end{lemma}
+\begin{proof}
+    $w^n = 1 \Rightarrow w^n - 1 = 0 \Rightarrow \left(w^{\frac{n}{2}} - 1 \right)\left(w^{\frac{n}{2}} + 1\right) = 0$.
+    So, $w^{\frac{n}{2}} = \pm 1$, but $w^{\frac{n}{2}} \neq 1$ since $w$ is an $n$-PRU, so $w^{\frac{n}{2}} = -1$.
+    Then, $w^{\frac{n}{2} + i} = w^{\frac{n}{2}}w^i = -w^i$
+\end{proof}
 
-\textcolor{red}{TODO: Finish this lecture ... }
+\begin{theorem}{}{lec6-fft}
+    Let $n$ be a power of $2$. Let $w \in \F$ be an $n$-PRU. Then, $\DFT(w)$ can be computed in $\bigO(n\log n)$ field operations.
+\end{theorem}
+\begin{proof}
+Let $f = a_0 + a_1x + \ldots + a_{n-1}x^{n-1}$.
+We'll exhibit an algorithm to compute $\DFT(w)(f)$ in $\bigO(n\log n)$ time:
 
-\begin{definition}{}{}
-    We say $\F$ \ul{supports} the FFT (\textcolor{red}{TODO: Add Cref here}), if $\F$ has a $2^\ell$-PRU for any $\ell \in \N$
-\end{definition}
+\begin{algorithm}[H]
+    \caption{Fast Fourier Transform (FFT)}\label{lec6:alg-fft}
+
+    \ul{Input}: $f = a_0 + a_1x + \ldots + a_{n-1}x^{n-1}$, $w \in \F$ an $n$-PRU.
+    
+    \ul{Output}: $\DFT(w)(f)$
+    
+    \BlankLine
+    \nl Compute $w^2, w^3, \ldots, w^{n-1}$
+
+    \nl Recursively compute $\DFT(w)(f_{even})$ and $\DFT(w)(f_{odd})$:
+    \begin{equation*}
+        \DFT(w)(f_{even}) = 
+        \begin{pmatrix}
+            f_{even}(w^2) \\ f_{even}(w^4) \\ \vdots \\ f_{even}(w^{n})
+        \end{pmatrix}
+        \quad\text{and}\quad
+        \DFT(w)(f_{odd}) =
+        \begin{pmatrix}
+            f_{odd}(w^2) \\ f_{odd}(w^4) \\ \vdots \\ f_{odd}(w^{n})
+        \end{pmatrix}
+    \end{equation*}
+
+    \nl Compute $f(w^k) = f_{even}(w^{2k}) + w^kf_{odd}(w^{2k})$ for $k = 0, 1, \ldots, n - 1$
+\end{algorithm}
+
+Let $T(n)$ be the cost for $\deg f = n$. 
+Line 1 costs less than $n$ multiplications.
+Line 3 costs $n$ multiplications and $n$ additions.
+In total,the cost of \Cref{lec6:alg-fft} is
+\begin{equation*}
+    T(n) = 2T\left(\frac{n}{2}\right) + 3n \in \bigO(n\log n)
+\end{equation*} 
+\end{proof}
+
+\subsection{Polynomial Multiplication using the FFT}
+We want to relate this method back to polynomial multiplication.
 
 \begin{theorem}{}{}
-    If $\F$ supports the FFT, the polynomials of degree at most $n$ can be multiplied ... \textcolor{red}{wut this theorem makes no sense ... hmmm i'll fix this later}
+    Let $\F$ be a field, $n = 2^k$, $w \in \F$ an $n$-PRU.
+    Then, polynomials in $\F[x]$ of degree $< \frac{n}{2}$ can be multiplied using $\bigO(n \log n)$ field ops.
+\end{theorem}
+\begin{proof}
+    Recall that polynomial multiplication can be performed by:
+    \begin{enumerate}
+        \item Evaluating the two functions at $n$ points
+        \item Multiplying the images pointwise
+        \item Interpolating to obtain the multiplied function
+    \end{enumerate}
+
+    Further, we can express evaluation and interpolation as matrix operations using the Vandermonde matrix (\Cref{exmp:lec5:poly-mult-vdm}).
+    Now, we'll use the DFT and Fast Fourier Transform algorithm to speed both operations up.
+
+    Let $a = a_0 + a_1x + \ldots + a_{\frac{n}{2} - 1}x^{\frac{n}{2} - 1}$, $b = b_0 + b_1x + \ldots + b_{\frac{n}{2} - 1}x^{\frac{n}{2} - 1}$ and
+    \begin{equation*}
+        \overline{a} = 
+        \begin{bmatrix}
+            a_0 \\ a_1 \\ \vdots \\ a_{\frac{n}{2} - 1} \\ 0 \\ \vdots \\ 0    
+        \end{bmatrix}
+        \qquad
+        \overline{b} = 
+        \begin{bmatrix}
+            b_0 \\ b_1 \\ \vdots \\ b_{\frac{n}{2} - 1} \\ 0 \\ \vdots \\ 0    
+        \end{bmatrix}
+    \end{equation*}
+    where the $0$'s are padding elements so that the vectors are of length $n$.
+
+    Let $c = c_0 + c_1 + \ldots + c_nx^n = a \times b$ and $\overline{c}$ be the vector of its coefficients as with $\overline{a}$ and $\overline{b}$.
+    Then,
+    \begin{align*}
+        \overline{c} &= \left(\DFT(w)\right)^{-1}\left(\DFT(w)(a) \cdot \DFT(w)(b)\right) \\
+        &= \frac{1}{n}\left(\DFT(w^{-1})\right)\left(\DFT(w)(a) \cdot \DFT(w)(b)\right)
+    \end{align*}
+    (where $\cdot$ is pointwise multiplication)
+
+    And this uses $\bigO(n\log n)$ field operations
+\end{proof}
+
+\begin{definition}{}{lec6-supports}
+    We say $\F$ \ul{supports} the FFT (\Cref{lec6:alg-fft}), if $\F$ has a $2^\ell$-PRU for any $\ell \in \N$
+\end{definition}
+
+More generally, we'll use \Cref{defn:lec6-supports} to extend \Cref{th:lec6-fft}.
+\begin{theorem}{}{}
+    If $\F$ supports the FFT, the polynomials of degree at most $n$ can be multiplied in $\bigO(n \log n)$ field ops.
 \end{theorem}
 
 \begin{theorem}{Sch\"{o}nhage \& Strassen, 1971}{lec6-fast-int-mult}

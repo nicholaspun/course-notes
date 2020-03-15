@@ -110,7 +110,7 @@ Given $a$ as above and $n$ evaluation points: $u_0, \ldots u_{n - 1}$, the evalu
 \subsubsection{Polynomial Interpolation}
 \begin{proposition}{Determinant of a Vandermonde Matrix}{det-vandermonde}
     Let $V = VDM(u_1, \ldots, u_n)$. The determinant $\det(V)$ is:
-    \begin{equation}\label{eq:vandermonde-poly-interp}
+    \begin{equation}
         \det(V) = \prod_{1 \leq i < j \leq n} (u_j - u_i)
     \end{equation}
 \end{proposition}
@@ -118,7 +118,7 @@ Given $a$ as above and $n$ evaluation points: $u_0, \ldots u_{n - 1}$, the evalu
     Observe that when $u_1, \ldots, u_n$ are all distinct, then $\det(V)$ is non-zero and the matrix is invertible.
 \end{remark}
 Given $(u_0, \alpha_0), (u_1, \alpha_1), \ldots, (u_{n-1}, \alpha_{n-1})$, where $u_0, \ldots u_{n-1}$ are all distinct, the interpolation of $a$ at these $n$ points is:
-\begin{equation}
+\begin{equation}\label{eq:vandermonde-poly-interp}
     \begin{bmatrix}
         a_0 \\ \vdots \\ a_{n-1}
     \end{bmatrix}
@@ -134,7 +134,7 @@ Given $(u_0, \alpha_0), (u_1, \alpha_1), \ldots, (u_{n-1}, \alpha_{n-1})$, where
 We can rewrite the steps \Cref{alg:poly-mult-lagrange} as expressions involving the Vandermonde matrix.
 Here, we'll just look at an example, and leave writing the algorithm out formally as an exercise to the reader.
 
-\begin{example}{}{}
+\begin{example}{}{lec5:poly-mult-vdm}
     We will work over the field $\Z_7$.
     Consider the following polynomials:
     \begin{align*}
@@ -208,6 +208,9 @@ Here, we'll just look at an example, and leave writing the algorithm out formall
 \end{example}
 
 \subsection{Choosing ``Good'' Evaluation Points}
+We'll see how we can choose better evaluation points to achieve polynomial multiplication in time $\bigO(n\log n)$ next lecture.
+For now, let's just make the following definition.
+
 \begin{definition}{Primitive $n$-th root of unity}{}
     Let $n \in \N$ and $w \in \F$. $w$ is a \ul{primitive $n$-th root of unity} ($n$-PRU) if:
     \begin{enumerate}
@@ -228,8 +231,8 @@ Here, we'll just look at an example, and leave writing the algorithm out formall
         \item Let $\F = \C$:
         \begin{itemize}
             \item $w = e^{\frac{2\pi i}{8}}$ is an $8$-PRU.
-            \item $w = -1$ is an $4$-PRU
-            \item $w = i$ is an $2$-PRU
+            \item $w = i$ is an $4$-PRU
+            \item $w = -1$ is an $2$-PRU
         \end{itemize}
 
         \item Let $\F = \Z_{17}$:

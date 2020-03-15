@@ -56,4 +56,56 @@ We'll use $M$ to add information to our cost estimates and improve our cost anal
     \end{itemize}
 \end{example}
 
-\subsubsection{Fast Division with Remainder}
+\subsection{Fast Division with Remainder}
+\ul{Goal}: Given two polynomials: 
+\begin{align*}
+    a(x) &= a_nx^n + a_{n-1}x^{n-1} + \ldots + a_1x + a_0 \in \F[x] \\
+    b(x) &= b_mx^m + b_{m-1}x^{m-1} + \ldots + b_1x + b_0 \in \F[x].
+\end{align*} 
+with $a_n, b_m \neq 0$, $b$ monic, and $m \leq n$, find $q(x)$ and $r(x)$ such that $a(x) = q(x)b(x) + r(x)$, $\deg r < \deg b$.
+
+\subsubsection{Reversions}
+To solve the above problem, we'll need a new operation called \ul{reversion}. 
+
+Given $a(x) = a_nx^n + a_{n-1}x^{n-1} + \ldots + a_1x + a_0 \in \F[x]$, we define the reversion of $a$, denoted $\rev(a)$ or $\rev_n(a)$ to be the following procedure:
+\begin{enumerate}
+    \item Substitute $x$ with $\frac{1}{y}$, then
+    \item Multiply by $y^n$.
+\end{enumerate} 
+This gives:
+\begin{equation}
+    \begin{aligned}
+        \rev(a) = \rev_n(a) &:= y^na\left(\frac{1}{y}\right) \\
+        &= y^n\left(a_0 + a_1\left(\frac{1}{y}\right) + \ldots + a_n\left(\frac{1}{y^n}\right)\right) \\
+        &= y^na_0 + y^{n-1}a_1 + \ldots + a_n
+    \end{aligned}
+\end{equation}
+So, we have reversed the ordering of the coefficients.
+
+\begin{remark}
+    $\rev\left(\rev\left(a\right)\right) = a$
+\end{remark}
+
+\begin{note}
+    Reversions don't cost any ring operations. For example, if the coefficients were stored as an array, then a reversion is just a reversal of the array. 
+\end{note}
+
+\subsubsection{Back to Fast Division}
+Using the idea of reversions, let's rewrite our goal.
+The reversion of $a(x) = q(x)b(x) + r(x)$ is:
+\begin{align*}
+    \rev_n(a) = y^na\left(\frac{1}{y}\right) &= y^n\left(q\left(\frac{1}{y}\right)b\left(\frac{1}{y}\right) + r\left(\frac{1}{y}\right)\right) \\
+    &= y^n\left(q\left(\frac{1}{y}\right)\right)
+    y^n\left(b\left(\frac{1}{y}\right)\right) + 
+    y^n\left(r\left(\frac{1}{y}\right)\right) \\
+    &= \rev_{n-m}(q)\rev_m(b) + y^{n-m+1}\rev_{m-1}(r)
+\end{align*}
+For the last step: $\deg b = m$, so $\deg q = n - m$.
+Further, since $\deg r < \deg b$, $\deg r$ is at most $m-1$.
+
+And, if we take the equation modulo $y^{n - m + 1}$, this gives:
+\begin{equation}\label{eq:lec7-fast-division-new-goal}
+    \rev_n(a) = \rev_{n-m}(q)\rev_m(b) \pmod{y^{n-m+1}}
+\end{equation}
+\ul{We revise our goal}: Solve \Cref{eq:lec7-fast-division-new-goal} for the unknown $\rev_{n-m}(q)$
+
