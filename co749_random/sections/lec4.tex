@@ -1,1 +1,42 @@
-\section{0-1 Law, Evolution of Graphs and Theorem E}
+\section{Evolution of Graphs and Theorem E}
+
+\begin{theorem}[Theorem E]\label{th:E}
+    ~
+    \begin{enumerate}[label = (\alph*)]
+        \item Fix $k \geq 2$ integer.
+        If $n^{\frac{k-2}{k-1} - 2} \ll p \ll n^{\frac{k-1}{k} - 2}$, then a.a.s $\G(n, p)$ is a forest and the largest component is of order $k$.
+
+        \item If $p \ll \frac{1}{n}$, then a.a.s $\G(n, p)$ is a forest and the largest component is of order $o(\log n)$
+        
+        \item If $p = \frac{c}{n}$, $0 < c < 1$, then a.a.s every component of $\G(n, p)$ is a tree or unicyclic and the largest component has order $\Theta(\log n)$
+        
+        \item If $p = \frac{c}{n}$, $c > 1$, then a.a.s $\G(n, p)$ contains a unique component of linear order and all other components of order $\bigO(\log n)$
+        
+        \item When $p \geq \frac{\log n + \log\log n \omega(1)}{2n}$, a.a.s $\G(n, p)$ has a giant component and a few isolated vertices
+        
+        \item When $p \geq \frac{\log n + \omega(1)}{n}$, a.a.s $\G(n, p)$ connected and has a perfect matching if $n$ even, or a matching of size $\frac{n-1}{2}$ if $n$ is odd.
+        
+        \item When $p \geq \frac{\log n + \log\log n + \omega(1)}{n}$, a.a.s $\G(n, p)$ is Hamiltonian
+    \end{enumerate}
+\end{theorem}
+
+\subsection{Small Subgraphs}
+\begin{lemma}
+    If $p = o(1/n)$, then a.a.s $\G(n, p)$ has no cycles
+\end{lemma}
+\begin{proof}
+    Use Markov's Inequality
+\end{proof}
+
+\begin{proof}
+    (of \Cref{th:E} (a))
+
+    That $\G(n, p)$ is a forest is directly implied by above.
+    It remains to show that every tree has order $\leq k$ and there is one tree of order $k$.
+
+    Let $X_t$ be the number of trees of order $t$ in $\G(n, p)$.
+    First, we show that that $\E \left(\sum_{t \geq k + 1} X_t\right) = o(1)$, so a.a.s $\sum_{t \geq k + 1}X_t = 0$ by Markov's inequality.
+    This tells us that we don't have trees of order $> k$
+
+    Then, we show the existence of a tree of order $k$ by using the 2nd moment method.
+\end{proof}
