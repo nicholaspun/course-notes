@@ -1,1 +1,23 @@
 \section{Concentration Inequalities, Coupling, Connection Theorem}
+
+\begin{definition}
+    Given a sequence of probability spaces $(\Omega_n, P_n)_{n \geq 1}$. We say that $A_n$ holds \ul{asympototically almost surely} (a.a.s) if $P_n(A_n) \rightarrow 1$ as $n \rightarrow \infty$
+\end{definition}
+
+\begin{theorem}[Markov's Inequality]
+    Let $X$ be a nonnegative random variable. Then, for any real $t > 0$, $\Pr(X \geq t) \leq \frac{\E X}{t}$
+\end{theorem}
+\begin{proof}
+    Let $I_t$ be the indicator r.v. that $X \geq t$.
+    Then, $X \geq t\cdot I_t$, so:
+    \begin{equation*}
+        \E x \geq t \cdot \E I_t = t \cdot \PR (X \geq t)
+    \end{equation*}
+\end{proof}
+
+\begin{theorem}[Chebyshev's Inequality]
+    For any $t \geq 0$
+    \begin{equation*}
+        \PR (| X - \E X | \geq t) \leq \frac{\Var X}{t^2}
+    \end{equation*}
+\end{theorem}

@@ -51,14 +51,14 @@ The probability of $A \subseteq \Omega$ is $\sum_{\omega \in A} \PR(\omega)$, de
 
 \begin{definition}
     A \underline{random variable} (r.v) $X$ is a function $X: \Omega \rightarrow \R$.
-    In a discrete probability space, the \underline{expectation} of $X$ is defined by: $\EX(X) = \sum_{\omega \in \Omega} X(\omega)\PR(\omega)$
+    In a discrete probability space, the \underline{expectation} of $X$ is defined by: $\E(X) = \sum_{\omega \in \Omega} X(\omega)\PR(\omega)$
 \end{definition}
 
 \begin{proposition}[Linearity of Expectation]
-    $\EX(X + Y) = \EX(X) + \EX(Y)$
+    $\E(X + Y) = \E(X) + \E(Y)$
 \end{proposition}
 \begin{proof}
-    $\EX(X + Y) = \sum_{\omega \in \Omega} (X+Y)(\omega)\PR(\omega) = \sum_{\omega \in \Omega} X(\omega)\PR(\omega) + \sum_{\omega \in \Omega} Y(\omega)\PR(\omega) = \EX(X) + \EX(Y)$  
+    $\E(X + Y) = \sum_{\omega \in \Omega} (X+Y)(\omega)\PR(\omega) = \sum_{\omega \in \Omega} X(\omega)\PR(\omega) + \sum_{\omega \in \Omega} Y(\omega)\PR(\omega) = \E(X) + \E(Y)$  
 \end{proof}
 
 \begin{lemma}
@@ -85,6 +85,10 @@ The probability of $A \subseteq \Omega$ is $\sum_{\omega \in A} \PR(\omega)$, de
     \begin{align*}
         \binom{n}{k} &= \frac{1}{k!}\prod_{i = 0}^{k - 1} (n - i) \\
         &= \frac{n^k}{k!}\prod_{i = 0}^{k - 1} \left(1 - \frac{i}{n}\right) \\
+        &= \frac{n^k}{k!}\prod_{i = 0}^{k - 1} e^{\bigO(i/n)} \qquad \left(\log(1 - x) = \bigO(x)\right)\\
+        &= \frac{n^k}{k!} \exp\left(\bigO\left(\frac{1}{n}\sum_{i = 0}^{k - 1} i\right)\right) \\
+        &= \frac{n^k}{k!} \exp\left(\bigO\left(\frac{k^2}{n}\right)\right) \\
+        &= (1 + o(1))\frac{n^k}{k!} \qquad \left(\text{as $k = o(\sqrt{n})$}\right)
     \end{align*}
 \end{proof}
 
