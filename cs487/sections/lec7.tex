@@ -1,60 +1,8 @@
 % !TeX root = ../cs487.tex
 
-\section{Multiplication Time, Newton Iteration and Fast Division with Remainder}
+\section{Multiplication Time, Fast Division with Remainder and Newton Iteration}
 
-\subsection{Multiplication Time}
-\begin{definition}{}{}
-    A function $M:\N_{> 0} \rightarrow \R_{>0}$ is a \ul{multiplication time} for $R[x]$ ($R$ ring) if polynomials in $R[x]$ of degree $< n$ can be multiplied using at most $M(n)$ ring operations in $R$.
-\end{definition}
-We'll use $M$ to add information to our cost estimates and improve our cost analysis for algorithms
-
-\begin{example}{}{}
-    We've seen a couple examples of multiplication time already:
-    \begin{itemize}
-        \item For \textbf{Na\"{i}ve Multiplication} of polynomials, we know that $M(n) \in \bigO(n^2)$
-        \item Using \textbf{Karatsuba's algorithm}, we can reduce that cost to $M(n) \in \bigO(n^{1.59})$
-        \item Cantor \& Kaltofen (\Cref{th:lec6-ring-poly-mult}) showed: $M(n) \in \bigO(n^2)$
-    \end{itemize}
-    And a couple interesting results for integers:
-    \begin{itemize}
-        \item Sch\"{o}hage \& Strassen (\Cref{th:lec6-fast-int-mult}) showed that: $M(n) \in \bigO(n\log n\log \log n)$
-        \item F\"{u}rer showed in 2007: $M(n) \in \bigO(n\log n K^{\log^* n})$, where $K$ is some constant $> 1$ and $\log^*$ is the iterated logarithm. (Harvey and Van Der Hoeven showed that $K = 4$ in 2018)
-        \item In March 2019, Harvey and Van Der Hoeven showed that $M(n) \in \bigO(n \log n)$ (Note that the result has yet to be officially peer-reviewed as of the time these notes were taken)
-    \end{itemize}
-\end{example}
-
-\ul{Useful Assumptions about $M$}:
-\begin{enumerate}
-    \item Superlinearity: 
-    
-    If $n \geq m$ 
-    \begin{equation}\label{eq:lec7-mult-time-superlinearity}
-        \frac{M(n)}{n} \geq \frac{M(m)}{m}
-    \end{equation}
-    
-    \item At most quadratic:
-    \begin{equation}\label{eq:lec7-mult-time-quadratic}
-        M(mn) \leq m^2M(n)
-    \end{equation}
-\end{enumerate}
-
-\begin{proposition}{}{lec7-mult-time}
-    \Cref{eq:lec7-mult-time-superlinearity} implies the following:
-    \begin{itemize}
-        \item $M(mn) \geq mM(n)$
-        \item $M(n + m) \geq M(n) + M(m)$
-        \item $M(n) \geq n$
-    \end{itemize}
-\end{proposition}
-
-\begin{example}{}{}
-    Using the assumptions and \Cref{prop:lec7-mult-time}, we can say the following:
-    \begin{itemize}
-        \item $nM(n) + M(n^2) \leq 2M(n^2) \in \bigO(M(n^2))$
-        \item $M(cn) \leq c^2M(n) \in \bigO(M(n))$ for constant $c$ 
-        \item $n^3 + nM(n) \geq M(n^3) + M(n^{\frac{3}{2}}) \in \Omega(M(n^3))$
-    \end{itemize}
-\end{example}
+(See \Cref{sec:multiplication-time} for notes on Multiplication time)
 
 \subsection{Fast Division with Remainder}
 \ul{Goal}: Given two polynomials: 
@@ -108,4 +56,120 @@ And, if we take the equation modulo $y^{n - m + 1}$, this gives:
     \rev_n(a) = \rev_{n-m}(q)\rev_m(b) \pmod{y^{n-m+1}}
 \end{equation}
 \ul{We revise our goal}: Solve \Cref{eq:lec7-fast-division-new-goal} for the unknown $\rev_{n-m}(q)$
+
+\subsection{Newton Iteration}
+To solve \Cref{eq:lec7-fast-division-new-goal}, we want to take the inverse of $\rev_m(b)$:
+\begin{equation}
+    \rev_{n-m}(q) = \rev_n(a)\rev_m(b)^{-1} \pmod{y^{n-m+1}}
+\end{equation}
+\ul{Generalizing this problem a bit}: Given a function $g$ and $k \in \N$, we want to find a function $h$ so that $gh \equiv 1 \mod{x^k}$.
+
+The main idea is to do this iteratively using Newton's method.
+Recall that Newton's method calculates a sequence $h_0, h_1, h_2, \ldots$ by using the formula:
+\begin{equation}
+    h_{i + 1} = h_i - \frac{\phi(h_i)}{\phi'(h_i)}
+\end{equation}
+Toying around with the function for $\phi$, we find that $\phi(h) = \frac{1}{h} - g$ will work for us since $1/g$ is a root of $\phi$.
+Indeed, $\phi(1/g) = \frac{1}{1/g} - g = g - g = 0$.
+
+Suppose we already have $h_i$, let's perform one iteration of newton's method with the above $\phi$:
+\begin{align*}
+    h_{i + 1} &= h_i - \frac{\phi(h_i)}{\phi'(h_i)} \\
+    &= h_i - \frac{\frac{1}{h_i} - g}{-\frac{1}{h_i^2}} \\
+    &= h_i + h_i - gh_i^2 \\
+    &= 2h_i - gh_i^2
+\end{align*}
+How fast does this converge to our desired modulus $x^k$?
+Observe that $h_i$ is squared in each iteration, so our precision is doubled in each step.
+
+We summarize this in the following theorem:
+\begin{theorem}{}{}
+    Let $h_0, h_1, h_2, \ldots \in \F[x]$ be such that $\deg h_i < 2^i$ and $gh_i \equiv 1 \pmod{x^{2^i}}$.
+    Then, $h_0 = 1$ and $h_{i + 1} \equiv 2h_i - gh_i^2 \pmod{x^{2^{i+1}}}$ for $i > 0$
+\end{theorem}
+And, this yields the following algorithm:
+
+\begin{algorithm}[H]
+    \caption{Quadratic Newton Iteration}\label{alg:quadratic-newton-iteration}
+    
+    \textbf{Input}: $g \in \F[x]$ monic and $n = 2^r$
+    
+    \textbf{Output}: $h \in \F[x]$ such that $gh \equiv 1 \pmod{x^n}$
+
+    \BlankLine
+    \nl $h_0 :=  1$
+
+    \nl \For{$i = 0, 1, \ldots, r$}{
+        $h_{i + 1} = 2h_i - gh_i^2 \pmod{x^{2^{i + 1}}}$
+    }
+\end{algorithm}
+
+\begin{theorem}{Time Complexity of \Cref{alg:quadratic-newton-iteration}}{lec7-time-complexity-quadratic-newton-iteration}
+    If $n = 2^r$, then $h_r \equiv g^{-1} \pmod{x^n}$ can be computed in $\bigO(M(n))$ field operations    
+\end{theorem}
+\begin{proof}
+    Computing $h_{i + 1}$ requires at most $2M(2^{i + 1}) + 2 \cdot 2^{i + 1}$ field operations. (Polynomial multiplication, scalar multiplication and subtraction).
+    Then, the total cost is:
+    \begin{align*}
+        &2\sum_{i = 0}^{r - 1} \left(M\left(2^{i + 1}\right) + 2^{i + 1}\right) \\
+        &= \left(2\sum_{i = 0}^{r - 1} M\left(2^{i + 1}\right)\right) + \left(4\sum_{i = 0}^{r - 1}2^i\right) \\
+        &\leq \left(2\sum_{i = 0}^{r - 1} M\left(2^{i + 1}\right)\right) + 4n \\
+        &\leq 2M\left(2^r\right)\sum_{i = 0}^{r - 1} \frac{1}{2^{r - i}} + 4n \qquad \left(\text{since $M(2^i) \leq \frac{M(2^r)}{2^{r - i}}$ by superlinearity}\right) \\
+        &\leq 2M\left(2^r\right)\sum_{i \geq 0} \frac{1}{2^i} + 4n \\
+        &\in \bigO\left(M\left(2^r\right)\right) + \bigO(n) \\
+        &\in \bigO\left(M(n)\right)
+    \end{align*}
+\end{proof}
+
+\subsection{Completing Fast Division with Remainder}
+We now have the necessary components to complete the algorithm for Fast Division with Remainder:
+
+\begin{algorithm}[H]
+    \caption{Fast Division with Remainder}\label{alg:fast-division-with-remainder}
+    
+    \textbf{Input}: Two polynomials: 
+    \begin{itemize}
+        \item $a(x) = a_nx^n + a_{n-1}x^{n-1} + \ldots + a_1x + a_0 \in \F[x]$
+        \item $b(x) = b_mx^m + b_{m-1}x^{m-1} + \ldots + b_1x + b_0 \in \F[x]$
+    \end{itemize} 
+    with $a_n, b_m \neq 0$, $b$ monic, and $m \leq n$
+    
+    \textbf{Output}: $q(x)$ and $r(x)$ such that $a(x) = q(x)b(x) + r(x)$, $\deg r < \deg b$.
+
+    \BlankLine
+    \nl Compute $\rev(a)$
+
+    \nl Compute $\rev(b)^{-1}$ to precision $x^{n - m + 1}$ using \Cref{alg:quadratic-newton-iteration}
+
+    \nl Compute $\rev(q) = \rev(a)\cdot\rev(b)^{-1} \pmod{x^{n - m + 1}}$
+
+    \nl $q \leftarrow \rev\left(\rev(q)\right)$
+
+    \nl $r \leftarrow a - q \cdot b$
+\end{algorithm}
+
+\begin{corollary}{}{}
+    Let $a, b \in \F[x]$ with $\deg a = n, \deg b = m, n \geq m$. Then, $q = a \quo b$ can be computed in $M(n - m)$ field ops
+\end{corollary}
+\begin{proof}
+    By \Cref{th:lec7-time-complexity-quadratic-newton-iteration}
+\end{proof}
+
+\begin{corollary}{}{}
+    For polynomials of degree at most $n$ in $\F$, division with remainder requires at most $\bigO(M(n))$ operations.
+\end{corollary}
+\begin{proof}
+    Computing $q$ uses at most $M(n - m)$ field ops and computing $r$ uses at most $\bigO(M(n))$ field ops
+\end{proof}
+
+\subsection{Concluding Remarks}
+
+
+
+
+
+
+
+
+
 

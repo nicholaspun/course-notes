@@ -26,6 +26,13 @@
 \input{sections/lec6}\clearpage
 \input{sections/lec7}\clearpage
 
+\appendix
+\makeatletter
+\renewcommand{\prefix@section}{Appendix \thesection: }
+\makeatother
+\addcontentsline{toc}{section}{Appendices}
+\input{appendices/multiplication_time}\clearpage
+
 \nocite{*}
 \bibliographystyle{unsrt}
 \bibliography{cs487}
