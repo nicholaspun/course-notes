@@ -32,7 +32,7 @@
 \end{definition}
 
 \subsection{First Order Logic of Graphs}
-\begin{example}
+\begin{example}\label{lec3:diameter-two}
     \begin{equation*}
         \forall x \forall y \exists z \left(x = y \vee x \sim y \vee \left(x \sim z \wedge y \sim z\right)\right)
     \end{equation*}
@@ -65,5 +65,8 @@ Let $P_k$ be the property that for any disjoint sets $W$ and $V$ of order at mos
     After $k$ rounds, this produces two sequences $v_1, v_2, \ldots, v_k$ in $G_1$ and $v_1', v_2', \ldots, v_k'$ in $G_2$.
     Player 2 wins if $v_i \mapsto v_i' \ \forall 1 \leq i \leq k$ is an isomorphism between $G_1[v_1, v_2, \ldots, v_k]$ and $G_2[v_1', v_2', \ldots, v_k']$, and Player 1 wins otherwise.
 
-    The idea is that if $G_1, G_2$ are similar, then player 2 will win, but if they are not similar, then player 1 can exploit the dissimilarity.  
+    The idea is that if $G_1, G_2$ are similar, then player 2 will win, but if they are not similar, then player 1 can exploit the dissimilarity. 
+    
+    \ul{Claim}: Let $Th_k(G)$ be the set of graph properties of $G$ expressible by 1st-order logic sentences with quantifier depth at most $k$.
+    Player 2 has a winning strategy if and only if $Th_k(G_1) = Th_k(G_2)$ (i.e. They share the same set of properties)
 \end{proof}
