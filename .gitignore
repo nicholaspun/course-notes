@@ -9,4 +9,5 @@
 **/__latexindent_temp.tex
 **/*.bbl
 **/*.blg
+**/*.loa
 .vscode/
