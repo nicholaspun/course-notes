@@ -1,6 +1,7 @@
 \documentclass[12pt]{article}
 
 \usepackage{co434}
+\usepackage[nottoc]{tocbibind}
 
 \begin{document}
 
@@ -17,7 +18,12 @@
 \tableofcontents
 \clearpage
 
-\input{sections/lec1}
-\input{sections/lec2}
+\input{sections/lec1}\clearpage
+\input{sections/lec2}\clearpage
+\input{sections/lec3}\clearpage
+
+\nocite{*}
+\bibliographystyle{unsrt}
+\bibliography{co434}
 
 \end{document}
