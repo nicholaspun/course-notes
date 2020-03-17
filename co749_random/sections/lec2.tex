@@ -4,6 +4,8 @@
     Given a sequence of probability spaces $(\Omega_n, P_n)_{n \geq 1}$. We say that $A_n$ holds \ul{asympototically almost surely} (a.a.s) if $P_n(A_n) \rightarrow 1$ as $n \rightarrow \infty$
 \end{definition}
 
+\subsection{Concentration Inequalities}
+
 \begin{theorem}[Markov's Inequality]
     Let $X$ be a nonnegative random variable. Then, for any real $t > 0$, $\Pr(X \geq t) \leq \frac{\E X}{t}$
 \end{theorem}
@@ -21,3 +23,110 @@
         \PR (| X - \E X | \geq t) \leq \frac{\Var X}{t^2}
     \end{equation*}
 \end{theorem}
+
+\begin{example}
+    Let $X$ be the number of edges in $\G(n, p), N = \binom{n}{2}$.
+    $X \sim \Bin(N, p)$ so $\E X = Np$ and $\Var X = p(1 - p)N$.
+
+    Further, by Chevyshev's Inequality, for all $t > 0$:
+    \begin{equation*}
+        \PR(|X - \E X| \geq t) \leq \frac{p(1-p)N}{t^2}
+    \end{equation*}
+\end{example}
+
+This leads us to the following proposition:
+\begin{proposition}\label{lec2:num-edges-bound}
+    Let $f_n \rightarrow \infty$ as $n \rightarrow \infty$.
+    Then,
+    \begin{equation*}
+        \PR(|X - Np| \geq f_n \sqrt{p(1-p)N}) \leq \frac{1}{f_n^2} = o(1)
+    \end{equation*}
+    So a.a.s:
+    \begin{equation*}
+        pN - f_n \sqrt{p(1-p)N} \leq X \leq pN + f_n \sqrt{p(1-p)N}
+    \end{equation*}
+\end{proposition}
+
+\subsection{Coupling}
+\begin{definition}
+    Given 2 r.v.s $X, Y$, a \ul{coupling} of $X$ and $Y$ is a construction of a join distribution of $(\hat{X}, \hat{Y})$ into the probability space such that marginally $\hat{X} \sim X$ and $\hat{Y} \sim Y$
+\end{definition}
+
+\begin{lemma}
+    ~
+    \begin{enumerate}[label = (\alph*)]
+        \item Let $0 \leq m_1 < m_2 \leq N$ and $0 \leq p_1 < p_2 \leq 1$.
+        There exist couplings such that:
+        \begin{equation*}
+            \G(n, m_1) \subseteq \G(n, m_2) \quad \text{and} \quad \G(n, p_1) \subseteq \G(n, p_2) 
+        \end{equation*}
+        where by $\G(n, p_1) \subseteq \G(n, p_2)$ (and respectively, $m_1$ and $m_2$), we mean that there exists a coupling $(G_1, G_2)$ such that:
+        \begin{itemize}
+            \item Marginally, $G_1 \sim \G(n, p_1), G_2 \sim \G(n, p_2)$, and
+            \item jointly, $G_1 \subseteq G_2$ always
+        \end{itemize}
+
+
+        \item Let $m_1 = pN - f\sqrt{p(1-p)N}, m_2 = pN + f\sqrt{p(1-p)N}$ ($f = f(n)$ as before).
+        Then, there exists a coupling $(G_1, H, G_2)$ such that:
+        \begin{itemize}
+            \item $G_1 \sim \G(n, m_1), G_2 \sim \G(n, m_2), H \sim \G(n, p)$
+            \item $\PR(G_1 \subseteq H \subseteq G_2) = 1 - o(1)$
+        \end{itemize}
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    ~
+    \begin{enumerate}[label = (\alph*)]
+        \item Let $G_1 \sim \G(n, p_1)$.
+        For $G_2$, include every non-edge in $G_1$, include it independently with probability $q = 1 - \frac{1 - p_2}{1 - p_1}$.
+        Clearly, $G_1 \subseteq G_2$.
+        Then, check the probability that an edge is \ul{not} included in $G_2$:
+        \begin{equation*}
+            (1 - p_1)(1 - q) = (1 - p_1)\left(1 - \left(1 - \frac{1 - p_2}{1 - p_1}\right)\right) = 1 - p_2
+        \end{equation*}
+
+        For $G_1 \sim \G(n, m_1), G_2 \sim \G(n, m_2)$, we choose permutation and the first $m_1, m_2$ edges
+    \end{enumerate}
+\end{proof}
+
+\subsection{Connection Theorem}
+
+\begin{definition}
+    Let $\Omega$ be the set of graphs on $[n]$. $Q \subseteq \Omega$ is a \ul{graph property} if it is invariant under graph isomorphism.
+    We say $Q$ is \ul{monotone increasing} if:
+    \begin{equation*}
+        G \in Q \Rightarrow H \in Q \quad \forall H \supseteq G
+    \end{equation*}
+    Further, we say $Q$ is \ul{convex} if:
+    \begin{equation*}
+        G_1, G_2 \in Q, G_1 \subseteq G_2 \Rightarrow H \in Q \quad \forall G_1 \subseteq H \subseteq G_2 
+    \end{equation*}
+\end{definition}
+
+\begin{theorem}
+    Suppose $Q$ is monotone.
+    Then, for any $0 \leq m_1 \leq m_2 \leq N$, $0 \leq p_1 \leq p_2 \leq 1$:
+    \begin{align*}
+        \PR(\G(n, m_1) \in Q) &\leq \PR(\G(n, m_2) \in Q) \\
+        \PR(\G(n, p_1) \in Q) &\leq \PR(\G(n, p_2) \in Q)
+    \end{align*}
+\end{theorem}
+
+\begin{theorem}[Connection Theorem]
+    Let $Q$ be a graph property:
+    \begin{enumerate}[label = (\roman*)]
+        \item Given $p = p(n)$. Suppose for all $m = pN + \bigO(\sqrt{p(1-p)N})$ we have $\G(n, m) \in Q$ a.a.s. Then, a.a.s $\G(n, p) \in Q$
+        \item Suppose $Q$ is convex. Given $m = m(n)$ and suppose $\G(n, m/N) \in Q$ a.a.s. Then, a.a.s $\G(n, m) \in Q$
+    \end{enumerate}
+\end{theorem}
+\begin{proof}[Proof Sketch]
+    ~
+    \begin{enumerate}[label = (\roman*)]
+        \item Write $\PR(\G(n, p) \in G)$ in terms of the number of edges in the graph, i.e. $\PR(\G(n, p) \in G) = \sum_{m = 0}^N \PR(X = m, \G(n, p) \in Q)$ (Law of total probability).
+        Then, use \Cref{lec2:num-edges-bound}.
+
+        \item Condition on the number of edges, and analyze the probabilities of having a graph with: less edges than 1 standard deviation ($m_1$), more edges than 1 standard deviation ($m_2$), and a number of edges within 1 standard deviation ($m$).
+        Then construct graphs from $\G(n, m_1)$ and $\G(n, m_2)$ and use convexity to show $\PR(\G(n, m) \in Q) = 1 - o(1)$
+    \end{enumerate}
+\end{proof}
