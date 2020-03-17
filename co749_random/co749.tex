@@ -1,6 +1,7 @@
 \documentclass[12pt]{article}
 
 \usepackage{co749}
+\usepackage[nottoc]{tocbibind}
 
 \begin{document}
 
@@ -8,7 +9,8 @@
   \centering
   \vspace*{2in}
   {\huge CO749 - Random Graph Theory}\par
-  \vspace{0.5in}
+  {\Large (Lecture Summaries)}\par
+  \vspace{0.3in}
   {\large University of Waterloo}\par
   {\large Nicholas Pun}\par
   {\large Winter 2020}\par 
@@ -17,6 +19,14 @@
 \tableofcontents
 \clearpage
 
-\input{sections/lec1-introduction}
+\input{sections/lec1}\clearpage
+\input{sections/lec2}\clearpage
+\input{sections/lec3}\clearpage
+\input{sections/lec4}\clearpage
+\input{sections/lec5}\clearpage
+
+\nocite{*}
+\bibliographystyle{unsrt}
+\bibliography{co749}
 
 \end{document}

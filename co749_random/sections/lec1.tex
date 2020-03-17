@@ -1,0 +1,93 @@
+\section{Introduction}
+
+\begin{definition}
+    The \underline{probability space} we'll work in is denoted with the triple $(G, \PR, F)$, where $G$ is a class of graphs, $\PR$ a probability measure and $F$ a sigma algebra.
+\end{definition}
+
+\underline{Normally}, $G$ is a finite set, $\PR$ is a discrete probability measure and $F = 2^G$
+
+\begin{definition}[Erd\H{o}s-R\'enyi Random Graph Model]
+    ~
+    \begin{itemize}
+        \item The $\G(n,p)$ model: A graph with vertex set $[n]$ is constructed randomly by including each edge in $k_{[n]}$ with probability $p$
+        \item The $\G(n,m)$ model: A graph is chosen uniformly at random from all graphs with vertex set $[n]$ and has $m$ edges.
+    \end{itemize}
+\end{definition}
+
+(Aside: We can think of $\G(n,m)$ as labelling the edges )
+
+Other models:
+\begin{itemize}
+    \item $\G(n,d)$ is the model of random $d$-regular graphs
+    \item $\G(n,\tilde{d})$ where $\tilde{d} = (d_1, \ldots, d_n)$ is a vector representing the degrees of vertices. (This is a generalization of $G(n,d)$)
+    \item $\G(n,r)$ is the model of random geometric graphs. The construction is as follows: Pick $n$ points uniformly in the unit square, then, add an edge if and only if the distance between two points is $\leq r$
+    \item Random trees. A tree is chosen uniformly at random from the $n^{n-2}$ trees on $n$ vertices.
+\end{itemize}
+
+In this class, we will primarily focus on the Erd\H{o}s-R\'enyi Model.
+
+\subsection{Probability Primer}
+\begin{definition}
+    A \underline{discrete probability space} consists of a countable set $\Omega$ and a probability function $\PR: \Omega \rightarrow [0,1]$ such that $\sum_{\omega \in \Omega} \PR(\omega) = 1$
+\end{definition}
+
+A subset of $\Omega$ is called an \underline{event}.
+The probability of $A \subseteq \Omega$ is $\sum_{\omega \in A} \PR(\omega)$, denoted $\PR(A)$.
+
+\begin{proposition}[Inclusion-Exclusion]
+    For events $A, B$:
+    $$\PR(A \cup B) = \PR(A) + \PR(B) - \PR(A \cap B)$$
+    and, in general:
+    $$\PR\left(\bigcup_{i = 1}^n A_i\right) = \sum_{i = 1}^n \PR(A_i) - \sum_{i_1 < i_2} \PR(A_{i_1} \cap A_{i_2}) + \sum_{i_1 < i_2 < i_3} \PR(A_{i_1} \cap A_{i_2} \cap A_{i_3}) + \ldots + (-1)^{n-1} \PR\left(\bigcap_{i=1}^n A_i\right)$$
+\end{proposition}
+
+\begin{corollary}
+    $\PR\left(\bigcup_{i=1}^n A_i\right) \leq \sum_{i=1}^n \PR(A_i)$
+\end{corollary}
+
+\begin{definition}
+    Two events are \underline{independent} if $\PR(A \cap B) = \PR(A)\PR(B)$
+\end{definition}
+
+\begin{definition}
+    A \underline{random variable} (r.v) $X$ is a function $X: \Omega \rightarrow \R$.
+    In a discrete probability space, the \underline{expectation} of $X$ is defined by: $\EX(X) = \sum_{\omega \in \Omega} X(\omega)\PR(\omega)$
+\end{definition}
+
+\begin{proposition}[Linearity of Expectation]
+    $\EX(X + Y) = \EX(X) + \EX(Y)$
+\end{proposition}
+\begin{proof}
+    $\EX(X + Y) = \sum_{\omega \in \Omega} (X+Y)(\omega)\PR(\omega) = \sum_{\omega \in \Omega} X(\omega)\PR(\omega) + \sum_{\omega \in \Omega} Y(\omega)\PR(\omega) = \EX(X) + \EX(Y)$  
+\end{proof}
+
+\begin{lemma}
+    ~
+    \begin{itemize}
+        \item For any $n \geq k \geq 1$
+        \begin{equation*}
+            \left(\frac{n}{k}\right)^k \leq \binom{n}{k} \leq \frac{n^k}{k!} \leq \left(\frac{en}{k}\right)^k
+        \end{equation*}
+
+        \item (Stirling's Formula)
+        \begin{equation*}
+            n! = \sqrt{2\pi n}\left(\frac{n}{e}\right)^n\left(1 + \frac{1}{12n} + \bigO(n^{-2})\right)
+        \end{equation*}
+
+        \item For every $t \in \R, e^t \geq 1 + t$ 
+    \end{itemize}
+\end{lemma}
+
+\begin{lemma}
+    Assume $k = o(\sqrt{n})$ Then, $\binom{n}{k} \sim \frac{n^k}{k!}$
+\end{lemma}
+\begin{proof}
+    \begin{align*}
+        \binom{n}{k} &= \frac{1}{k!}\prod_{i = 0}^{k - 1} (n - i) \\
+        &= \frac{n^k}{k!}\prod_{i = 0}^{k - 1} \left(1 - \frac{i}{n}\right) \\
+    \end{align*}
+\end{proof}
+
+\begin{remark}
+    $k = o\left(n^{\frac{2}{3}}\right)$, then $\binom{n}{k} \sim e^{-\frac{k^2}{n}}\cdot\frac{n^k}{k!}$
+\end{remark}
