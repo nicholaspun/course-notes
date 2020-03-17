@@ -1,2 +1,69 @@
 \section{Threshold, First Order Logic of Graphs}
 
+\subsection{Threshold}
+\begin{definition}
+    We say a property $Q$ has a \ul{threshold} $p_0$ if:
+    \begin{equation*}
+        \PR(\G(n, p) \in Q) \rightarrow 
+        \begin{cases}
+            0 \quad \text{if $p \ll p_0$} \\
+            1 \quad \text{if $p \gg p_0$}    
+        \end{cases}
+    \end{equation*}
+\end{definition}
+
+\begin{theorem}[Bollob\'{a}s \& Thomason, 1987]
+    Every non-trivial monotone property has a threshold
+\end{theorem}
+
+\begin{definition}
+    We say a property $Q$ has a \ul{sharp threshold} $p_0$ if $\forall \epsilon > 0$:
+    \begin{equation*}
+        \PR(\G(n, p) \in Q) \rightarrow 
+        \begin{cases}
+            0 \quad \text{if $p \leq (1 - \epsilon)p_0$} \\
+            1 \quad \text{if $p \geq (1 + \epsilon)p_0$}    
+        \end{cases}
+    \end{equation*}
+\end{definition}
+
+\begin{definition}
+    The \ul{window} of a threshold is $\delta(\epsilon) = p_{1 - \epsilon} - p_{\epsilon}$
+\end{definition}
+
+\subsection{First Order Logic of Graphs}
+\begin{example}
+    \begin{equation*}
+        \forall x \forall y \exists z \left(x = y \vee x \sim y \vee \left(x \sim z \wedge y \sim z\right)\right)
+    \end{equation*}
+    is the statement characterizing the graphs of diameter $\leq 2$
+\end{example}
+
+Fix $k > 0$.
+Let $P_k$ be the property that for any disjoint sets $W$ and $V$ of order at most $k$, there exists a vertex $x \in V(G) \setminus (W \cup V)$ such that $x$ is adjacent to all vertices in $W$ and is adjacent to none of $V$
+
+\begin{lemma}
+    Suppose $m(n), p(n)$ satisfy the following:
+
+    For every fixed $\epsilon > 0$
+    \begin{align*}
+        &mn^{-2 + \epsilon} \rightarrow \infty, \qquad (N - m)n^{-2 + \epsilon} \rightarrow \infty \\
+        &pn^\epsilon \rightarrow \infty, \qquad (1-p)n^\epsilon \rightarrow \infty
+    \end{align*}
+    For every fixed $k > 0$, a.a.s $\G(n, p) \in P_k$ and $\G(n, m) \in P_k$
+\end{lemma}
+
+\begin{theorem}[0-1 law of the 1st order logic of random graphs]
+    Suppose $m(n), p(n)$ satisfy the conditions of the lemma.
+    Suppose $Q$ is a graph property given by a 1st order sentence.
+    Then, either $Q$ holds a.a.s or does not hold a.a.s.
+\end{theorem}
+\begin{proof}[Proof Sketch]
+    We play a $k$-round Ehrenfeucht-Fra\"{i}ss\'{e} Game.
+    Player 1 chooses vertices from either graph and Player 2 must choose vertices from the other graph.
+    
+    After $k$ rounds, this produces two sequences $v_1, v_2, \ldots, v_k$ in $G_1$ and $v_1', v_2', \ldots, v_k'$ in $G_2$.
+    Player 2 wins if $v_i \mapsto v_i' \ \forall 1 \leq i \leq k$ is an isomorphism between $G_1[v_1, v_2, \ldots, v_k]$ and $G_2[v_1', v_2', \ldots, v_k']$, and Player 1 wins otherwise.
+
+    The idea is that if $G_1, G_2$ are similar, then player 2 will win, but if they are not similar, then player 1 can exploit the dissimilarity.  
+\end{proof}
