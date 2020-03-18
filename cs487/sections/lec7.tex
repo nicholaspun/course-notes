@@ -1,6 +1,6 @@
 % !TeX root = ../cs487.tex
 
-\section{Multiplication Time, Fast Division with Remainder and Newton Iteration}
+\section{Fast Division with Remainder and Newton Iteration}
 
 (See \Cref{sec:multiplication-time} for notes on Multiplication time)
 
@@ -163,8 +163,67 @@ We now have the necessary components to complete the algorithm for Fast Division
 \end{proof}
 
 \subsection{Concluding Remarks}
+\begin{theorem}{Existence and Uniqueness of Inverse}{}
+    Let $g = g_0 + g_1x + g_2x^2 + \ldots \in F[[x]]$ have constant coefficient $g_0 = 1$.
+    For any $k \in \Z_{> 0}$, there exists a unique $b \in F[x]$ with $\deg b < k$ such that $bg \equiv 1 \pmod{x^k}$
+\end{theorem}
+\begin{proof}
+    We work in $\mathrm{mod}\ x^k$.
+    Write $g = 1 + g_1x + \ldots + g_{k-1}x^{k-1} \pmod{x^{k-1}}$ and let $b = b_0 + b_1x + \ldots + b_{k-1}x^{k-1}$.
+    Then,
+    \begin{equation*}
+        bg = (b_0 + b_1x + \ldots + b_{k-1}x^{k-1})(1 + g_1x + \ldots + g_{k-1}x^{k-1}) \equiv 1
+    \end{equation*}
+    if and only if
+    \begin{equation*}
+        \begin{blockarray}{crcc}
+            & \text{\large B} & &  \\
+           \begin{block}{[cccc]}
+                1       &           &          &   \\
+                b_1     & \ddots    &          &   \\
+                \vdots  & \ddots    & \ddots   &   \\
+                b_{k-1} & \ldots    & b_1      & 1 \\
+            \end{block}
+       \end{blockarray}
+       \begin{blockarray}{crcc}
+            & \text{\large G} & &  \\
+            \begin{block}{[cccc]}
+                1       &           &          &   \\
+                g_1     & \ddots    &          &   \\
+                \vdots  & \ddots    & \ddots   &   \\
+                g_{k-1} & \ldots    & g_1      & 1 \\
+            \end{block}
+        \end{blockarray}
+        =
+        \begin{blockarray}{cclc}
+            & & \text{\large I}_k &  \\
+           \begin{block}{[cccc]}
+                1       &           &          &   \\
+                        & \ddots    &          &   \\
+                        &           & \ddots   &   \\
+                        &           &          & 1 \\
+            \end{block}
+       \end{blockarray}
+    \end{equation*}
+    (Note: $BG = I_k$ and $GB = I_k$. This is easy to see since the multiplication of the polynomials is commutative)
 
+    if and only if
+    \begin{equation*}
+        G
+        \begin{bmatrix}
+            1 \\ b_1 \\ \vdots \\ b_{k-1}
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            1 \\ 0 \\ \vdots \\ 0
+        \end{bmatrix}
+    \end{equation*}
+    And this system has a unique solution for $b$.
+\end{proof}
 
+\begin{note}
+    $B$ and $G$ are known as Toeplitz matrices.
+\end{note}
 
 
 
