@@ -1,0 +1,19 @@
+% !TeX root = ../cs487.tex
+
+\section{Chinese Remainder Algorithm}
+
+\begin{theorem}{Chinese Remainder Theorem}{chinese-remainder-theorem}
+    Let $R$ be an Euclidean Domain and $M = m_0m_1 \ldots m_{r-1}$, where $\gcd(m_i, m_j) = 1$ for $i \neq j$.
+    (Note that this condition implies that $M = \lcm(m_0, \ldots, m_1)$)
+    Then,
+    \begin{equation}
+        \faktor{R}{(M)} \cong \faktor{R}{(m_0)} \times \ldots \times \faktor{R}{(m_{r-1})}
+    \end{equation}
+\end{theorem}
+
+Recall that in \Cref{sec:lec2-multimodular-reduction},  that showed one direction of the bijection, i.e. the map taking $\rem(a, M) \mapsto \left(\rem(a, m_0), \rem(a, m_1), \ldots, \rem(a, m_{r-1})\right)$.
+This takes $\bigO(\log^2 M)$ word ops.
+
+In this lecture, we want to develop the reverse map using a similar amount of word ops.
+
+\subsection{Why is this interesting?}
