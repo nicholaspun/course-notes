@@ -1,1 +1,12 @@
-\section{}
+\section{Cycles, Degrees of Vertices, Critical Window Analysis}
+
+Let $X \sim \Po(\lambda)$ and recall that $\PR(X = i) = e^{-\lambda}\frac{\lambda^i}{i!} \ \forall i \geq 0$ and $\E(X)_r = \lambda^r \ \forall r \geq 0$.
+
+\begin{theorem}
+    Given a sequence of random variables $(X_n)_{n \geq 1}$ and $\lambda > 0$, suppose $\E(X_n)_r \rightarrow \lambda^r \ \forall r \geq 0$. Then, $X_n \rightarrow \Po(\lambda)$ as $n \rightarrow \infty$ 
+\end{theorem}
+
+Let $Y_k$ denote the number of $k$-cycles in $\G(n, p)$.
+\begin{theorem}
+    Let $p = \frac{c}{n}$, where $c$ fixed, then for every $k \geq 3$, $Y_k \rightarrow \Po(\frac{c^k}{2k})$
+\end{theorem}
