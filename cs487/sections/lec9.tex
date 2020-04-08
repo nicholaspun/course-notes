@@ -15,5 +15,109 @@ Recall that in \Cref{sec:lec2-multimodular-reduction},  that showed one directio
 This takes $\bigO(\log^2 M)$ word ops.
 
 In this lecture, we want to develop the reverse map using a similar amount of word ops.
+The idea of using small moduli and this Chinese Remainder algorithm (which we may refer to as ``Chinese Remaindering'') to obtain a pre-image will be a central idea in many of the remaining algorithms we will learn.
 
-\subsection{Why is this interesting?}
+\begin{example}{}{}
+    Operations on modular residues are reflected when we perform Chinese Remainder to retrieve the preimage.
+
+    Let $m = 1001 = 7 \times 11 \times 13$, so in this example we'll consider $R = \Z_{1001} \cong \Z_7 \times \Z_{11} \times \Z_{13}$
+    
+    Let $a \equiv 233 \pmod{m}, \ b \equiv 365 \pmod{m}$.
+    By \Cref{th:chinese-remainder-theorem}, $a \mapsto (2, 2, 12)$ and $b \mapsto (1, 2, 1)$
+    
+    Consider the following operations:
+    \begin{enumerate}
+        \item $\rem(a + b, m) = (2, 2, 12) + (1, 2, 1) = (3, 4, 0) \mapsto 598 \pmod{m}$.
+        Indeed: $233 + 365 \equiv 598 \pmod{m}$!
+
+        \item $\rem(a\cdot b, m) = (2, 2, 12)\cdot(1, 2, 1) = (2, 4 , 12) \mapsto 961 \pmod{m}$.
+        Indeed, we can check: $233 \cdot 365 = 85045 \equiv 961 \pmod{m}$ 
+    \end{enumerate}
+
+    \bf{The main takeaway}: The Chinese Remainder Theorem guarantees a unique preimage, so we can always work with small moduli and then work backwards.
+    (Many times, it'll be much more computationally efficient to do so!)
+\end{example}
+
+Let's start developing the algorithm:
+
+\ul{Goal}: Given moduli $m_0, m_1, \ldots m_{r - 1}$ and images $v_0, v_1, \ldots, v_{r - 1}$.
+Find an $f \in R$ ($R$ Euclidean Domain) such that $f \equiv v_i \pmod{m_i}$ for $0 \leq i \leq r - 1$
+
+Let $M = m_0m_1\ldots m_{r-1}$ and consider the following construction for $f$:
+\begin{equation}
+    f = v_0s_0\frac{M}{m_0} + v_1s_1\frac{M}{m_1} + \ldots + v_{r-1}s_{r-1}\frac{M}{m_{r-1}}
+\end{equation}
+Consider $f \bmod m_0$, then each of $\frac{M}{m_1}, \ldots, \frac{M}{m_{r-1}}$ will vanish and we are left with:
+\begin{align*}
+    f &= v_0s_0\frac{M}{m_0} \equiv v_0 \pmod{m_0} \\
+    &\Rightarrow s_0\frac{M}{m_0} \equiv 1 \pmod{m_0}
+\end{align*}
+To determine $s_0$ recall that we can apply EEA to get:
+\begin{equation*}
+    s_0\frac{M}{m_0} + t_0m_0 = 1
+\end{equation*}
+Since the choice of $s_0$ was arbitrary, this works for any $s_i$ for $0 \leq i \leq r - 1$.
+So our algorithm is:
+
+\begin{algorithm}[H]
+    \caption{Chinese Remainder Algorithm}\label{chinese-remainder-algorithm}
+
+    \nl Compute $M = m_0m_1\ldots m_{r-1}$
+
+    \nl Compute $\frac{M}{m_i}$ for $0 \leq i \leq r - 1$
+
+    \nl Compute $s_i$ such that $s_i\frac{M}{m_i} + t_im_i = 1$ using EEA
+
+    \nl Compute $f = v_0s_0\frac{M}{m_0} + v_1s_1\frac{M}{m_1} + \ldots + v_{r-1}s_{r-1}\frac{M}{m_{r-1}}$
+\end{algorithm}
+
+\begin{theorem}{}{}
+    If each $v_i$ is in the range $[0, m_i - 1]$, then the cost of the Chinese Remainder algorithm is $\bigO(\log^2 M)$ word operations
+\end{theorem}
+\begin{proof}
+    Each step is bounded by $\bigO(\log^2 M)$ word operations
+\end{proof}
+
+\begin{example}{}{}
+    Let $m_0, m_1, m_2 = 7, 11, 13$ and $v_0, v_1, v_2 = 2, 2, 12$, so $M = 1001$
+
+    We want to find $s_0, s_1, s_2$ so that $f \equiv v_i \pmod{m_i}$ for each $i$, where:
+    \begin{align*}
+        f &= 2 \times \frac{7 \times 11 \times 13}{7} \times s_0 + 2 \times \frac{7 \times 11 \times 13}{11} \times s_1 + 12 \times \frac{7 \times 11 \times 13}{13} \times s_2 \\
+        &= 2 \times (11 \times 13) \times s_0 + 2 \times (7 \times 13) \times s_1 + 12 \times (7 \times 11) \times s_2 \\
+    \end{align*}
+
+    We use EEA to compute each $s_i$:
+    \begin{align*}
+        &\gcd(11 \times 13, 7) = 1 \Rightarrow (-2)(11 \times 13) + (41)(7) = 1 \Rightarrow s_0 = -2 \\
+        &\gcd(7 \times 13, 11) = 1 \Rightarrow (4)(7 \times 13) + (-33)(11) = 1 \Rightarrow s_1 = 4 \\
+        &\gcd(7 \times 11, 13) = 1 \Rightarrow (-1)(7 \times 11) + (6)(13) = 1 \Rightarrow s_2 = -1    
+    \end{align*}
+\end{example}
+
+\begin{note}
+    Here, we perform the algorithm over the positive range, i.e. All our numbers are in the range $[0, m - 1]$.
+    We can perform the Chinese Remainder algorithm over the symmetric range as well.
+    Then, our numbers must be in the range: $\left[-\left\lfloor\frac{m-1}{2}\right\rfloor, \left\lfloor\frac{m}{2}\right\rfloor\right]$
+\end{note}
+
+\subsection{Variations to Chinese Remaindering}
+
+\subsubsection{Incremental Chinese Remaindering}
+Suppose we are given some $a \in \Z$ and we start choosing small primes $m_0, m_1, m_2, \ldots$ to compute the sequence:
+\begin{equation*}
+    \rem(a, m_0), \rem(a, m_0m_1), \rem(a, m_0m_1m_2), \ldots
+\end{equation*}
+Eventually, $M = m_0m_1m_2\ldots$ will become large enough such that $\rem(a, M)$ will be the actual result.
+This occurs when the sequence fixed (There may be a chance that the sequence appears fixed but $M$ isn't large enough yet, however, we can perform the analysis to determine that with low probability, we will get false positives).
+
+\subsubsection{Mixed Radix Representation}
+Let $0 \leq a < m_0m_1\ldots m_{r-1}$, each $m_i \in \N_{\geq 2}$ (not necessarily relatively prime)
+
+\ul{Claim}: We can write $a$ uniquely as:
+\begin{equation*}
+    a = a_0 + a_1m_0 + a_2m_0m_1 + \ldots + a_rm_0m_1\ldots m_{r-1}
+\end{equation*}
+with $0 \leq a_i < m_i$ for all $i$.
+
+In fact, we can use this to help us compute the incremental chinese remaindering by letting $m_0m_1\ldots m_{r-2}$ be one radix and $m_r$ be the second radix.
