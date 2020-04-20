@@ -3,18 +3,24 @@
 \usepackage{co749}
 \usepackage[nottoc]{tocbibind}
 
+\newcommand{\includelecture}[1]{
+  \includepdf[pages=1, pagecommand=\section{}]{#1}
+  \includepdf[pages=2-]{#1}
+  \clearpage
+}
+
 \begin{document}
 
 \begin{titlepage}
   \centering
   \vspace*{2in}
   {\huge CO749 - Random Graph Theory}\par
-  {\Large (Lecture Summaries)}\par
+  {\Large (Lecture Summaries ... sort of)}\par
   \vspace{0.3in}
   {\large University of Waterloo}\par
   {\large Nicholas Pun}\par
   {\large Winter 2020}\par 
- \end{titlepage}
+\end{titlepage}
  
 \tableofcontents
 \clearpage
@@ -24,6 +30,14 @@
 \input{sections/lec3}\clearpage
 \input{sections/lec4}\clearpage
 \input{sections/lec5}\clearpage
+
+In a feat of ultimate laziness (as the true computer scientist I am), the rest of the notes are going to be scans.
+
+\includelecture{sections/lec6.pdf}
+\includelecture{sections/lec7.pdf}
+\includelecture{sections/lec8.pdf}
+\includelecture{sections/lec9.pdf}
+\includelecture{sections/lec10.pdf}
 
 \nocite{*}
 \bibliographystyle{unsrt}

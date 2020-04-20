@@ -19,6 +19,7 @@
 \RequirePackage[ruled,vlined]{algorithm2e}
 \RequirePackage{multirow}
 \RequirePackage[mathscr]{eucal}
+\RequirePackage{pdfpages}
 
 % -- References -- %
 \crefname{algocf}{alg.}{algs.}
@@ -48,20 +49,28 @@
 \tikzset{edge/.style = {->, > = stealth, shorten > = 1pt, thick}}
 
 % -- Shortcuts -- %
+% Number Systems
 \DeclareMathOperator{\R}{\mathbb{R}}
 \DeclareMathOperator{\N}{\mathbb{N}}
 \DeclareMathOperator{\Q}{\mathbb{Q}}
 \DeclareMathOperator{\Z}{\mathbb{Z}}
-\DeclareMathOperator{\PR}{\mathbb{P}}
+
+% Probability
 \DeclareMathOperator{\E}{\mathbb{E}}
-\DeclareMathOperator{\G}{\mathscr{G}}
-\DeclareMathOperator{\bigO}{\mathcal{O}}
+\DeclareMathOperator{\PR}{\mathbb{P}}
 \DeclareMathOperator{\Var}{\mathrm{Var}}
 \DeclareMathOperator{\Bin}{\mathrm{Bin}}
 \DeclareMathOperator{\Po}{\mathrm{Po}}
 
-% Alias
+% Other
+\DeclareMathOperator{\G}{\mathscr{G}}
+\DeclareMathOperator{\bigO}{\mathcal{O}}
+
+% -- Aliases -- %
 \newcommand{\ul}{\underline}
+\renewcommand{\bf}{\textbf}
+\renewcommand{\it}{\textit}
+\renewcommand{\tt}{\texttt}
 
 % -- Section Title -- %
 \makeatletter

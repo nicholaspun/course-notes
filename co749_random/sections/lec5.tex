@@ -2,11 +2,73 @@
 
 Let $X \sim \Po(\lambda)$ and recall that $\PR(X = i) = e^{-\lambda}\frac{\lambda^i}{i!} \ \forall i \geq 0$ and $\E(X)_r = \lambda^r \ \forall r \geq 0$.
 
-\begin{theorem}
+\begin{theorem}\label{th:lec5-poisson}
     Given a sequence of random variables $(X_n)_{n \geq 1}$ and $\lambda > 0$, suppose $\E(X_n)_r \rightarrow \lambda^r \ \forall r \geq 0$. Then, $X_n \rightarrow \Po(\lambda)$ as $n \rightarrow \infty$ 
 \end{theorem}
 
 Let $Y_k$ denote the number of $k$-cycles in $\G(n, p)$.
 \begin{theorem}
-    Let $p = \frac{c}{n}$, where $c$ fixed, then for every $k \geq 3$, $Y_k \rightarrow \Po(\frac{c^k}{2k})$
+    Let $p = \frac{c}{n}$, where $c$ fixed, then for every $k \geq 3$, $Y_k \rightarrow \Po\left(\frac{c^k}{2k}\right)$
+\end{theorem}
+\begin{proof}
+    $\E[Y_k] = \binom{n}{k}\frac{(k-1)!}{2}p^k \sim \frac{n^k}{k!}\frac{(k-1)!}{2}p^k = \frac{n^kp^k}{2k} = \frac{c^k}{2k}$
+    
+    Now, fix $r \geq 2$ and consider:
+    \[
+        (Y_k)_r = |\{C_1, \ldots, C_r \::\: C_i \text{ is a $k$-cycle} \}|
+    \]
+    So, $(Y_k)_r$ can be treated like the number of ordered lists of $k$-cycles.
+    First, consider $r$ $k$-cycles that are all vertex-disjoint, then consider the case where there are vertex intersections.
+    Apply \Cref{th:lec5-poisson} to finish the proof.
+\end{proof}
+
+\subsection{Degrees of Vertices}
+
+\begin{theorem}
+    Let $p = \frac{c\log n}{n}$ ($c > 0$ fixed).
+    \begin{enumerate}[label=(\alph*)]
+        \item If $c < 1$, a.a.s $\exists$ isolated vertices
+        \item If $c > 1$, a.a.s there are no isolated vertices
+    \end{enumerate}
+    (Note: This is a sharp threshold)
+\end{theorem}
+\begin{proof}
+    Let $X$ be the number of isolated vertices.
+    \[
+        \E[X] = n\cdot(1 - p)^{n - 1} \sim n^{1-c}
+    \]
+    Then, if $c > 1$, then use Markov's inequality to find (b).
+    If $c < 1$, then use Chebyshev's inequality to find (a).
+\end{proof}
+
+\subsection{Critical Window Analysis}
+
+\begin{theorem}
+    Let $p = \frac{\log n + c}{n}$, $c$ fixed. Then
+    \begin{equation}
+        \PR(X = 0) \sim e^{-e^{-c}}
+    \end{equation}
+\end{theorem}
+
+\begin{corollary}
+    Let $p = \frac{\log n + c(n)}{n}$. 
+    If $c(n) \rightarrow -\infty$, then a.a.s $\G(n, p)$ has isolated vertices.
+    And, if $c(n) \rightarrow +\infty$, then a.a.s $\G(n, p)$ has no isolated vertices
+\end{corollary}
+
+Let $X_k$ be the number of vertices with degree $k$
+\begin{theorem}
+    Let $\epsilon > 0$ be fixed, $\epsilon n^{-\frac{3}{2}} \leq p \leq 1 - \epsilon n^{-\frac{3}{2}}$.
+    Let $k = k(n)$ be a nonnegative integer and $\lambda_k(n) = n\cdot\PR(\Bin(n - 1, p) = k)$
+    Then,
+    \begin{enumerate}[label=(\roman*)]
+        \item If $\lambda_k(n) = o(1)$, then a.a.s $X_k = 0$
+        \item If $\lambda_k(n) \rightarrow o(1)$, then a.a.s $X_k \geq t$ for any fixed $t$.
+        \item If $0 < \lambda_k := \lim_{n \rightarrow \infty} \lambda_k(n) < \infty$, then $\PR(X_k = t) \sim e^{\lambda_k}\cdot\frac{\lambda_k^t}{t!}$
+    \end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+    Let $p = \frac{\log n + c}{n}$, $c$ fixed.
+    Then, $\PR(\G(n, p) \text{ is connected}) \rightarrow e^{-e^{-c}}$
 \end{theorem}
