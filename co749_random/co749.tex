@@ -4,8 +4,8 @@
 \usepackage[nottoc]{tocbibind}
 
 \newcommand{\includelecture}[1]{
-  \includepdf[pages=1, pagecommand=\section{}]{#1}
-  \includepdf[pages=2-]{#1}
+  \includepdf[pages=1, pagecommand={\thispagestyle{plain}\section{}}]{#1}
+  \includepdf[pages=2-, pagecommand={\thispagestyle{plain}}]{#1}
   \clearpage
 }
 
@@ -38,6 +38,12 @@ In a feat of ultimate laziness (as the true computer scientist I am), the rest o
 \includelecture{sections/lec8.pdf}
 \includelecture{sections/lec9.pdf}
 \includelecture{sections/lec10.pdf}
+\includelecture{sections/lec11.pdf}
+\includelecture{sections/lec12.pdf}
+\includelecture{sections/lec13.pdf}
+\includelecture{sections/lec14.pdf}
+\includelecture{sections/lec15.pdf}
+\includelecture{sections/lec16.pdf}
 
 \nocite{*}
 \bibliographystyle{unsrt}
