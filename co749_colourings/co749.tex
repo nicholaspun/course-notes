@@ -66,17 +66,18 @@ Lack of review has left me to forget what the main ideas of these lectures were.
 \loop
   \includelecture{sections/lec\the\lecNum.pdf}
   \advance \lecNum +1
-\ifnum \lecNum<14
+\ifnum \lecNum<15
 \repeat
 
 % Skipping 15
+\stepcounter{section}
 
-% \lecNum=16
-% \loop
-%   \includelecture{sections/lec\the\lecNum.pdf}
-%   \advance \lecNum +1
-% \ifnum \lecNum<19
-% \repeat
+\lecNum=16
+\loop
+  \includelecture{sections/lec\the\lecNum.pdf}
+  \advance \lecNum +1
+\ifnum \lecNum<19
+\repeat
 
 
 \nocite{*}
