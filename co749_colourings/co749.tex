@@ -1,0 +1,61 @@
+\documentclass[12pt]{article}
+
+\usepackage{co749}
+\usepackage[nottoc]{tocbibind}
+
+\newcommand{\includelecture}[1]{
+  \includepdf[pages=1, pagecommand={\thispagestyle{plain}\section{}}]{#1}
+  \includepdf[pages=2-, pagecommand={\thispagestyle{plain}}]{#1}
+  \clearpage
+}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{2in}
+  {\huge CO749 - Graph Colourings}\par
+  {\Large (Notes Scans)}\par
+  \vspace{0.3in}
+  {\large University of Waterloo}\par
+  {\large Nicholas Pun}\par
+  {\large Winter 2020}\par 
+\end{titlepage}
+ 
+\tableofcontents
+\clearpage
+
+\section*{Summary}
+\addcontentsline{toc}{section}{Summary}
+Lecture 1, 2 - History
+
+Lecture 3 - Probabilistic method overview, colour degree
+
+Lecture 4 - Reed-Sudakov, Wasteful colouring procedure, expectations for variables in proof of Reed-Sudakov
+
+Lecture 5 - Reed-Sudakov (continued), Concentration Inequalities, Talagrand's inequality
+
+Lecture 6 - Finish Reed-Sudakov, exceptional Talagrand's, Balls \& Bins
+
+Lecture 7 - Regularization \& Equalizing coin flips, Kim's theorem for girth-five graphs
+
+Lecture 8 - Finishing Kim's, edge-colouring and Kahn's theorem
+
+Lecture 9 - Finishing Kahn's
+
+\clearpage
+
+\newcount\lecNum
+\lecNum=1
+\loop
+  \includelecture{sections/lec\the\lecNum.pdf}
+  \advance \lecNum +1
+\ifnum \lecNum<10
+\repeat
+
+
+\nocite{*}
+\bibliographystyle{unsrt}
+\bibliography{co749}
+
+\end{document}
