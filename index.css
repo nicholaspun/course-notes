@@ -30,6 +30,27 @@ body {
   text-align: center;
 }
 
+.links-container {
+  width: 80%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.links-container > a { 
+  padding: 10px;
+  margin: 2px
+}
+
+.links-container > a:nth-of-type(odd) {
+  background-color: #e8e8e8;
+}
+    
+.links-container > a:nth-of-type(even) {
+  background-color: #f5f5f5;
+}
+
 .logo-container {
   margin-top: 35px;
 }
