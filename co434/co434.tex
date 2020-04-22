@@ -3,6 +3,12 @@
 \usepackage{co434}
 \usepackage[nottoc]{tocbibind}
 
+\newcommand{\includelecture}[1]{
+  \includepdf[pages=1, pagecommand={\thispagestyle{plain}\section{}}]{sections/lec#1.pdf}
+  \includepdf[pages=2-, pagecommand=\thispagestyle{plain}]{sections/lec#1.pdf}
+  \clearpage
+}
+
 \begin{document}
 
 \begin{titlepage}
@@ -19,8 +25,26 @@
 \clearpage
 
 \input{sections/lec1}\clearpage
-\input{sections/lec2}\clearpage
-\input{sections/lec3}\clearpage
+\input{sections/lec2}
+Proof:
+\includepdf[pages=-]{sections/lec2.pdf}\clearpage
+
+Uploading scans of my notes for now ... I'll type these up one day ... 
+\clearpage
+
+\newcount\lecNum
+\lecNum=3
+\loop
+  \includelecture{\the\lecNum}
+  \advance \lecNum +1
+\ifnum \lecNum<19
+\repeat
+
+\section*{}
+Missed a definition in lecture 15 (there's a big blank chunk):
+
+\includegraphics[width=\textwidth]{sections/lec15.png}
+\clearpage
 
 \nocite{*}
 \bibliographystyle{unsrt}
