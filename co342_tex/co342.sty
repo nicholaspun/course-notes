@@ -19,11 +19,9 @@
 \RequirePackage{bookmark}
 \RequirePackage[ruled,vlined]{algorithm2e}
 \RequirePackage{multirow}
-\RequirePackage{subfiles} % Best loaded last in the preamble
+\RequirePackage[nottoc]{tocbibind}
 
 % -- References -- %
-\crefname{tcb@cnt@example}{eg}{egs.}
-\Crefname{tcb@cnt@example}{Example}{Examples}
 \crefname{tcb@cnt@proposition}{prop.}{props.}
 \Crefname{tcb@cnt@proposition}{Proposition}{Propositions}
 \crefname{tcb@cnt@theorem}{thm.}{thms.}
@@ -41,17 +39,34 @@
 
 % -- Theorems, Definitions, Examples -- %
 \tcbuselibrary{theorems}
-\newtcbtheorem[number within=section]{definition}{Definition}{colback=black!5,colframe=lightgray!35!black,fonttitle=\bfseries,parbox=false,breakable}{defn}
-\newtcbtheorem[number within=section]{theorem}{Theorem}{colback=black!5,colframe=yellow!35!black,fonttitle=\bfseries,parbox=false,breakable}{th}
-\newtcbtheorem[number within=section]{proposition}{Proposition}{colback=black!5,colframe=yellow!50!black,fonttitle=\bfseries,parbox=false,breakable}{prop}
-\newtcbtheorem[number within=section]{lemma}{Lemma}{colback=black!5,colframe=yellow!50!black,fonttitle=\bfseries,parbox=false,breakable}{lem}
-\newtcbtheorem[number within=section]{corollary}{Corollary}{colback=black!5,colframe=yellow!35!black,fonttitle=\bfseries,parbox=false,breakable}{corol}
-\newtcbtheorem[number within=section]{example}{Example}{colback=white,colframe=blue!25!black!50,fonttitle=\bfseries, parbox=false,breakable}{exmp}
-\theoremstyle{definition}
-\newtheorem*{note}{Note}
-\newtheorem{remark}{Remark}[section]
+\tcbset{deflt/.style={
+    theorem style=plain,
+    fonttitle=\bfseries,
+    coltitle=black,
+    colback=white,
+    parbox=false,
+    breakable
+}}
 
-\numberwithin{equation}{section}
+\newtcbtheorem[number within=chapter]{definition}{Definition}
+    {deflt, colback=lightgray!15, colframe=lightgray!35!black}{defn}
+\newtcbtheorem[number within=chapter]{theorem}{Theorem}
+    {deflt, colback=red!5, colframe=red!50!black}{th}
+\newtcbtheorem[number within=chapter]{proposition}{Proposition}
+    {deflt, colback=red!5, colframe=red!50!black}{prop}
+\newtcbtheorem[number within=chapter]{lemma}{Lemma}
+    {deflt, colback=red!5, colframe=red!50!black}{lem}
+\newtcbtheorem[number within=chapter]{corollary}{Corollary}
+    {deflt, colback=red!5, colframe=red!50!black}{corol}
+
+\theoremstyle{definition}
+\newtheorem{exmp}{Example}[chapter]
+
+\theoremstyle{remark}
+\newtheorem*{note}{Note}
+\newtheorem{remark}{Remark}[chapter]
+
+\numberwithin{equation}{chapter}
 
 % -- Tikz Options -- %
 \usetikzlibrary{arrows.meta, shapes, positioning, fit, snakes}
@@ -59,13 +74,17 @@
 \tikzset{directed/.style = {->, > = stealth, shorten > = 1pt, thick}}
 \tikzset{edge/.style = {thick}}
 \tikzset{path/.style = {decoration={snake}, decorate}}
-% amplitude=.4mm, segment length=2mm, post length=0mm, pre length=0mm
 \tikzset{box/.style = {shape=rectangle, draw, thick, rounded corners}}
 
-% -- Shortcuts -- %
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\N}{\mathbb{N}}
-\newcommand{\Q}{\mathbb{Q}}
-\newcommand{\Z}{\mathbb{Z}}
+% -- Math -- %
+\DeclareMathOperator{\Z}{\mathbb{Z}} % Integers
+\DeclareMathOperator{\N}{\mathbb{N}} % Naturals
+\DeclareMathOperator{\Q}{\mathbb{Q}} % Rationals
+\DeclareMathOperator{\F}{\mathbb{F}} % Field
+
+% -- Aliases -- %
+\renewcommand{\it}{\textit}
+\renewcommand{\bf}{\textbf}
+\newcommand{\ul}{\underline}
 
 \endinput
