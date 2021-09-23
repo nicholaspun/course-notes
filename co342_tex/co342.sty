@@ -12,6 +12,7 @@
 \RequirePackage{graphicx}
 \RequirePackage{enumitem}
 \RequirePackage{caption}
+\RequirePackage{subcaption}
 \RequirePackage[many]{tcolorbox}
 \RequirePackage{tikz}
 \RequirePackage{hyperref}
@@ -60,7 +61,7 @@
     {deflt, colback=red!5, colframe=red!50!black}{corol}
 
 \theoremstyle{definition}
-\newtheorem{exmp}{Example}[chapter]
+\newtheorem{example}{Example}[chapter]
 
 \theoremstyle{remark}
 \newtheorem*{note}{Note}
@@ -70,7 +71,7 @@
 
 % -- Tikz Options -- %
 \usetikzlibrary{arrows.meta, shapes, positioning, fit, snakes}
-\tikzset{vertex/.style = {shape=circle, draw, thick, minimum size=1.5em}}
+\tikzset{vertex/.style = {shape=circle, draw, thick}}
 \tikzset{directed/.style = {->, > = stealth, shorten > = 1pt, thick}}
 \tikzset{edge/.style = {thick}}
 \tikzset{path/.style = {decoration={snake}, decorate}}
